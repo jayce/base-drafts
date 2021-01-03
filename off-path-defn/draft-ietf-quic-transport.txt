@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 26 June 2021                                            Mozilla
-                                                        23 December 2020
+Expires: 7 July 2021                                             Mozilla
+                                                          3 January 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -54,11 +54,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 June 2021.
+   This Internet-Draft will expire on 7 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -5219,7 +5219,7 @@ Table of Contents
    (Initial keys) as described in [QUIC-TLS].  This protection does not
    provide confidentiality or integrity against attackers that can
    observe packets, but provides some level of protection against
-   attackers that cannot also observes packets.
+   attackers that cannot observe packets.
 
    The client and server use the Initial packet type for any packet that
    contains an initial cryptographic handshake message.  This includes
@@ -7120,12 +7120,12 @@ Table of Contents
    with spoofed source and destination addresses.
 
    For the purposes of this discussion, it is assumed that an off-path
-   attacker has the ability to observe and re-inject a modified copy of
-   a packet into the network that will reach the destination endpoint
-   prior to the arrival of the original packet observed by the attacker.
-   In other words, an attacker has the ability to consistently "win" a
-   race with the legitimate packets between the endpoints, potentially
-   causing the original packet to be ignored by the recipient.
+   attacker has the ability to inject a modified copy of a packet into
+   the network that will reach the destination endpoint prior to the
+   arrival of the original packet observed by the attacker.  In other
+   words, an attacker has the ability to consistently "win" a race with
+   the legitimate packets between the endpoints, potentially causing the
+   original packet to be ignored by the recipient.
 
    It is also assumed that an attacker has the resources necessary to
    affect NAT state, potentially both causing an endpoint to lose its
@@ -8074,12 +8074,12 @@ Table of Contents
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 23 December 2020,
+              draft-ietf-quic-recovery, 3 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 23 December 2020,
+              Internet-Draft, draft-ietf-quic-tls, 3 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
@@ -8195,7 +8195,7 @@ Table of Contents
    [QUIC-INVARIANTS]
               Thomson, M., "Version-Independent Properties of QUIC",
               Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 23 December 2020,
+              invariants, 3 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-MANAGEABILITY]
