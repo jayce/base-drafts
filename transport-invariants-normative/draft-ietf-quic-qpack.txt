@@ -5,10 +5,10 @@
 QUIC                                                           C. Krasic
 Internet-Draft                                                   Netflix
 Intended status: Standards Track                               M. Bishop
-Expires: 8 June 2021                                 Akamai Technologies
+Expires: 8 July 2021                                 Akamai Technologies
                                                         A. Frindell, Ed.
                                                                 Facebook
-                                                         5 December 2020
+                                                          4 January 2021
 
 
                   QPACK: Header Compression for HTTP/3
@@ -47,11 +47,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 June 2021.
+   This Internet-Draft will expire on 8 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -98,7 +98,7 @@ Table of Contents
        4.3.3.  Insert With Literal Name
        4.3.4.  Duplicate
      4.4.  Decoder Instructions
-       4.4.1.  Section Acknowledgement
+       4.4.1.  Section Acknowledgment
        4.4.2.  Stream Cancellation
        4.4.3.  Insert Count Increment
      4.5.  Field Line Representations
@@ -134,25 +134,26 @@ Table of Contents
      B.5.  Dynamic Table Insert, Eviction
    Appendix C.  Sample One Pass Encoding Algorithm
    Appendix D.  Change Log
-     D.1.  Since draft-ietf-quic-qpack-18
-     D.2.  Since draft-ietf-quic-qpack-17
-     D.3.  Since draft-ietf-quic-qpack-16
-     D.4.  Since draft-ietf-quic-qpack-15
-     D.5.  Since draft-ietf-quic-qpack-14
-     D.6.  Since draft-ietf-quic-qpack-13
-     D.7.  Since draft-ietf-quic-qpack-12
-     D.8.  Since draft-ietf-quic-qpack-11
-     D.9.  Since draft-ietf-quic-qpack-10
-     D.10. Since draft-ietf-quic-qpack-09
-     D.11. Since draft-ietf-quic-qpack-08
-     D.12. Since draft-ietf-quic-qpack-06
-     D.13. Since draft-ietf-quic-qpack-05
-     D.14. Since draft-ietf-quic-qpack-04
-     D.15. Since draft-ietf-quic-qpack-03
-     D.16. Since draft-ietf-quic-qpack-02
-     D.17. Since draft-ietf-quic-qpack-01
-     D.18. Since draft-ietf-quic-qpack-00
-     D.19. Since draft-ietf-quic-qcram-00
+     D.1.  Since draft-ietf-quic-qpack-19
+     D.2.  Since draft-ietf-quic-qpack-18
+     D.3.  Since draft-ietf-quic-qpack-17
+     D.4.  Since draft-ietf-quic-qpack-16
+     D.5.  Since draft-ietf-quic-qpack-15
+     D.6.  Since draft-ietf-quic-qpack-14
+     D.7.  Since draft-ietf-quic-qpack-13
+     D.8.  Since draft-ietf-quic-qpack-12
+     D.9.  Since draft-ietf-quic-qpack-11
+     D.10. Since draft-ietf-quic-qpack-10
+     D.11. Since draft-ietf-quic-qpack-09
+     D.12. Since draft-ietf-quic-qpack-08
+     D.13. Since draft-ietf-quic-qpack-06
+     D.14. Since draft-ietf-quic-qpack-05
+     D.15. Since draft-ietf-quic-qpack-04
+     D.16. Since draft-ietf-quic-qpack-03
+     D.17. Since draft-ietf-quic-qpack-02
+     D.18. Since draft-ietf-quic-qpack-01
+     D.19. Since draft-ietf-quic-qpack-00
+     D.20. Since draft-ietf-quic-qcram-00
    Acknowledgments
    Authors' Addresses
 
@@ -190,7 +191,7 @@ Table of Contents
       and trailer fields; this document uses "fields" for generality.
 
    HTTP field line:  A name-value pair sent as part of an HTTP field
-      section.  See Section 5.4 and Section 5.6 of [SEMANTICS].
+      section.  See Sections 6.3 and Section 6.5 of [SEMANTICS].
 
    HTTP field value:  Data associated with a field name, composed from
       all field line values with that field name in that section,
@@ -255,8 +256,8 @@ Table of Contents
    static or dynamic table.  References to the static table and literal
    representations do not require any dynamic state and never risk head-
    of-line blocking.  References to the dynamic table risk head-of-line
-   blocking if the encoder has not received an acknowledgement
-   indicating the entry is available at the decoder.
+   blocking if the encoder has not received an acknowledgment indicating
+   the entry is available at the decoder.
 
    An encoder MAY insert any entry in the dynamic table it chooses; it
    is not limited to field lines it is compressing.
@@ -392,9 +393,9 @@ Table of Contents
    stream.  The decoder tracks the Known Received Count in order to be
    able to send Insert Count Increment instructions.
 
-   A Section Acknowledgement instruction (Section 4.4.1) implies that
-   the decoder has received all dynamic table state necessary to decode
-   the field section.  If the Required Insert Count of the acknowledged
+   A Section Acknowledgment instruction (Section 4.4.1) implies that the
+   decoder has received all dynamic table state necessary to decode the
+   field section.  If the Required Insert Count of the acknowledged
    field section is greater than the current Known Received Count, Known
    Received Count is updated to the value of the Required Insert Count.
 
@@ -448,10 +449,10 @@ Table of Contents
 
    After the decoder finishes decoding a field section encoded using
    representations containing dynamic table references, it MUST emit a
-   Section Acknowledgement instruction (Section 4.4.1).  A stream may
+   Section Acknowledgment instruction (Section 4.4.1).  A stream may
    carry multiple field sections in the case of intermediate responses,
    trailers, and pushed requests.  The encoder interprets each
-   Section Acknowledgement instruction as acknowledging the earliest
+   Section Acknowledgment instruction as acknowledging the earliest
    unacknowledged field section containing dynamic table references sent
    on the given stream.
 
@@ -468,7 +469,7 @@ Table of Contents
    references.  An encoder cannot infer from this instruction that any
    updates to the dynamic table have been received.
 
-   The Section Acknowledgement and Stream Cancellation instructions
+   The Section Acknowledgment and Stream Cancellation instructions
    permit the encoder to remove references to entries in the dynamic
    table.  When an entry with absolute index lower than the Known
    Received Count has zero references, then it is considered evictable;
@@ -483,7 +484,7 @@ Table of Contents
    encoder, but could be redundant with other decoder feedback.  By
    delaying an Insert Count Increment instruction, the decoder might be
    able to coalesce multiple Insert Count Increment instructions, or
-   replace them entirely with Section Acknowledgements; see
+   replace them entirely with Section Acknowledgments; see
    Section 4.4.1.  However, delaying too long may lead to compression
    inefficiencies if the encoder waits for an entry to be acknowledged
    before using it.
@@ -610,16 +611,16 @@ Table of Contents
 3.2.4.  Absolute Indexing
 
    Each entry possesses an absolute index that is fixed for the lifetime
-   of that entry.  The first entry inserted has an absolute index of
-   "0"; indices increase by one with each insertion.
+   of that entry.  The first entry inserted has an absolute index of 0;
+   indices increase by one with each insertion.
 
 3.2.5.  Relative Indexing
 
    Relative indices begin at zero and increase in the opposite direction
    from the absolute index.  Determining which entry has a relative
-   index of "0" depends on the context of the reference.
+   index of 0 depends on the context of the reference.
 
-   In encoder instructions (Section 4.3), a relative index of "0" refers
+   In encoder instructions (Section 4.3), a relative index of 0 refers
    to the most recently inserted value in the dynamic table.  Note that
    this means the entry referenced by a given relative index will change
    while interpreting instructions on the encoder stream.
@@ -644,7 +645,7 @@ Table of Contents
    references are stable even if encoded field sections and dynamic
    table updates are processed out of order.
 
-   In a field line representation, a relative index of "0" refers to the
+   In a field line representation, a relative index of 0 refers to the
    entry with absolute index equal to Base - 1.
 
                   Base
@@ -745,6 +746,7 @@ Table of Contents
    MUST initiate at most one encoder stream and at most one decoder
    stream.  Receipt of a second instance of either stream type MUST be
    treated as a connection error of type H3_STREAM_CREATION_ERROR.
+
    These streams MUST NOT be closed.  Closure of either unidirectional
    stream type MUST be treated as a connection error of type
    H3_CLOSED_CRITICAL_STREAM.
@@ -774,7 +776,7 @@ Table of Contents
 4.3.1.  Set Dynamic Table Capacity
 
    An encoder informs the decoder of a change to the dynamic table
-   capacity using an instruction that begins with the '001' three-bit
+   capacity using an instruction that starts with the '001' 3-bit
    pattern.  This is followed by the new dynamic table capacity
    represented as an integer with a 5-bit prefix; see Section 4.1.1.
 
@@ -802,7 +804,7 @@ Table of Contents
 
    An encoder adds an entry to the dynamic table where the field name
    matches the field name of an entry stored in the static or the
-   dynamic table using an instruction that starts with the '1' one-bit
+   dynamic table using an instruction that starts with the '1' 1-bit
    pattern.  The second ('T') bit indicates whether the reference is to
    the static or dynamic table.  The 6-bit prefix integer
    (Section 4.1.1) that follows is used to locate the table entry for
@@ -828,7 +830,7 @@ Table of Contents
 
    An encoder adds an entry to the dynamic table where both the field
    name and the field value are represented as string literals using an
-   instruction that starts with the '01' two-bit pattern.
+   instruction that starts with the '01' 2-bit pattern.
 
    This is followed by the name represented as a 6-bit prefix string
    literal, and the value represented as an 8-bit prefix string literal;
@@ -850,7 +852,7 @@ Table of Contents
 4.3.4.  Duplicate
 
    An encoder duplicates an existing entry in the dynamic table using an
-   instruction that begins with the '000' three-bit pattern.  This is
+   instruction that starts with the '000' 3-bit pattern.  This is
    followed by the relative index of the existing entry represented as
    an integer with a 5-bit prefix; see Section 4.1.1.
 
@@ -872,11 +874,11 @@ Table of Contents
    the encoder about the processing of field sections and table updates
    to ensure consistency of the dynamic table.
 
-4.4.1.  Section Acknowledgement
+4.4.1.  Section Acknowledgment
 
    After processing an encoded field section whose declared Required
-   Insert Count is not zero, the decoder emits a Section Acknowledgement
-   instruction.  The instruction begins with the '1' one-bit pattern,
+   Insert Count is not zero, the decoder emits a Section Acknowledgment
+   instruction.  The instruction starts with the '1' 1-bit pattern,
    followed by the field section's associated stream ID encoded as a
    7-bit prefix integer; see Section 4.1.1.
 
@@ -888,23 +890,22 @@ Table of Contents
    | 1 |      Stream ID (7+)       |
    +---+---------------------------+
 
-                     Figure 9: Section Acknowledgement
+                      Figure 9: Section Acknowledgment
 
-   If an encoder receives a Section Acknowledgement instruction
-   referring to a stream on which every encoded field section with a
-   non-zero Required Insert Count has already been acknowledged, this
-   MUST be treated as a connection error of type
-   QPACK_DECODER_STREAM_ERROR.
+   If an encoder receives a Section Acknowledgment instruction referring
+   to a stream on which every encoded field section with a non-zero
+   Required Insert Count has already been acknowledged, this MUST be
+   treated as a connection error of type QPACK_DECODER_STREAM_ERROR.
 
-   The Section Acknowledgement instruction might increase the Known
+   The Section Acknowledgment instruction might increase the Known
    Received Count; see Section 2.1.4.
 
 4.4.2.  Stream Cancellation
 
    When a stream is reset or reading is abandoned, the decoder emits a
-   Stream Cancellation instruction.  The instruction begins with the
-   '01' two-bit pattern, followed by the stream ID of the affected
-   stream encoded as a 6-bit prefix integer.
+   Stream Cancellation instruction.  The instruction starts with the
+   '01' 2-bit pattern, followed by the stream ID of the affected stream
+   encoded as a 6-bit prefix integer.
 
    This instruction is used as described in Section 2.2.2.
 
@@ -917,7 +918,7 @@ Table of Contents
 
 4.4.3.  Insert Count Increment
 
-   The Insert Count Increment instruction begins with the '00' two-bit
+   The Insert Count Increment instruction starts with the '00' 2-bit
    pattern, followed by the Increment encoded as a 6-bit prefix integer.
    This instruction increases the Known Received Count (Section 2.1.4)
    by the value of the Increment parameter.  The decoder should send an
@@ -1131,7 +1132,7 @@ Table of Contents
 
              Figure 15: Literal Field Line With Name Reference
 
-   This representation starts with the '01' two-bit pattern.  The
+   This representation starts with the '01' 2-bit pattern.  The
    following bit, 'N', indicates whether an intermediary is permitted to
    add this field line to the dynamic table on subsequent hops.  When
    the 'N' bit is set, the encoded field line MUST always be encoded
@@ -1170,11 +1171,10 @@ Table of Contents
 
         Figure 16: Literal Field Line With Post-Base Name Reference
 
-   This representation starts with the '0000' four-bit pattern.  The
-   fifth bit is the 'N' bit as described in Section 4.5.4.  This is
-   followed by a post-base index of the dynamic table entry
-   (Section 3.2.6) encoded as an integer with a 3-bit prefix; see
-   Section 4.1.1.
+   This representation starts with the '0000' 4-bit pattern.  The fifth
+   bit is the 'N' bit as described in Section 4.5.4.  This is followed
+   by a post-base index of the dynamic table entry (Section 3.2.6)
+   encoded as an integer with a 3-bit prefix; see Section 4.1.1.
 
    Only the field name is taken from the dynamic table entry; the field
    value is encoded as an 8-bit prefix string literal; see
@@ -1198,11 +1198,10 @@ Table of Contents
 
               Figure 17: Literal Field Line With Literal Name
 
-   This representation begins with the '001' three-bit pattern.  The
-   fourth bit is the 'N' bit as described in Section 4.5.4.  The name
-   follows, represented as a 4-bit prefix string literal, then the
-   value, represented as an 8-bit prefix string literal; see
-   Section 4.1.2.
+   This representation starts with the '001' 3-bit pattern.  The fourth
+   bit is the 'N' bit as described in Section 4.5.4.  The name follows,
+   represented as a 4-bit prefix string literal, then the value,
+   represented as an 8-bit prefix string literal; see Section 4.1.2.
 
 5.  Configuration
 
@@ -1532,14 +1531,13 @@ Table of Contents
 
    [HTTP3]    Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 5 December 2020,
+              quic-http, 4 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 5 December
-              2020,
+              Internet-Draft, draft-ietf-quic-transport, 4 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -1562,9 +1560,9 @@ Table of Contents
    [SEMANTICS]
               Fielding, R., Nottingham, M., and J. Reschke, "HTTP
               Semantics", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-semantics-12, 2 October 2020,
+              httpbis-semantics-13, 14 December 2020,
               <http://www.ietf.org/internet-drafts/draft-ietf-httpbis-
-              semantics-12.txt>.
+              semantics-13.txt>.
 
 9.2.  Informative References
 
@@ -1892,7 +1890,7 @@ B.2.  Dynamic Table
                                  Size=106
 
    Stream: Decoder
-   84                  | Section Acknowledgement (stream=4)
+   84                  | Section Acknowledgment (stream=4)
 
                                  Abs Ref Name        Value
                                   1   0  :authority  www.example.com
@@ -2064,63 +2062,67 @@ Appendix D.  Change Log
       *RFC Editor's Note:* Please remove this section prior to
       publication of a final version of this document.
 
-D.1.  Since draft-ietf-quic-qpack-18
+D.1.  Since draft-ietf-quic-qpack-19
 
    Editorial changes only
 
-D.2.  Since draft-ietf-quic-qpack-17
+D.2.  Since draft-ietf-quic-qpack-18
 
    Editorial changes only
 
-D.3.  Since draft-ietf-quic-qpack-16
+D.3.  Since draft-ietf-quic-qpack-17
 
    Editorial changes only
 
-D.4.  Since draft-ietf-quic-qpack-15
+D.4.  Since draft-ietf-quic-qpack-16
+
+   Editorial changes only
+
+D.5.  Since draft-ietf-quic-qpack-15
 
    No changes
 
-D.5.  Since draft-ietf-quic-qpack-14
+D.6.  Since draft-ietf-quic-qpack-14
 
    Added security considerations
 
-D.6.  Since draft-ietf-quic-qpack-13
+D.7.  Since draft-ietf-quic-qpack-13
 
    No changes
 
-D.7.  Since draft-ietf-quic-qpack-12
+D.8.  Since draft-ietf-quic-qpack-12
 
    Editorial changes only
 
-D.8.  Since draft-ietf-quic-qpack-11
+D.9.  Since draft-ietf-quic-qpack-11
 
    Editorial changes only
 
-D.9.  Since draft-ietf-quic-qpack-10
+D.10.  Since draft-ietf-quic-qpack-10
 
    Editorial changes only
 
-D.10.  Since draft-ietf-quic-qpack-09
+D.11.  Since draft-ietf-quic-qpack-09
 
-   *  Decoders MUST emit Header Acknowledgements (#2939)
+   *  Decoders MUST emit Header Acknowledgments (#2939)
 
    *  Updated error code for multiple encoder or decoder streams (#2970)
 
    *  Added explicit defaults for new SETTINGS (#2974)
 
-D.11.  Since draft-ietf-quic-qpack-08
+D.12.  Since draft-ietf-quic-qpack-08
 
    *  Endpoints are permitted to create encoder and decoder streams even
       if they can't use them (#2100, #2529)
 
    *  Maximum values for settings removed (#2766, #2767)
 
-D.12.  Since draft-ietf-quic-qpack-06
+D.13.  Since draft-ietf-quic-qpack-06
 
    *  Clarify initial dynamic table capacity maximums (#2276, #2330,
       #2330)
 
-D.13.  Since draft-ietf-quic-qpack-05
+D.14.  Since draft-ietf-quic-qpack-05
 
    *  Introduced the terms dynamic table capacity and maximum dynamic
       table capacity.
@@ -2128,18 +2130,18 @@ D.13.  Since draft-ietf-quic-qpack-05
    *  Renamed SETTINGS_HEADER_TABLE_SIZE to
       SETTINGS_QPACK_MAX_TABLE_CAPACITY.
 
-D.14.  Since draft-ietf-quic-qpack-04
+D.15.  Since draft-ietf-quic-qpack-04
 
    *  Changed calculation of Delta Base Index to avoid an illegal value
       (#2002, #2005)
 
-D.15.  Since draft-ietf-quic-qpack-03
+D.16.  Since draft-ietf-quic-qpack-03
 
    *  Change HTTP settings defaults (#2038)
 
    *  Substantial editorial reorganization
 
-D.16.  Since draft-ietf-quic-qpack-02
+D.17.  Since draft-ietf-quic-qpack-02
 
    *  Largest Reference encoded modulo MaxEntries (#1763)
 
@@ -2161,12 +2163,12 @@ D.16.  Since draft-ietf-quic-qpack-02
    *  Initial table size is the maximum permitted when table is first
       usable (#1642)
 
-D.17.  Since draft-ietf-quic-qpack-01
+D.18.  Since draft-ietf-quic-qpack-01
 
    *  Only header blocks that reference the dynamic table are
       acknowledged (#1603, #1605)
 
-D.18.  Since draft-ietf-quic-qpack-00
+D.19.  Since draft-ietf-quic-qpack-00
 
    *  Renumbered instructions for consistency (#1471, #1472)
 
@@ -2182,7 +2184,7 @@ D.18.  Since draft-ietf-quic-qpack-00
    *  Control streams use typed unidirectional streams rather than fixed
       stream IDs (#910,#1359)
 
-D.19.  Since draft-ietf-quic-qcram-00
+D.20.  Since draft-ietf-quic-qcram-00
 
    *  Separate instruction sets for table updates and header blocks
       (#1235, #1142, #1141)
