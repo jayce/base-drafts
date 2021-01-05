@@ -4,8 +4,8 @@
 
 QUIC                                                          M. Thomson
 Internet-Draft                                                   Mozilla
-Intended status: Standards Track                        28 December 2020
-Expires: 1 July 2021
+Intended status: Standards Track                          5 January 2021
+Expires: 9 July 2021
 
 
                  Version-Independent Properties of QUIC
@@ -43,11 +43,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 July 2021.
+   This Internet-Draft will expire on 9 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -107,9 +107,9 @@ Table of Contents
    Unless specifically prohibited in this document, any aspect of the
    protocol can change between different versions.
 
-   Appendix A is a non-exhaustive list of some incorrect assumptions
-   that might be made based on knowledge of QUIC version 1; these do not
-   apply to every version of QUIC.
+   Appendix A contains a non-exhaustive list of some incorrect
+   assumptions that might be made based on knowledge of QUIC version 1;
+   these do not apply to every version of QUIC.
 
 3.  Conventions and Definitions
 
@@ -379,14 +379,13 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 28 December 2020,
+              Internet-Draft, draft-ietf-quic-tls, 5 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 28 December
-              2020,
+              Internet-Draft, draft-ietf-quic-transport, 5 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC5116]  McGrew, D., "An Interface and Algorithms for Authenticated
@@ -400,9 +399,9 @@ Appendix A.  Incorrect Assumptions
    changeable when a new version is deployed.
 
    This section lists a sampling of incorrect assumptions that might be
-   made based on knowledge of QUIC version 1.  Some of these statements
-   are not even true for QUIC version 1.  This is not an exhaustive
-   list; it is intended to be illustrative only.
+   made about QUIC based on knowledge of QUIC version 1.  Some of these
+   statements are not even true for QUIC version 1.  This is not an
+   exhaustive list; it is intended to be illustrative only.
 
    *Any and all of the following statements can be false for a given
    QUIC version:*
