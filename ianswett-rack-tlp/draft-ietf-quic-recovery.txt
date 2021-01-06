@@ -313,9 +313,9 @@ Table of Contents
 4.7.  Probe Timeout Replaces RTO and TLP
 
    QUIC uses a probe timeout (PTO; see Section 6.2), with a timer based
-   on TCP's RTO computation.  QUIC's PTO includes the peer's maximum
-   expected acknowledgment delay instead of using a fixed minimum
-   timeout.
+   on TCP's RTO computation; see [RFC6297].  QUIC's PTO includes the
+   peer's maximum expected acknowledgment delay instead of using a fixed
+   minimum timeout.
 
    As reflected by TLP defined in RACK ([RACK]), a single packet loss at
    the tail does not indicate persistent congestion, so QUIC does not
@@ -1392,6 +1392,10 @@ Table of Contents
               Transmission Protocol (SCTP)", RFC 5827,
               DOI 10.17487/RFC5827, May 2010,
               <https://www.rfc-editor.org/info/rfc5827>.
+
+   [RFC6297]  Welzl, M. and D. Ros, "A Survey of Lower-than-Best-Effort
+              Transport Protocols", RFC 6297, DOI 10.17487/RFC6297, June
+              2011, <https://www.rfc-editor.org/info/rfc6297>.
 
    [RFC6298]  Paxson, V., Allman, M., Chu, J., and M. Sargent,
               "Computing TCP's Retransmission Timer", RFC 6298,

@@ -1466,8 +1466,8 @@ more accurate round-trip time estimate; see Section 13.2 of <span>[<a href="#QUI
 <a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-probe-timeout-replaces-rto-" class="section-name selfRef">Probe Timeout Replaces RTO and TLP</a>
         </h3>
 <p id="section-4.7-1">QUIC uses a probe timeout (PTO; see <a href="#pto" class="xref">Section 6.2</a>), with a timer based on TCP's RTO
-computation.  QUIC's PTO includes the peer's maximum expected acknowledgment
-delay instead of using a fixed minimum timeout.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+computation; see <span>[<a href="#RFC6297" class="xref">RFC6297</a>]</span>.  QUIC's PTO includes the peer's maximum expected
+acknowledgment delay instead of using a fixed minimum timeout.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
 <p id="section-4.7-2">As reflected by TLP defined in RACK (<span>[<a href="#RACK" class="xref">RACK</a>]</span>), a single
 packet loss at the tail does not indicate persistent congestion, so QUIC does
 not collapse the congestion window when the PTO expires.  Instead of
@@ -2587,6 +2587,10 @@ responses can be specified, such as (<span>[<a href="#RFC8511" class="xref">RFC8
 <dt id="RFC5827">[RFC5827]</dt>
         <dd>
 <span class="refAuthor">Allman, M.</span><span class="refAuthor">, Avrachenkov, K.</span><span class="refAuthor">, Ayesta, U.</span><span class="refAuthor">, Blanton, J.</span><span class="refAuthor">, and P. Hurtig</span>, <span class="refTitle">"Early Retransmit for TCP and Stream Control Transmission Protocol (SCTP)"</span>, <span class="seriesInfo">RFC 5827</span>, <span class="seriesInfo">DOI 10.17487/RFC5827</span>, <time datetime="2010-05" class="refDate">May 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5827">https://www.rfc-editor.org/info/rfc5827</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6297">[RFC6297]</dt>
+        <dd>
+<span class="refAuthor">Welzl, M.</span><span class="refAuthor"> and D. Ros</span>, <span class="refTitle">"A Survey of Lower-than-Best-Effort Transport Protocols"</span>, <span class="seriesInfo">RFC 6297</span>, <span class="seriesInfo">DOI 10.17487/RFC6297</span>, <time datetime="2011-06" class="refDate">June 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6297">https://www.rfc-editor.org/info/rfc6297</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC6298">[RFC6298]</dt>
         <dd>
