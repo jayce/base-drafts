@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         7 December 2020
-Expires: 10 June 2021
+Intended status: Standards Track                          6 January 2021
+Expires: 10 July 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -19,6 +19,12 @@ Abstract
    describes a mapping of HTTP semantics over QUIC.  This document also
    identifies HTTP/2 features that are subsumed by QUIC, and describes
    how HTTP/2 extensions can be ported to HTTP/3.
+
+DO NOT DEPLOY THIS VERSION OF HTTP
+
+   DO NOT DEPLOY THIS VERSION OF HTTP/3 UNTIL IT IS IN AN RFC.  This
+   version is still a work in progress.  For trial deployments, please
+   use earlier versions.
 
 Note to Readers
 
@@ -45,11 +51,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 June 2021.
+   This Internet-Draft will expire on 10 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -70,12 +76,11 @@ Table of Contents
      2.1.  Document Organization
      2.2.  Conventions and Terminology
    3.  Connection Setup and Management
-     3.1.  Draft Version Identification
-     3.2.  Discovering an HTTP/3 Endpoint
-       3.2.1.  HTTP Alternative Services
-       3.2.2.  Other Schemes
-     3.3.  Connection Establishment
-     3.4.  Connection Reuse
+     3.1.  Discovering an HTTP/3 Endpoint
+       3.1.1.  HTTP Alternative Services
+       3.1.2.  Other Schemes
+     3.2.  Connection Establishment
+     3.3.  Connection Reuse
    4.  HTTP Request Lifecycle
      4.1.  HTTP Message Exchanges
        4.1.1.  Field Formatting and Compression
@@ -145,40 +150,41 @@ Table of Contents
      A.4.  HTTP/2 Error Codes
        A.4.1.  Mapping Between HTTP/2 and HTTP/3 Errors
    Appendix B.  Change Log
-     B.1.  Since draft-ietf-quic-http-31
-     B.2.  Since draft-ietf-quic-http-30
-     B.3.  Since draft-ietf-quic-http-29
-     B.4.  Since draft-ietf-quic-http-28
-     B.5.  Since draft-ietf-quic-http-27
-     B.6.  Since draft-ietf-quic-http-26
-     B.7.  Since draft-ietf-quic-http-25
-     B.8.  Since draft-ietf-quic-http-24
-     B.9.  Since draft-ietf-quic-http-23
-     B.10. Since draft-ietf-quic-http-22
-     B.11. Since draft-ietf-quic-http-21
-     B.12. Since draft-ietf-quic-http-20
-     B.13. Since draft-ietf-quic-http-19
-     B.14. Since draft-ietf-quic-http-18
-     B.15. Since draft-ietf-quic-http-17
-     B.16. Since draft-ietf-quic-http-16
-     B.17. Since draft-ietf-quic-http-15
-     B.18. Since draft-ietf-quic-http-14
-     B.19. Since draft-ietf-quic-http-13
-     B.20. Since draft-ietf-quic-http-12
-     B.21. Since draft-ietf-quic-http-11
-     B.22. Since draft-ietf-quic-http-10
-     B.23. Since draft-ietf-quic-http-09
-     B.24. Since draft-ietf-quic-http-08
-     B.25. Since draft-ietf-quic-http-07
-     B.26. Since draft-ietf-quic-http-06
-     B.27. Since draft-ietf-quic-http-05
-     B.28. Since draft-ietf-quic-http-04
-     B.29. Since draft-ietf-quic-http-03
-     B.30. Since draft-ietf-quic-http-02
-     B.31. Since draft-ietf-quic-http-01
-     B.32. Since draft-ietf-quic-http-00
-     B.33. Since draft-shade-quic-http2-mapping-00
-   Acknowledgements
+     B.1.  Since draft-ietf-quic-http-32
+     B.2.  Since draft-ietf-quic-http-31
+     B.3.  Since draft-ietf-quic-http-30
+     B.4.  Since draft-ietf-quic-http-29
+     B.5.  Since draft-ietf-quic-http-28
+     B.6.  Since draft-ietf-quic-http-27
+     B.7.  Since draft-ietf-quic-http-26
+     B.8.  Since draft-ietf-quic-http-25
+     B.9.  Since draft-ietf-quic-http-24
+     B.10. Since draft-ietf-quic-http-23
+     B.11. Since draft-ietf-quic-http-22
+     B.12. Since draft-ietf-quic-http-21
+     B.13. Since draft-ietf-quic-http-20
+     B.14. Since draft-ietf-quic-http-19
+     B.15. Since draft-ietf-quic-http-18
+     B.16. Since draft-ietf-quic-http-17
+     B.17. Since draft-ietf-quic-http-16
+     B.18. Since draft-ietf-quic-http-15
+     B.19. Since draft-ietf-quic-http-14
+     B.20. Since draft-ietf-quic-http-13
+     B.21. Since draft-ietf-quic-http-12
+     B.22. Since draft-ietf-quic-http-11
+     B.23. Since draft-ietf-quic-http-10
+     B.24. Since draft-ietf-quic-http-09
+     B.25. Since draft-ietf-quic-http-08
+     B.26. Since draft-ietf-quic-http-07
+     B.27. Since draft-ietf-quic-http-06
+     B.28. Since draft-ietf-quic-http-05
+     B.29. Since draft-ietf-quic-http-04
+     B.30. Since draft-ietf-quic-http-03
+     B.31. Since draft-ietf-quic-http-02
+     B.32. Since draft-ietf-quic-http-01
+     B.33. Since draft-ietf-quic-http-00
+     B.34. Since draft-shade-quic-http2-mapping-00
+   Acknowledgments
    Author's Address
 
 1.  Introduction
@@ -215,8 +221,8 @@ Table of Contents
    control across the entire connection, QUIC has the capability to
    improve the performance of HTTP compared to a TCP mapping.  QUIC also
    incorporates TLS 1.3 ([TLS13]) at the transport layer, offering
-   comparable security to running TLS over TCP, with the improved
-   connection setup latency of TCP Fast Open ([TFO]).
+   comparable confidentiality and integrity to running TLS over TCP,
+   with the improved connection setup latency of TCP Fast Open ([TFO]).
 
    This document defines a mapping of HTTP semantics over the QUIC
    transport protocol, drawing heavily on the design of HTTP/2.  While
@@ -235,7 +241,7 @@ Table of Contents
    Once a client knows that an HTTP/3 server exists at a certain
    endpoint, it opens a QUIC connection.  QUIC provides protocol
    negotiation, stream-based multiplexing, and flow control.  Discovery
-   of an HTTP/3 endpoint is described in Section 3.2.
+   of an HTTP/3 endpoint is described in Section 3.1.
 
    Within each stream, the basic unit of HTTP/3 communication is a frame
    (Section 7.2).  Each frame type serves a different purpose.  For
@@ -327,12 +333,13 @@ Table of Contents
 
    frame:  The smallest unit of communication on a stream in HTTP/3,
       consisting of a header and a variable-length sequence of bytes
-      structured according to the frame type.  Protocol elements called
-      "frames" exist in both this document and [QUIC-TRANSPORT].  Where
-      frames from [QUIC-TRANSPORT] are referenced, the frame name will
-      be prefaced with "QUIC."  For example, "QUIC CONNECTION_CLOSE
-      frames."  References without this preface refer to frames defined
-      in Section 7.2.
+      structured according to the frame type.
+
+      Protocol elements called "frames" exist in both this document and
+      [QUIC-TRANSPORT].  Where frames from [QUIC-TRANSPORT] are
+      referenced, the frame name will be prefaced with "QUIC."  For
+      example, "QUIC CONNECTION_CLOSE frames."  References without this
+      preface refer to frames defined in Section 7.2.
 
    HTTP/3 connection:  A QUIC connection where the negotiated
       application protocol is HTTP/3.
@@ -355,7 +362,7 @@ Table of Contents
 
    stream error:  An application-level error on the individual stream.
 
-   The term "payload body" is defined in Section 5.5.4 of [SEMANTICS].
+   The term "payload data" is defined in Section 6.4 of [SEMANTICS].
 
    Finally, the terms "resource", "message", "user agent", "origin
    server", "gateway", "intermediary", "proxy", and "tunnel" are defined
@@ -367,36 +374,7 @@ Table of Contents
 
 3.  Connection Setup and Management
 
-3.1.  Draft Version Identification
-
-      *RFC Editor's Note:* Please remove this section prior to
-      publication of a final version of this document.
-
-   HTTP/3 uses the token "h3" to identify itself in ALPN and Alt-Svc.
-   Only implementations of the final, published RFC can identify
-   themselves as "h3".  Until such an RFC exists, implementations MUST
-   NOT identify themselves using this string.
-
-   Implementations of draft versions of the protocol MUST add the string
-   "-" and the corresponding draft number to the identifier.  For
-   example, draft-ietf-quic-http-01 is identified using the string
-   "h3-01".
-
-   Draft versions MUST use the corresponding draft transport version as
-   their transport.  For example, the application protocol defined in
-   draft-ietf-quic-http-25 uses the transport defined in draft-ietf-
-   quic-transport-25.
-
-   Non-compatible experiments that are based on these draft versions
-   MUST append the string "-" and an experiment name to the identifier.
-   For example, an experimental implementation based on draft-ietf-quic-
-   http-09 that reserves an extra stream for unsolicited transmission of
-   1980s pop music might identify itself as "h3-09-rickroll".  Note that
-   any label MUST conform to the "token" syntax defined in Section 5.7.2
-   of [SEMANTICS].  Experimenters are encouraged to coordinate their
-   experiments on the quic@ietf.org mailing list.
-
-3.2.  Discovering an HTTP/3 Endpoint
+3.1.  Discovering an HTTP/3 Endpoint
 
    HTTP relies on the notion of an authoritative response: a response
    that has been determined to be the most appropriate response for that
@@ -407,11 +385,22 @@ Table of Contents
 
    The "https" scheme associates authority with possession of a
    certificate that the client considers to be trustworthy for the host
-   identified by the authority component of the URL.  If a server
-   presents a certificate and proof that it controls the corresponding
-   private key, then a client will accept a secured TLS session with
-   that server as being authoritative for all origins with the "https"
-   scheme and a host identified in the certificate.
+   identified by the authority component of the URL.
+
+   If a server presents a valid certificate and proof that it controls
+   the corresponding private key, then a client will accept a secured
+   TLS session with that server as being authoritative for all origins
+   with the "https" scheme and a host identified in the certificate.
+   The host must be listed either as the CN field of the certificate
+   subject or as a dNSName in the subjectAltName field of the
+   certificate; see [RFC6125].  For a host that is an IP address, the
+   client MUST verify that the address appears as an iPAddress in the
+   subjectAltName field of the certificate.
+
+   If the hostname or address is not present in the certificate, the
+   client MUST NOT consider the server authoritative for origins
+   containing that hostname or address.  See Section 4.3 of [SEMANTICS]
+   for more detail on authoritative access.
 
    A client MAY attempt access to a resource with an "https" URI by
    resolving the host identifier to an IP address, establishing a QUIC
@@ -429,7 +418,7 @@ Table of Contents
    advertisement always includes an explicit port, and URLs contain
    either an explicit port or a default port associated with the scheme.
 
-3.2.1.  HTTP Alternative Services
+3.1.1.  HTTP Alternative Services
 
    An HTTP origin advertises the availability of an equivalent HTTP/3
    endpoint via the Alt-Svc HTTP response header field or the HTTP/2
@@ -446,7 +435,7 @@ Table of Contents
    port; if this connection is successful, the client can send HTTP
    requests using the mapping described in this document.
 
-3.2.2.  Other Schemes
+3.1.2.  Other Schemes
 
    Although HTTP is independent of the transport protocol, the "http"
    scheme associates authority with the ability to receive TCP
@@ -464,7 +453,7 @@ Table of Contents
    accomplish this is described in [RFC8164].  Other mechanisms might be
    defined for various schemes in the future.
 
-3.3.  Connection Establishment
+3.2.  Connection Establishment
 
    HTTP/3 relies on QUIC version 1 as the underlying transport.  The use
    of other QUIC transport versions with HTTP/3 MAY be defined by future
@@ -473,9 +462,9 @@ Table of Contents
    QUIC version 1 uses TLS version 1.3 or greater as its handshake
    protocol.  HTTP/3 clients MUST support a mechanism to indicate the
    target host to the server during the TLS handshake.  If the server is
-   identified by a DNS name, clients MUST send the Server Name
-   Indication (SNI; [RFC6066]) TLS extension unless an alternative
-   mechanism to indicate the target host is used.
+   identified by a domain name ([DNS-TERMS]), clients MUST send the
+   Server Name Indication (SNI; [RFC6066]) TLS extension unless an
+   alternative mechanism to indicate the target host is used.
 
    QUIC connections are established as described in [QUIC-TRANSPORT].
    During connection establishment, HTTP/3 support is indicated by
@@ -490,7 +479,7 @@ Table of Contents
    endpoint as the initial frame of their respective HTTP control
    stream; see Section 6.2.1.
 
-3.4.  Connection Reuse
+3.3.  Connection Reuse
 
    HTTP/3 connections are persistent across multiple requests.  For best
    performance, it is expected that clients will not close connections
@@ -500,18 +489,6 @@ Table of Contents
 
    Once a connection exists to a server endpoint, this connection MAY be
    reused for requests with multiple different URI authority components.
-   In general, a server is considered authoritative for all URIs with
-   the "https" scheme for which the hostname in the URI is present in
-   the authenticated certificate provided by the server, either as the
-   CN field of the certificate subject or as a dNSName in the
-   subjectAltName field of the certificate; see [RFC6125].  For a host
-   that is an IP address, the client MUST verify that the address
-   appears as an iPAddress in the subjectAltName field of the
-   certificate.  If the hostname or address is not present in the
-   certificate, the client MUST NOT consider the server authoritative
-   for origins containing that hostname or address.  See Section 4.3 of
-   [SEMANTICS] for more detail on authoritative access.
-
    Clients SHOULD NOT open more than one HTTP/3 connection to a given
    host and port pair, where the host is derived from a URI, a selected
    alternative service ([ALTSVC]), or a configured proxy.  A client MAY
@@ -541,7 +518,7 @@ Table of Contents
    client MUST send only a single request on a given stream.  A server
    sends zero or more interim HTTP responses on the same stream as the
    request, followed by a single final HTTP response, as detailed below.
-   See Section 14 of [SEMANTICS] for a description of interim and final
+   See Section 15 of [SEMANTICS] for a description of interim and final
    HTTP responses.
 
    Pushed responses are sent on a server-initiated unidirectional QUIC
@@ -559,18 +536,18 @@ Table of Contents
    1.  the header field section, sent as a single HEADERS frame (see
        Section 7.2.2),
 
-   2.  optionally, the payload body, if present, sent as a series of
+   2.  optionally, the payload data, if present, sent as a series of
        DATA frames (see Section 7.2.1), and
 
    3.  optionally, the trailer field section, if present, sent as a
        single HEADERS frame.
 
-   Header and trailer field sections are described in Sections 5.4 and
-   5.6 of [SEMANTICS]; the payload body is described in Section 5.5.4 of
+   Header and trailer field sections are described in Sections 6.3 and
+   6.5 of [SEMANTICS]; the payload data is described in Section 6.4 of
    [SEMANTICS].
 
    Receipt of an invalid sequence of frames MUST be treated as a
-   connection error of type H3_FRAME_UNEXPECTED (Section 8).  In
+   connection error of type H3_FRAME_UNEXPECTED; see Section 8.  In
    particular, a DATA frame before any HEADERS frame, or a HEADERS or
    DATA frame after the trailing HEADERS frame is considered invalid.
    Other frame types, especially unknown frame types, might be permitted
@@ -581,7 +558,8 @@ Table of Contents
    These PUSH_PROMISE frames are not part of the response; see
    Section 4.4 for more details.  PUSH_PROMISE frames are not permitted
    on push streams; a pushed response that includes PUSH_PROMISE frames
-   MUST be treated as a connection error of type H3_FRAME_UNEXPECTED.
+   MUST be treated as a connection error of type H3_FRAME_UNEXPECTED;
+   see Section 8.
 
    Frames of unknown types (Section 9), including reserved frames
    (Section 7.2.8) MAY be sent on a request or push stream before,
@@ -596,9 +574,9 @@ Table of Contents
    MUST NOT be used.
 
    A response MAY consist of multiple messages when and only when one or
-   more interim responses (1xx; see Section 14.2 of [SEMANTICS]) precede
+   more interim responses (1xx; see Section 15.2 of [SEMANTICS]) precede
    a final response to the same request.  Interim responses do not
-   contain a payload body or trailers.
+   contain payload data or trailers.
 
    An HTTP request/response exchange fully consumes a client-initiated
    bidirectional QUIC stream.  After sending a request, a client MUST
@@ -614,7 +592,7 @@ Table of Contents
    message has been received to make progress.  If a client-initiated
    stream terminates without enough of the HTTP message to provide a
    complete response, the server SHOULD abort its response with the
-   error code H3_REQUEST_INCOMPLETE.
+   error code H3_REQUEST_INCOMPLETE; see Section 8.
 
    A server can send a complete response prior to the client sending an
    entire request if the response does not depend on any portion of the
@@ -633,7 +611,7 @@ Table of Contents
 4.1.1.  Field Formatting and Compression
 
    HTTP messages carry metadata as a series of key-value pairs called
-   HTTP fields; see Sections 5.4 and 5.6 of [SEMANTICS].  For a listing
+   HTTP fields; see Sections 6.3 and 6.5 of [SEMANTICS].  For a listing
    of registered HTTP fields, see the "Hypertext Transfer Protocol
    (HTTP) Field Name Registry" maintained at
    https://www.iana.org/assignments/http-fields/.
@@ -645,11 +623,10 @@ Table of Contents
    As in previous versions of HTTP, field names are strings containing a
    subset of ASCII characters that are compared in a case-insensitive
    fashion.  Properties of HTTP field names and values are discussed in
-   more detail in Section 5.4.3 of [SEMANTICS].  As in HTTP/2,
-   characters in field names MUST be converted to lowercase prior to
-   their encoding.  A request or response containing uppercase
-   characters in field names MUST be treated as malformed
-   (Section 4.1.3).
+   more detail in Section 5.1 of [SEMANTICS].  As in HTTP/2, characters
+   in field names MUST be converted to lowercase prior to their
+   encoding.  A request or response containing uppercase characters in
+   field names MUST be treated as malformed (Section 4.1.3).
 
    Like HTTP/2, HTTP/3 does not use the Connection header field to
    indicate connection-specific fields; in this protocol, connection-
@@ -696,7 +673,7 @@ Table of Contents
 
    The following pseudo-header fields are defined for requests:
 
-   ":method":  Contains the HTTP method (Section 8 of [SEMANTICS])
+   ":method":  Contains the HTTP method (Section 9 of [SEMANTICS])
 
    ":scheme":  Contains the scheme portion of the target URI
       (Section 3.1 of [URI])
@@ -754,7 +731,7 @@ Table of Contents
    included in the HTTP/1.1 request line.
 
    For responses, a single ":status" pseudo-header field is defined that
-   carries the HTTP status code; see Section 14 of [SEMANTICS].  This
+   carries the HTTP status code; see Section 15 of [SEMANTICS].  This
    pseudo-header field MUST be included in all responses; otherwise, the
    response is malformed (Section 4.1.3).
 
@@ -772,7 +749,7 @@ Table of Contents
    ([RFC6265]) MAY be split into separate field lines, each with one or
    more cookie-pairs, before compression.  If a decompressed field
    section contains multiple cookie field lines, these MUST be
-   concatenated into a single octet string using the two-octet delimiter
+   concatenated into a single byte string using the two-byte delimiter
    of 0x3b, 0x20 (the ASCII string "; ") before being passed into a
    context other than HTTP/2 or HTTP/3, such as an HTTP/1.1 connection,
    or a generic HTTP server application.
@@ -794,7 +771,7 @@ Table of Contents
    has received this parameter SHOULD NOT send an HTTP message header
    that exceeds the indicated size, as the peer will likely refuse to
    process it.  However, an HTTP message can traverse one or more
-   intermediaries before reaching the origin server; see Section 3.7 of
+   intermediaries before reaching the origin server; see Section 3.6 of
    [SEMANTICS].  Because this limit is applied separately by each
    implementation which processes the message, messages below this limit
    are not guaranteed to be accepted.
@@ -842,7 +819,7 @@ Table of Contents
    automatically retry a request with a non-idempotent method unless it
    has some means to know that the request semantics are idempotent
    independent of the method or some means to detect that the original
-   request was never applied.  See Section 8.2.2 of [SEMANTICS] for more
+   request was never applied.  See Section 9.2.2 of [SEMANTICS] for more
    details.
 
 4.1.3.  Malformed Requests and Responses
@@ -862,21 +839,21 @@ Table of Contents
 
    *  the inclusion of uppercase field names, or
 
-   *  the inclusion of invalid characters in field names or values
+   *  the inclusion of invalid characters in field names or values.
 
-   A request or response that includes a payload body can include a
+   A request or response that includes payload data can include a
    Content-Length header field.  A request or response is also malformed
-   if the value of a content-length header field does not equal the sum
-   of the DATA frame payload lengths that form the body.  A response
-   that is defined to have no payload, as described in Section 5.5.4 of
-   [SEMANTICS], can have a non-zero content-length field, even though no
+   if the value of a Content-Length header field does not equal the sum
+   of the DATA frame lengths that form the payload data.  A response
+   that is defined to have no payload, as described in Section 6.4 of
+   [SEMANTICS], can have a non-zero Content-Length field, even though no
    content is included in DATA frames.
 
    Intermediaries that process HTTP requests or responses (i.e., any
    intermediary not acting as a tunnel) MUST NOT forward a malformed
    request or response.  Malformed requests or responses that are
    detected MUST be treated as a stream error (Section 8) of type
-   H3_GENERAL_PROTOCOL_ERROR.
+   H3_MESSAGE_ERROR.
 
    For malformed requests, a server MAY send an HTTP response indicating
    the error prior to closing or resetting the stream.  Clients MUST NOT
@@ -889,7 +866,7 @@ Table of Contents
 
    The CONNECT method requests that the recipient establish a tunnel to
    the destination origin server identified by the request-target; see
-   Section 8.3.6 of [SEMANTICS].  It is primarily used with HTTP proxies
+   Section 9.3.6 of [SEMANTICS].  It is primarily used with HTTP proxies
    to establish a TLS session with an origin server for the purposes of
    interacting with "https" resources.
 
@@ -915,7 +892,7 @@ Table of Contents
    ([RFC0793]) to the server identified in the ":authority" pseudo-
    header field.  Once this connection is successfully established, the
    proxy sends a HEADERS frame containing a 2xx series status code to
-   the client, as defined in Section 14.3 of [SEMANTICS].
+   the client, as defined in Section 15.3 of [SEMANTICS].
 
    All DATA frames on the stream correspond to data sent or received on
    the TCP connection.  The payload of any DATA frame sent by the client
@@ -928,7 +905,7 @@ Table of Contents
    to be sent on the stream.  Extension frames MAY be used if
    specifically permitted by the definition of the extension.  Receipt
    of any other known frame type MUST be treated as a connection error
-   of type H3_FRAME_UNEXPECTED.
+   of type H3_FRAME_UNEXPECTED; see Section 8.
 
    The TCP connection can be closed by either peer.  When the client
    ends the request stream (that is, the receive stream at the proxy
@@ -943,16 +920,16 @@ Table of Contents
    A TCP connection error is signaled by abruptly terminating the
    stream.  A proxy treats any error in the TCP connection, which
    includes receiving a TCP segment with the RST bit set, as a stream
-   error of type H3_CONNECT_ERROR (Section 8.1).  Correspondingly, if a
+   error of type H3_CONNECT_ERROR; see Section 8.  Correspondingly, if a
    proxy detects an error with the stream or the QUIC connection, it
    MUST close the TCP connection.  If the underlying TCP implementation
    permits it, the proxy SHOULD send a TCP segment with the RST bit set.
 
 4.3.  HTTP Upgrade
 
-   HTTP/3 does not support the HTTP Upgrade mechanism (Section 6.6 of
+   HTTP/3 does not support the HTTP Upgrade mechanism (Section 7.8 of
    [SEMANTICS]) or 101 (Switching Protocols) informational status code
-   (Section 14.2.2 of [SEMANTICS]).
+   (Section 15.2.2 of [SEMANTICS]).
 
 4.4.  Server Push
 
@@ -972,9 +949,9 @@ Table of Contents
    client sends MAX_PUSH_ID frames to control the number of pushes that
    a server can promise.  A server SHOULD use Push IDs sequentially,
    beginning from zero.  A client MUST treat receipt of a push stream as
-   a connection error of type H3_ID_ERROR when no MAX_PUSH_ID frame has
-   been sent or when the stream references a Push ID that is greater
-   than the maximum Push ID.
+   a connection error of type H3_ID_ERROR (Section 8) when no
+   MAX_PUSH_ID frame has been sent or when the stream references a Push
+   ID that is greater than the maximum Push ID.
 
    The Push ID is used in one or more PUSH_PROMISE frames
    (Section 7.2.5) that carry the header section of the request message.
@@ -998,14 +975,14 @@ Table of Contents
    Not all requests can be pushed.  A server MAY push requests that have
    the following properties:
 
-   *  cacheable; see Section 8.2.3 of [SEMANTICS]
+   *  cacheable; see Section 9.2.3 of [SEMANTICS]
 
-   *  safe; see Section 8.2.1 of [SEMANTICS]
+   *  safe; see Section 9.2.1 of [SEMANTICS]
 
    *  does not include a request body or trailer section
 
    The server MUST include a value in the ":authority" pseudo-header
-   field for which the server is authoritative; see Section 3.4.
+   field for which the server is authoritative; see Section 3.3.
 
    Clients SHOULD send a CANCEL_PUSH frame upon receipt of a
    PUSH_PROMISE frame carrying a request that is not cacheable, is not
@@ -1142,7 +1119,8 @@ Table of Contents
    than the identifier in any previous frame, since clients might
    already have retried unprocessed requests on another HTTP connection.
    Receiving a GOAWAY containing a larger identifier than previously
-   received MUST be treated as a connection error of type H3_ID_ERROR.
+   received MUST be treated as a connection error of type H3_ID_ERROR;
+   see Section 8.
 
    An endpoint that is attempting to gracefully shut down a connection
    can send a GOAWAY frame with a value set to the maximum possible
@@ -1240,8 +1218,8 @@ Table of Contents
    HTTP/3 does not use server-initiated bidirectional streams, though an
    extension could define a use for these streams.  Clients MUST treat
    receipt of a server-initiated bidirectional stream as a connection
-   error of type H3_STREAM_CREATION_ERROR unless such an extension has
-   been negotiated.
+   error of type H3_STREAM_CREATION_ERROR (Section 8) unless such an
+   extension has been negotiated.
 
 6.2.  Unidirectional Streams
 
@@ -1319,7 +1297,8 @@ Table of Contents
    sender MUST NOT close the control stream, and the receiver MUST NOT
    request that the sender close the control stream.  If either control
    stream is closed at any point, this MUST be treated as a connection
-   error of type H3_CLOSED_CRITICAL_STREAM.
+   error of type H3_CLOSED_CRITICAL_STREAM.  Connection errors are
+   described in Section 8.
 
    A pair of unidirectional streams is used rather than a single
    bidirectional stream.  This allows either peer to send data as soon
@@ -1343,7 +1322,7 @@ Table of Contents
 
    Only servers can push; if a server receives a client-initiated push
    stream, this MUST be treated as a connection error of type
-   H3_STREAM_CREATION_ERROR.
+   H3_STREAM_CREATION_ERROR; see Section 8.
 
    Push Stream Header {
      Stream Type (i) = 0x01,
@@ -1355,7 +1334,7 @@ Table of Contents
    Each Push ID MUST only be used once in a push stream header.  If a
    push stream header includes a Push ID that was used in another push
    stream header, the client MUST treat this as a connection error of
-   type H3_ID_ERROR.
+   type H3_ID_ERROR; see Section 8.
 
 6.2.3.  Reserved Stream Types
 
@@ -1445,24 +1424,24 @@ Table of Contents
    its description.  A frame payload that contains additional bytes
    after the identified fields or a frame payload that terminates before
    the end of the identified fields MUST be treated as a connection
-   error (Section 8) of type H3_FRAME_ERROR.
+   error of type H3_FRAME_ERROR; see Section 8.
 
    When a stream terminates cleanly, if the last frame on the stream was
-   truncated, this MUST be treated as a connection error (Section 8) of
-   type H3_FRAME_ERROR.  Streams that terminate abruptly may be reset at
-   any point in a frame.
+   truncated, this MUST be treated as a connection error of type
+   H3_FRAME_ERROR; see Section 8.  Streams that terminate abruptly may
+   be reset at any point in a frame.
 
 7.2.  Frame Definitions
 
 7.2.1.  DATA
 
    DATA frames (type=0x0) convey arbitrary, variable-length sequences of
-   bytes associated with an HTTP request or response payload body.
+   bytes associated with HTTP request or response payload data.
 
    DATA frames MUST be associated with an HTTP request or response.  If
    a DATA frame is received on a control stream, the recipient MUST
-   respond with a connection error (Section 8) of type
-   H3_FRAME_UNEXPECTED.
+   respond with a connection error of type H3_FRAME_UNEXPECTED; see
+   Section 8.
 
    DATA Frame {
      Type (i) = 0x0,
@@ -1739,12 +1718,12 @@ Table of Contents
    promise.
 
    If a PUSH_PROMISE frame is received on the control stream, the client
-   MUST respond with a connection error (Section 8) of type
-   H3_FRAME_UNEXPECTED.
+   MUST respond with a connection error of type H3_FRAME_UNEXPECTED; see
+   Section 8.
 
    A client MUST NOT send a PUSH_PROMISE frame.  A server MUST treat the
    receipt of a PUSH_PROMISE frame as a connection error of type
-   H3_FRAME_UNEXPECTED.
+   H3_FRAME_UNEXPECTED; see Section 8.
 
    See Section 4.4 for a description of the overall server push
    mechanism.
@@ -1777,8 +1756,8 @@ Table of Contents
 
    The GOAWAY frame applies to the entire connection, not a specific
    stream.  A client MUST treat a GOAWAY frame on a stream other than
-   the control stream as a connection error (Section 8) of type
-   H3_FRAME_UNEXPECTED.
+   the control stream as a connection error of type H3_FRAME_UNEXPECTED;
+   see Section 8.
 
    See Section 5.2 for more information on the use of the GOAWAY frame.
 
@@ -1839,26 +1818,40 @@ Table of Contents
 
 8.  Error Handling
 
-   QUIC allows the application to abruptly terminate (reset) individual
-   streams or the entire connection; see Sections 2.4 and 5.3 of
-   [QUIC-TRANSPORT].  These are referred to as "stream errors" or
-   "connection errors" (see Section 11 of [QUIC-TRANSPORT]) and have
-   associated error codes, but do not necessarily indicate a problem
-   with the connection or either implementation.  For example, a stream
-   can be reset if the requested resource is no longer needed.
+   When a stream cannot be completed successfully, QUIC allows the
+   application to abruptly terminate (reset) that stream and communicate
+   a reason; see Section 2.4 of [QUIC-TRANSPORT].  This is referred to
+   as a "stream error."  An HTTP/3 implementation can decide to close a
+   QUIC stream and communicate the type of error.  Wire encodings of
+   error codes are defined in Section 8.1.  Stream errors are distinct
+   from HTTP status codes which indicate error conditions.  Stream
+   errors indicate that the sender did not transfer or consume the full
+   request or response, while HTTP status codes indicate the result of a
+   request that was successfully received.
+
+   If an entire connection needs to be terminated, QUIC similarly
+   provides mechanisms to communicate a reason; see Section 5.3 of
+   [QUIC-TRANSPORT].  This is referred to as a "connection error."
+   Similar to stream errors, an HTTP/3 implementation can terminate a
+   QUIC connection and communicate the reason using an error code from
+   Section 8.1.
+
+   Although the reasons for closing streams and connections are called
+   "errors," these actions do not necessarily indicate a problem with
+   the connection or either implementation.  For example, a stream can
+   be reset if the requested resource is no longer needed.
 
    An endpoint MAY choose to treat a stream error as a connection error
-   under certain circumstances.  Implementations need to consider the
-   impact on outstanding requests before making this choice.
+   under certain circumstances, closing the entire connection in
+   response to a condition on a single stream.  Implementations need to
+   consider the impact on outstanding requests before making this
+   choice.
 
    Because new error codes can be defined without negotiation (see
    Section 9), use of an error code in an unexpected context or receipt
    of an unknown error code MUST be treated as equivalent to
    H3_NO_ERROR.  However, closing a stream can have other effects
    regardless of the error code; for example, see Section 4.1.
-
-   This section describes HTTP/3-specific error codes that can be used
-   to express the cause of a connection or stream error.
 
 8.1.  HTTP/3 Error Codes
 
@@ -1908,6 +1901,9 @@ Table of Contents
 
    H3_REQUEST_INCOMPLETE (0x10d):  The client's stream terminated
       without containing a fully-formed request.
+
+   H3_MESSAGE_ERROR (0x10e):  An HTTP message was malformed and cannot
+      be processed.
 
    H3_CONNECT_ERROR (0x10f):  The TCP connection established in response
       to a CONNECT request was reset or abnormally closed.
@@ -1976,21 +1972,24 @@ Table of Contents
 
    HTTP/3 relies on the HTTP definition of authority.  The security
    considerations of establishing authority are discussed in
-   Section 16.1 of [SEMANTICS].
+   Section 17.1 of [SEMANTICS].
 
 10.2.  Cross-Protocol Attacks
 
    The use of ALPN in the TLS and QUIC handshakes establishes the target
    application protocol before application-layer bytes are processed.
-   Because all QUIC packets are encrypted, it is difficult for an
-   attacker to control the plaintext bytes of an HTTP/3 connection,
-   which could be used in a cross-protocol attack on a plaintext
-   protocol.
+   This ensures that endpoints have strong assurances that peers are
+   using the same protocol.
+
+   This does not guarantee protection from all cross-protocol attacks.
+   Section 21.5 of [QUIC-TRANSPORT] describes some ways in which the
+   plaintext of QUIC packets can be used to perform request forgery
+   against endpoints that don't use authenticated transports.
 
 10.3.  Intermediary Encapsulation Attacks
 
    The HTTP/3 field encoding allows the expression of names that are not
-   valid field names in the syntax used by HTTP (Section 5.4.3 of
+   valid field names in the syntax used by HTTP (Section 5.1 of
    [SEMANTICS]).  Requests or responses containing invalid field names
    MUST be treated as malformed (Section 4.1.3).  An intermediary
    therefore cannot translate an HTTP/3 request or response containing
@@ -2003,7 +2002,7 @@ Table of Contents
    they are translated verbatim.  Any request or response that contains
    a character not permitted in a field value MUST be treated as
    malformed (Section 4.1.3).  Valid characters are defined by the
-   "field-content" ABNF rule in Section 5.4.4 of [SEMANTICS].
+   "field-content" ABNF rule in Section 5.5 of [SEMANTICS].
 
 10.4.  Cacheability of Pushed Responses
 
@@ -2061,8 +2060,8 @@ Table of Contents
    An endpoint that does not monitor this behavior exposes itself to a
    risk of denial-of-service attack.  Implementations SHOULD track the
    use of these features and set limits on their use.  An endpoint MAY
-   treat activity that is suspicious as a connection error (Section 8)
-   of type H3_EXCESSIVE_LOAD, but false positives will result in
+   treat activity that is suspicious as a connection error of type
+   H3_EXCESSIVE_LOAD (Section 8), but false positives will result in
    disrupting valid connections and requests.
 
 10.5.1.  Limits on Field Section Size
@@ -2109,7 +2108,7 @@ Table of Contents
    compressed in the same context as data under attacker control.
    HTTP/3 enables compression of fields (Section 4.1.1); the following
    concerns also apply to the use of HTTP compressed content-codings;
-   see Section 7.5.1 of [SEMANTICS].
+   see Section 8.5.1 of [SEMANTICS].
 
    There are demonstrable attacks on compression that exploit the
    characteristics of the web (e.g., [BREACH]).  The attacker induces
@@ -2234,7 +2233,9 @@ Table of Contents
    New registries created in this document operate under the QUIC
    registration policy documented in Section 22.1 of [QUIC-TRANSPORT].
    These registries all include the common set of fields listed in
-   Section 22.1.1 of [QUIC-TRANSPORT].
+   Section 22.1.1 of [QUIC-TRANSPORT].  These registries [SHALL be/are]
+   collected under a "Hypertext Transfer Protocol version 3 (HTTP/3)
+   Parameters" heading.
 
    The initial allocations in these registries created in this document
    are all assigned permanent status and list a change controller of the
@@ -2296,9 +2297,10 @@ Table of Contents
 
                    Table 2: Initial HTTP/3 Frame Types
 
-   Additionally, each code of the format "0x1f * N + 0x21" for non-
-   negative integer values of N (that is, 0x21, 0x40, ..., through
-   0x3FFFFFFFFFFFFFFE) MUST NOT be assigned by IANA.
+   Each code of the format "0x1f * N + 0x21" for non-negative integer
+   values of N (that is, 0x21, 0x40, ..., through 0x3ffffffffffffffe)
+   MUST NOT be assigned by IANA and MUST NOT appear in the listing of
+   assigned values.
 
 11.2.2.  Settings Parameters
 
@@ -2344,9 +2346,10 @@ Table of Contents
 
                      Table 3: Initial HTTP/3 Settings
 
-   Additionally, each code of the format "0x1f * N + 0x21" for non-
-   negative integer values of N (that is, 0x21, 0x40, ..., through
-   0x3ffffffffffffffe) MUST NOT be assigned by IANA.
+   Each code of the format "0x1f * N + 0x21" for non-negative integer
+   values of N (that is, 0x21, 0x40, ..., through 0x3ffffffffffffffe)
+   MUST NOT be assigned by IANA and MUST NOT appear in the listing of
+   assigned values.
 
 11.2.3.  Error Codes
 
@@ -2440,6 +2443,9 @@ Table of Contents
    |                           |        | terminated   |               |
    |                           |        | early        |               |
    +---------------------------+--------+--------------+---------------+
+   | H3_MESSAGE_ERROR          | 0x010e | Malformed    | Section 8.1   |
+   |                           |        | message      |               |
+   +---------------------------+--------+--------------+---------------+
    | H3_CONNECT_ERROR          | 0x010f | TCP reset    | Section 8.1   |
    |                           |        | or error on  |               |
    |                           |        | CONNECT      |               |
@@ -2451,9 +2457,10 @@ Table of Contents
 
                     Table 4: Initial HTTP/3 Error Codes
 
-   Additionally, each code of the format "0x1f * N + 0x21" for non-
-   negative integer values of N (that is, 0x21, 0x40, ..., through
-   0x3ffffffffffffffe) MUST NOT be assigned by IANA.
+   Each code of the format "0x1f * N + 0x21" for non-negative integer
+   values of N (that is, 0x21, 0x40, ..., through 0x3ffffffffffffffe)
+   MUST NOT be assigned by IANA and MUST NOT appear in the listing of
+   assigned values.
 
 11.2.4.  Stream Types
 
@@ -2490,9 +2497,10 @@ Table of Contents
 
                                   Table 5
 
-   Additionally, each code of the format "0x1f * N + 0x21" for non-
-   negative integer values of N (that is, 0x21, 0x40, ..., through
-   0x3ffffffffffffffe) MUST NOT be assigned by IANA.
+   Each code of the format "0x1f * N + 0x21" for non-negative integer
+   values of N (that is, 0x21, 0x40, ..., through 0x3ffffffffffffffe)
+   MUST NOT be assigned by IANA and MUST NOT appear in the listing of
+   assigned values.
 
 12.  References
 
@@ -2504,8 +2512,8 @@ Table of Contents
 
    [CACHING]  Fielding, R., Nottingham, M., and J. Reschke, "HTTP
               Caching", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-cache-12, 2 October 2020, <http://www.ietf.org/
-              internet-drafts/draft-ietf-httpbis-cache-12.txt>.
+              httpbis-cache-13, 14 December 2020, <http://www.ietf.org/
+              internet-drafts/draft-ietf-httpbis-cache-13.txt>.
 
    [HTTP-REPLAY]
               Thomson, M., Nottingham, M., and W. Tarreau, "Using Early
@@ -2514,14 +2522,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 7 December 2020,
+              Internet-Draft, draft-ietf-quic-qpack, 6 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 7 December
-              2020,
+              Internet-Draft, draft-ietf-quic-transport, 6 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
@@ -2566,9 +2573,9 @@ Table of Contents
    [SEMANTICS]
               Fielding, R., Nottingham, M., and J. Reschke, "HTTP
               Semantics", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-semantics-12, 2 October 2020,
+              httpbis-semantics-13, 14 December 2020,
               <http://www.ietf.org/internet-drafts/draft-ietf-httpbis-
-              semantics-12.txt>.
+              semantics-13.txt>.
 
    [URI]      Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66,
@@ -2582,15 +2589,19 @@ Table of Contents
               <http://breachattack.com/resources/
               BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf>.
 
+   [DNS-TERMS]
+              Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
+              Terminology", BCP 219, RFC 8499, DOI 10.17487/RFC8499,
+              January 2019, <https://www.rfc-editor.org/info/rfc8499>.
+
    [HPACK]    Peon, R. and H. Ruellan, "HPACK: Header Compression for
               HTTP/2", RFC 7541, DOI 10.17487/RFC7541, May 2015,
               <https://www.rfc-editor.org/info/rfc7541>.
 
-   [HTTP11]   Fielding, R., Nottingham, M., and J. Reschke, "HTTP/1.1
-              Messaging", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-messaging-12, 2 October 2020,
-              <http://www.ietf.org/internet-drafts/draft-ietf-httpbis-
-              messaging-12.txt>.
+   [HTTP11]   Fielding, R., Nottingham, M., and J. Reschke, "HTTP/1.1",
+              Work in Progress, Internet-Draft, draft-ietf-httpbis-
+              messaging-13, 14 December 2020, <http://www.ietf.org/
+              internet-drafts/draft-ietf-httpbis-messaging-13.txt>.
 
    [HTTP2]    Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
               Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
@@ -2860,7 +2871,7 @@ A.4.  HTTP/2 Error Codes
 
    PROTOCOL_ERROR (0x1):  This is mapped to H3_GENERAL_PROTOCOL_ERROR
       except in cases where more specific error codes have been defined.
-      Such cases include H3_FRAME_UNEXPECTED and
+      Such cases include H3_FRAME_UNEXPECTED, H3_MESSAGE_ERROR, and
       H3_CLOSED_CRITICAL_STREAM defined in Section 8.1.
 
    INTERNAL_ERROR (0x2):  H3_INTERNAL_ERROR in Section 8.1.
@@ -2868,7 +2879,7 @@ A.4.  HTTP/2 Error Codes
    FLOW_CONTROL_ERROR (0x3):  Not applicable, since QUIC handles flow
       control.
 
-   SETTINGS_TIMEOUT (0x4):  Not applicable, since no acknowledgement of
+   SETTINGS_TIMEOUT (0x4):  Not applicable, since no acknowledgment of
       SETTINGS is defined.
 
    STREAM_CLOSED (0x5):  Not applicable, since QUIC handles stream
@@ -2935,15 +2946,21 @@ Appendix B.  Change Log
       *RFC Editor's Note:* Please remove this section prior to
       publication of a final version of this document.
 
-B.1.  Since draft-ietf-quic-http-31
+B.1.  Since draft-ietf-quic-http-32
+
+   *  Removed draft version guidance; added final version string
+
+   *  Added H3_MESSAGE_ERROR for malformed messages
+
+B.2.  Since draft-ietf-quic-http-31
 
    Editorial changes only.
 
-B.2.  Since draft-ietf-quic-http-30
+B.3.  Since draft-ietf-quic-http-30
 
    Editorial changes only.
 
-B.3.  Since draft-ietf-quic-http-29
+B.4.  Since draft-ietf-quic-http-29
 
    *  Require a connection error if a reserved frame type that
       corresponds to a frame in HTTP/2 is received (#3991, #3993)
@@ -2951,7 +2968,7 @@ B.3.  Since draft-ietf-quic-http-29
    *  Require a connection error if a reserved setting that corresponds
       to a setting in HTTP/2 is received (#3954, #3955)
 
-B.4.  Since draft-ietf-quic-http-28
+B.5.  Since draft-ietf-quic-http-28
 
    *  CANCEL_PUSH is recommended even when the stream is reset (#3698,
       #3700)
@@ -2959,7 +2976,7 @@ B.4.  Since draft-ietf-quic-http-28
    *  Use H3_ID_ERROR when GOAWAY contains a larger identifier (#3631,
       #3634)
 
-B.5.  Since draft-ietf-quic-http-27
+B.6.  Since draft-ietf-quic-http-27
 
    *  Updated text to refer to latest HTTP revisions
 
@@ -2971,11 +2988,11 @@ B.5.  Since draft-ietf-quic-http-27
    *  Require either :authority or Host if the URI scheme has a
       mandatory authority component (#3408, #3475)
 
-B.6.  Since draft-ietf-quic-http-26
+B.7.  Since draft-ietf-quic-http-26
 
    *  No changes
 
-B.7.  Since draft-ietf-quic-http-25
+B.8.  Since draft-ietf-quic-http-25
 
    *  Require QUICv1 for HTTP/3 (#3117, #3323)
 
@@ -2984,7 +3001,7 @@ B.7.  Since draft-ietf-quic-http-25
 
    *  Clarify the definition of "malformed" (#3352, #3345)
 
-B.8.  Since draft-ietf-quic-http-24
+B.9.  Since draft-ietf-quic-http-24
 
    *  Removed H3_EARLY_RESPONSE error code; H3_NO_ERROR is recommended
       instead (#3130,#3208)
@@ -2993,7 +3010,7 @@ B.8.  Since draft-ietf-quic-http-24
 
    *  Some error codes are reserved for greasing (#3325,#3360)
 
-B.9.  Since draft-ietf-quic-http-23
+B.10.  Since draft-ietf-quic-http-23
 
    *  Removed "quic" Alt-Svc parameter (#3061,#3118)
 
@@ -3002,7 +3019,7 @@ B.9.  Since draft-ietf-quic-http-23
 
    *  Clarify error cases around CANCEL_PUSH (#2819,#3083)
 
-B.10.  Since draft-ietf-quic-http-22
+B.11.  Since draft-ietf-quic-http-22
 
    *  Removed priority signaling (#2922,#2924)
 
@@ -3044,11 +3061,11 @@ B.10.  Since draft-ietf-quic-http-22
 
    *  Unknown error codes cannot be treated as errors (#2998,#2816)
 
-B.11.  Since draft-ietf-quic-http-21
+B.12.  Since draft-ietf-quic-http-21
 
    No changes
 
-B.12.  Since draft-ietf-quic-http-20
+B.13.  Since draft-ietf-quic-http-20
 
    *  Prohibit closing the control stream (#2509, #2666)
 
@@ -3091,14 +3108,14 @@ B.12.  Since draft-ietf-quic-http-20
 
       -  Rationalize HTTP/3 stream creation errors (#2821, #2822)
 
-B.13.  Since draft-ietf-quic-http-19
+B.14.  Since draft-ietf-quic-http-19
 
    *  SETTINGS_NUM_PLACEHOLDERS is 0x9 (#2443,#2530)
 
    *  Non-zero bits in the Empty field of the PRIORITY frame MAY be
       treated as an error (#2501)
 
-B.14.  Since draft-ietf-quic-http-18
+B.15.  Since draft-ietf-quic-http-18
 
    *  Resetting streams following a GOAWAY is recommended, but not
       required (#2256,#2457)
@@ -3119,14 +3136,14 @@ B.14.  Since draft-ietf-quic-http-18
 
    *  Use connection error for invalid PRIORITY (#2507, #2508)
 
-B.15.  Since draft-ietf-quic-http-17
+B.16.  Since draft-ietf-quic-http-17
 
    *  HTTP_REQUEST_REJECTED is used to indicate a request can be retried
       (#2106, #2325)
 
    *  Changed error code for GOAWAY on the wrong stream (#2231, #2343)
 
-B.16.  Since draft-ietf-quic-http-16
+B.17.  Since draft-ietf-quic-http-16
 
    *  Rename "HTTP/QUIC" to "HTTP/3" (#1973)
 
@@ -3152,11 +3169,11 @@ B.16.  Since draft-ietf-quic-http-16
 
    *  Removed prohibition of zero-length DATA frames (#2098)
 
-B.17.  Since draft-ietf-quic-http-15
+B.18.  Since draft-ietf-quic-http-15
 
    Substantial editorial reorganization; no technical changes.
 
-B.18.  Since draft-ietf-quic-http-14
+B.19.  Since draft-ietf-quic-http-14
 
    *  Recommend sensible values for QUIC transport parameters
       (#1720,#1806)
@@ -3170,7 +3187,7 @@ B.18.  Since draft-ietf-quic-http-14
 
    *  HTTP_VERSION_FALLBACK falls back to HTTP/1.1 (#1677,#1685)
 
-B.19.  Since draft-ietf-quic-http-13
+B.20.  Since draft-ietf-quic-http-13
 
    *  Reserved some frame types for grease (#1333, #1446)
 
@@ -3182,7 +3199,7 @@ B.19.  Since draft-ietf-quic-http-13
 
    *  Specify behavior for truncated requests (#1596, #1643)
 
-B.20.  Since draft-ietf-quic-http-12
+B.21.  Since draft-ietf-quic-http-12
 
    *  TLS SNI extension isn't mandatory if an alternative method is used
       (#1459, #1462, #1466)
@@ -3200,17 +3217,17 @@ B.20.  Since draft-ietf-quic-http-12
    *  Priority mechanism now uses explicit placeholders to enable
       persistent structure in the tree (#441,#1421,#1422)
 
-B.21.  Since draft-ietf-quic-http-11
+B.22.  Since draft-ietf-quic-http-11
 
    *  Moved QPACK table updates and acknowledgments to dedicated streams
       (#1121, #1122, #1238)
 
-B.22.  Since draft-ietf-quic-http-10
+B.23.  Since draft-ietf-quic-http-10
 
    *  Settings need to be remembered when attempting and accepting 0-RTT
       (#1157, #1207)
 
-B.23.  Since draft-ietf-quic-http-09
+B.24.  Since draft-ietf-quic-http-09
 
    *  Selected QCRAM for header compression (#228, #1117)
 
@@ -3219,11 +3236,11 @@ B.23.  Since draft-ietf-quic-http-09
    *  Specified handling of unsupported versions in Alt-Svc (#1093,
       #1097)
 
-B.24.  Since draft-ietf-quic-http-08
+B.25.  Since draft-ietf-quic-http-08
 
    *  Clarified connection coalescing rules (#940, #1024)
 
-B.25.  Since draft-ietf-quic-http-07
+B.26.  Since draft-ietf-quic-http-07
 
    *  Changes for integer encodings in QUIC (#595,#905)
 
@@ -3233,11 +3250,11 @@ B.25.  Since draft-ietf-quic-http-07
 
    *  Improve description of server push usage (#947, #950, #957)
 
-B.26.  Since draft-ietf-quic-http-06
+B.27.  Since draft-ietf-quic-http-06
 
    *  Track changes in QUIC error code usage (#485)
 
-B.27.  Since draft-ietf-quic-http-05
+B.28.  Since draft-ietf-quic-http-05
 
    *  Made push ID sequential, add MAX_PUSH_ID, remove
       SETTINGS_ENABLE_PUSH (#709)
@@ -3246,7 +3263,7 @@ B.27.  Since draft-ietf-quic-http-05
 
    *  Expanded text on GOAWAY and cancellation (#757)
 
-B.28.  Since draft-ietf-quic-http-04
+B.29.  Since draft-ietf-quic-http-04
 
    *  Cite RFC 5234 (#404)
 
@@ -3263,15 +3280,15 @@ B.28.  Since draft-ietf-quic-http-04
 
    *  DATA frames cannot be empty (#700)
 
-B.29.  Since draft-ietf-quic-http-03
+B.30.  Since draft-ietf-quic-http-03
 
    None.
 
-B.30.  Since draft-ietf-quic-http-02
+B.31.  Since draft-ietf-quic-http-02
 
    *  Track changes in transport draft
 
-B.31.  Since draft-ietf-quic-http-01
+B.32.  Since draft-ietf-quic-http-01
 
    *  SETTINGS changes (#181):
 
@@ -3297,7 +3314,7 @@ B.31.  Since draft-ietf-quic-http-01
    *  Guide to differences from HTTP/2 and porting HTTP/2 extensions
       added (#127,#242)
 
-B.32.  Since draft-ietf-quic-http-00
+B.33.  Since draft-ietf-quic-http-00
 
    *  Changed "HTTP/2-over-QUIC" to "HTTP/QUIC" throughout (#11,#29)
 
@@ -3316,13 +3333,13 @@ B.32.  Since draft-ietf-quic-http-00
 
    *  Application-layer-defined error codes (#19,#74)
 
-B.33.  Since draft-shade-quic-http2-mapping-00
+B.34.  Since draft-shade-quic-http2-mapping-00
 
    *  Adopted as base for draft-ietf-quic-http
 
    *  Updated authors/editors list
 
-Acknowledgements
+Acknowledgments
 
    The original authors of this specification were Robbie Shade and Mike
    Warres.
