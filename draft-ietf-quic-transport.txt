@@ -3127,8 +3127,8 @@ Table of Contents
    and destination addresses, source and destination UDP ports, and the
    Destination Connection ID field.  The flow label generation MUST be
    designed to minimize the chances of linkability with a previously
-   used flow label, as this would enable correlating activity on
-   multiple paths; see Section 9.5.
+   used flow label, as a stable flow label would enable correlating
+   activity on multiple paths; see Section 9.5.
 
    A possible implementation is to compute the flow label as a
    cryptographic hash function of the source and destination addresses,
