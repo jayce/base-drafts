@@ -380,18 +380,15 @@ Table of Contents
    QUIC carries TLS handshake data in CRYPTO frames, each of which
    consists of a contiguous block of handshake data identified by an
    offset and length.  Those frames are packaged into QUIC packets and
-   encrypted under the current TLS encryption level.  As with TLS over
-   TCP, once TLS handshake data has been delivered to QUIC, it is QUIC's
+   encrypted under the current encryption level.  As with TLS over TCP,
+   once TLS handshake data has been delivered to QUIC, it is QUIC's
    responsibility to deliver it reliably.  Each chunk of data that is
    produced by TLS is associated with the set of keys that TLS is
    currently using.  If QUIC needs to retransmit that data, it MUST use
    the same keys even if TLS has already updated to newer keys.
 
-   One important difference between TLS records (used with TCP) and QUIC
-   CRYPTO frames is that in QUIC multiple frames may appear in the same
-   QUIC packet as long as they are associated with the same packet
-   number space.  For instance, an endpoint can bundle a Handshake
-   message and an ACK for some Handshake data into the same packet.
+   Each encryption level corresponds to a packet number space.  The
+   packet number space that is used determines the semantics of frames.
    Some frames are prohibited in different packet number spaces; see
    Section 12.5 of [QUIC-TRANSPORT].
 
@@ -665,11 +662,16 @@ Table of Contents
 
    Figure 5 shows the multiple packets that form a single "flight" of
    messages being processed individually, to show what incoming messages
-   trigger different actions.  New handshake messages are requested
-   after incoming packets have been processed.  This process varies
-   based on the structure of endpoint implementations and the order in
-   which packets arrive; this is intended to illustrate the steps
-   involved in a single handshake exchange.
+   trigger different actions.  This shows multiple "Get Handshake"
+   invocations to retrieve handshake messages at different encryption
+   levels.  New handshake messages are requested after incoming packets
+   have been processed.
+
+   Figure 5 shows one possible structure for a simple handshake
+   exchange.  The exact process varies based on the structure of
+   endpoint implementations and the order in which packets arrive.
+   Implementations could use a different number of operations or execute
+   them in other orders.
 
 4.2.  TLS Version
 
