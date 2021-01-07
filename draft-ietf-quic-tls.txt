@@ -656,7 +656,11 @@ Table of Contents
 
                                                  Handshake Received
                                                  Handshake Complete
+                                                Handshake Confirmed
                                               Install rx 1-RTT keys
+                        <--------------- 1-RTT
+                              (HANDSHAKE_DONE)
+   Handshake Confirmed
 
              Figure 5: Interaction Summary between QUIC and TLS
 
