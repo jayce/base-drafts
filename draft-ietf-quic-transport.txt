@@ -2458,9 +2458,9 @@ Table of Contents
    token, it MUST attempt to validate the token, unless it has already
    completed address validation.  If the token is invalid then the
    server SHOULD proceed as if the client did not have a validated
-   address, including potentially sending a Retry.  A server SHOULD
-   encode tokens provided with NEW_TOKEN frames and Retry packets
-   differently, and validate the latter more strictly.  If the
+   address, including potentially sending a Retry.  Tokens provided with
+   NEW_TOKEN frames and Retry packets can be distinguished by servers
+   (see Section 8.1.1), and the latter validated more strictly.  If the
    validation succeeds, the server SHOULD then allow the handshake to
    proceed.
 
