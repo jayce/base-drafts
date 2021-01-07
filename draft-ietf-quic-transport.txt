@@ -1798,12 +1798,6 @@ Table of Contents
    *  authenticated negotiation of an application protocol (TLS uses
       ALPN [ALPN] for this purpose)
 
-   Endpoints can use packets sent during the handshake to test for
-   Explicit Congestion Notification (ECN) support; see Section 13.4.  An
-   endpoint verifies support for ECN by observing whether the ACK frames
-   acknowledging the first packets it sends carry ECN counts, as
-   described in Section 13.4.2.
-
    The CRYPTO frame can be sent in different packet number spaces
    (Section 12.3).  The offsets used by CRYPTO frames to ensure ordered
    delivery of cryptographic handshake data start from zero in each
@@ -1830,9 +1824,11 @@ Table of Contents
 
                     Figure 4: Simplified QUIC Handshake
 
-   An endpoint validates support for Explicit Congestion Notification
-   (ECN) by observing whether the ACK frames acknowledging the first
-   packets it sends carry ECN counts, as described in Section 13.4.2.
+   Endpoints can use packets sent during the handshake to test for
+   Explicit Congestion Notification (ECN) support; see Section 13.4.  An
+   endpoint validates support for ECN by observing whether the ACK
+   frames acknowledging the first packets it sends carry ECN counts, as
+   described in Section 13.4.2.
 
    Endpoints MUST explicitly negotiate an application protocol.  This
    avoids situations where there is a disagreement about the protocol
