@@ -4651,6 +4651,11 @@ Table of Contents
    and 1252 bytes for IPv4.  Thus, modern IPv4 and all IPv6 network
    paths are expected to be able to support QUIC.
 
+   Note:  This requirement to support a UDP payload of 1200 bytes limits
+      the space available for IPv6 extension headers to 32 bytes or IPv4
+      options to 52 bytes if the path only supports the IPv6 minimum MTU
+      of 1280 bytes.  This affects Initial packets and path validation.
+
    Any maximum datagram size larger than 1200 bytes can be discovered
    using Path Maximum Transmission Unit Discovery (PMTUD; see
    Section 14.2.1) or Datagram Packetization Layer PMTU Discovery
@@ -4727,7 +4732,7 @@ Table of Contents
    fragmented or dropped ([RFC8085]).
 
    If a QUIC endpoint determines that the PMTU between any pair of local
-   and remote IP addresses has fallen below the smallest allowed maximum
+   and remote IP addresses cannot support the smallest allowed maximum
    datagram size of 1200 bytes, it MUST immediately cease sending QUIC
    packets, except for those in PMTU probes or those containing
    CONNECTION_CLOSE frames, on the affected path.  An endpoint MAY
