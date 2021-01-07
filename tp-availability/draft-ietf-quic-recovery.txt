@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                           I. Swett, Ed.
-Expires: 26 June 2021                                             Google
-                                                        23 December 2020
+Expires: 11 July 2021                                             Google
+                                                          7 January 2021
 
 
                QUIC Loss Detection and Congestion Control
@@ -43,11 +43,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 June 2021.
+   This Internet-Draft will expire on 11 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1326,14 +1326,13 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", Work in Progress, Internet-Draft, draft-ietf-quic-
-              tls, 23 December 2020,
+              tls, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 23 December
-              2020,
+              Internet-Draft, draft-ietf-quic-transport, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate

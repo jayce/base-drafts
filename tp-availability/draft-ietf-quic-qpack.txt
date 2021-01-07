@@ -5,10 +5,10 @@
 QUIC                                                           C. Krasic
 Internet-Draft                                                   Netflix
 Intended status: Standards Track                               M. Bishop
-Expires: 26 June 2021                                Akamai Technologies
+Expires: 11 July 2021                                Akamai Technologies
                                                         A. Frindell, Ed.
                                                                 Facebook
-                                                        23 December 2020
+                                                          7 January 2021
 
 
                   QPACK: Header Compression for HTTP/3
@@ -47,11 +47,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 June 2021.
+   This Internet-Draft will expire on 11 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1531,14 +1531,13 @@ Table of Contents
 
    [HTTP3]    Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 23 December 2020,
+              quic-http, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 23 December
-              2020,
+              Internet-Draft, draft-ietf-quic-transport, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate

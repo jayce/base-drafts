@@ -4,8 +4,8 @@
 
 QUIC                                                          M. Thomson
 Internet-Draft                                                   Mozilla
-Intended status: Standards Track                        23 December 2020
-Expires: 26 June 2021
+Intended status: Standards Track                          7 January 2021
+Expires: 11 July 2021
 
 
                  Version-Independent Properties of QUIC
@@ -43,11 +43,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 June 2021.
+   This Internet-Draft will expire on 11 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -379,14 +379,13 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 23 December 2020,
+              Internet-Draft, draft-ietf-quic-tls, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 23 December
-              2020,
+              Internet-Draft, draft-ietf-quic-transport, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC5116]  McGrew, D., "An Interface and Algorithms for Authenticated
