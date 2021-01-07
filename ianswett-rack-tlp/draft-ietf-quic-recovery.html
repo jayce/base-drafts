@@ -824,7 +824,7 @@ address div.right {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Iyengar &amp; Swett</td>
-<td class="center">Expires 10 July 2021</td>
+<td class="center">Expires 11 July 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -837,12 +837,12 @@ address div.right {
 <dd class="internet-draft">draft-ietf-quic-recovery</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-01-06" class="published">6 January 2021</time>
+<time datetime="2021-01-07" class="published">7 January 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-07-10">10 July 2021</time></dd>
+<dd class="expires"><time datetime="2021-07-11">11 July 2021</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -894,7 +894,7 @@ code and issues list for this draft can be found at
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 10 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1468,22 +1468,21 @@ more accurate round-trip time estimate; see Section 13.2 of <span>[<a href="#QUI
 <p id="section-4.7-1">QUIC uses a probe timeout (PTO; see <a href="#pto" class="xref">Section 6.2</a>), with a timer based on TCP's RTO
 computation; see <span>[<a href="#RFC6297" class="xref">RFC6297</a>]</span>.  QUIC's PTO includes the peer's maximum expected
 acknowledgment delay instead of using a fixed minimum timeout.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
-<p id="section-4.7-2">As reflected by TLP defined in RACK (<span>[<a href="#RACK" class="xref">RACK</a>]</span>), a single
-packet loss at the tail does not indicate persistent congestion, so QUIC does
-not collapse the congestion window when the PTO expires.  Instead of
-collapsing the congestion window and declaring everything in-flight lost, QUIC
-specifies a time-based definition to ensure one or more packets are sent prior
-to a dramatic decrease in congestion window; see <a href="#persistent-congestion" class="xref">Section 7.6</a>.
-QUIC allows probe packets to temporarily exceed the congestion window
-whenever the timer expires.<a href="#section-4.7-2" class="pilcrow">¶</a></p>
-<p id="section-4.7-3">In doing this, QUIC avoids unnecessary congestion window reductions, obviating
+<p id="section-4.7-2">Similar to the RACK-TLP loss detection algorithm for TCP
+(<span>[<a href="#RACK" class="xref">RACK</a>]</span>), QUIC does not collapse the congestion window
+when the PTO expires, since a single packet loss at the tail does not indicate
+persistent congestion.  Instead, QUIC collapses the congestion window when
+persistent congestion is declared; see <a href="#persistent-congestion" class="xref">Section 7.6</a>.<a href="#section-4.7-2" class="pilcrow">¶</a></p>
+<p id="section-4.7-3">QUIC allows probe packets to temporarily exceed the congestion window whenever
+the timer expires.<a href="#section-4.7-3" class="pilcrow">¶</a></p>
+<p id="section-4.7-4">In doing this, QUIC avoids unnecessary congestion window reductions, obviating
 the need for correcting mechanisms such as F-RTO (<span>[<a href="#RFC5682" class="xref">RFC5682</a>]</span>). Since QUIC does
 not collapse the congestion window on a PTO expiration, a QUIC sender is not
 limited from sending more in-flight packets after a PTO expiration if it still
 has available congestion window. This occurs when a sender is
 application-limited and the PTO timer expires. This is more aggressive than
 TCP's RTO mechanism when application-limited, but identical when not
-application-limited.<a href="#section-4.7-3" class="pilcrow">¶</a></p>
+application-limited.<a href="#section-4.7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="the-minimum-congestion-window-is-two-packets">
@@ -1711,7 +1710,7 @@ path, whereas loss detection also relies upon key availability.<a href="#section
         </h3>
 <p id="section-6.1-1">Acknowledgment-based loss detection implements the spirit of TCP's Fast
 Retransmit (<span>[<a href="#RFC5681" class="xref">RFC5681</a>]</span>), Early Retransmit (<span>[<a href="#RFC5827" class="xref">RFC5827</a>]</span>), FACK (<span>[<a href="#FACK" class="xref">FACK</a>]</span>),
-SACK loss recovery (<span>[<a href="#RFC6675" class="xref">RFC6675</a>]</span>), and RACK (<span>[<a href="#RACK" class="xref">RACK</a>]</span>). This
+SACK loss recovery (<span>[<a href="#RFC6675" class="xref">RFC6675</a>]</span>), and RACK-TLP (<span>[<a href="#RACK" class="xref">RACK</a>]</span>). This
 section provides an overview of how these algorithms are implemented in QUIC.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2">A packet is declared lost if it meets all the following conditions:<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2527,11 +2526,11 @@ responses can be specified, such as (<span>[<a href="#RFC8511" class="xref">RFC8
 <dl class="references">
 <dt id="QUIC-TLS">[QUIC-TLS]</dt>
         <dd>
-<span class="refAuthor">Thomson, M., Ed.</span><span class="refAuthor"> and S. Turner, Ed.</span>, <span class="refTitle">"Using TLS to Secure QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-tls</span>, <time datetime="2021-01-06" class="refDate">6 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-tls">https://tools.ietf.org/html/draft-ietf-quic-tls</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M., Ed.</span><span class="refAuthor"> and S. Turner, Ed.</span>, <span class="refTitle">"Using TLS to Secure QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-tls</span>, <time datetime="2021-01-07" class="refDate">7 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-tls">https://tools.ietf.org/html/draft-ietf-quic-tls</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-TRANSPORT">[QUIC-TRANSPORT]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-01-06" class="refDate">6 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-01-07" class="refDate">7 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>

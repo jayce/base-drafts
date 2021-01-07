@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                           I. Swett, Ed.
-Expires: 10 July 2021                                             Google
-                                                          6 January 2021
+Expires: 11 July 2021                                             Google
+                                                          7 January 2021
 
 
                QUIC Loss Detection and Congestion Control
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 July 2021.
+   This Internet-Draft will expire on 11 July 2021.
 
 Copyright Notice
 
@@ -317,14 +317,14 @@ Table of Contents
    peer's maximum expected acknowledgment delay instead of using a fixed
    minimum timeout.
 
-   As reflected by TLP defined in RACK ([RACK]), a single packet loss at
-   the tail does not indicate persistent congestion, so QUIC does not
-   collapse the congestion window when the PTO expires.  Instead of
-   collapsing the congestion window and declaring everything in-flight
-   lost, QUIC specifies a time-based definition to ensure one or more
-   packets are sent prior to a dramatic decrease in congestion window;
-   see Section 7.6.  QUIC allows probe packets to temporarily exceed the
-   congestion window whenever the timer expires.
+   Similar to the RACK-TLP loss detection algorithm for TCP ([RACK]),
+   QUIC does not collapse the congestion window when the PTO expires,
+   since a single packet loss at the tail does not indicate persistent
+   congestion.  Instead, QUIC collapses the congestion window when
+   persistent congestion is declared; see Section 7.6.
+
+   QUIC allows probe packets to temporarily exceed the congestion window
+   whenever the timer expires.
 
    In doing this, QUIC avoids unnecessary congestion window reductions,
    obviating the need for correcting mechanisms such as F-RTO
@@ -557,9 +557,9 @@ Table of Contents
 
    Acknowledgment-based loss detection implements the spirit of TCP's
    Fast Retransmit ([RFC5681]), Early Retransmit ([RFC5827]), FACK
-   ([FACK]), SACK loss recovery ([RFC6675]), and RACK ([RACK]).  This
-   section provides an overview of how these algorithms are implemented
-   in QUIC.
+   ([FACK]), SACK loss recovery ([RFC6675]), and RACK-TLP ([RACK]).
+   This section provides an overview of how these algorithms are
+   implemented in QUIC.
 
    A packet is declared lost if it meets all the following conditions:
 
@@ -1325,13 +1325,13 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", Work in Progress, Internet-Draft, draft-ietf-quic-
-              tls, 6 January 2021,
+              tls, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 6 January 2021,
+              Internet-Draft, draft-ietf-quic-transport, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
