@@ -14,8 +14,7 @@ Expires: 11 July 2021
 Abstract
 
    This document defines the properties of the QUIC transport protocol
-   that are expected to remain unchanged over time as new versions of
-   the protocol are developed.
+   that are common to all versions of the protocol.
 
 Note to Readers
 
