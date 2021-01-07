@@ -1123,7 +1123,8 @@ Table of Contents
    advertised based on the sum of bytes consumed on all streams.
 
    Once a receiver advertises a limit for the connection or a stream, it
-   MAY advertise a smaller limit, but this has no effect.
+   is not an error to advertise a smaller limit, but the smaller limit
+   has no effect.
 
    A receiver MUST close the connection with a FLOW_CONTROL_ERROR error
    (Section 11) if the sender violates the advertised connection or
