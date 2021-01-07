@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 11 June 2021                                            Mozilla
-                                                         8 December 2020
+Expires: 11 July 2021                                            Mozilla
+                                                          7 January 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -22,6 +22,12 @@ Abstract
    circumstances.  Accompanying documents describe the integration of
    TLS for key negotiation, loss detection, and an exemplary congestion
    control algorithm.
+
+DO NOT DEPLOY THIS VERSION OF QUIC
+
+   DO NOT DEPLOY THIS VERSION OF QUIC UNTIL IT IS IN AN RFC.  This
+   version is still a work in progress.  For trial deployments, please
+   use earlier versions.
 
 Note to Readers
 
@@ -48,11 +54,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 June 2021.
+   This Internet-Draft will expire on 11 July 2021.
 
 Copyright Notice
 
-   Copyright (c) 2020 IETF Trust and the persons identified as the
+   Copyright (c) 2021 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -158,9 +164,9 @@ Table of Contents
      12.5.  Frames and Number Spaces
    13. Packetization and Reliability
      13.1.  Packet Processing
-     13.2.  Generating Acknowledgements
+     13.2.  Generating Acknowledgments
        13.2.1.  Sending ACK Frames
-       13.2.2.  Acknowledgement Frequency
+       13.2.2.  Acknowledgment Frequency
        13.2.3.  Managing ACK Ranges
        13.2.4.  Limiting Ranges by Tracking ACK Frames
        13.2.5.  Measuring and Reporting Host Delay
@@ -236,7 +242,8 @@ Table of Contents
        21.5.2.  Request Forgery with Client Initial Packets
        21.5.3.  Request Forgery with Preferred Addresses
        21.5.4.  Request Forgery with Spoofed Migration
-       21.5.5.  Generic Request Forgery Countermeasures
+       21.5.5.  Request Forgery with Version Negotiation
+       21.5.6.  Generic Request Forgery Countermeasures
      21.6.  Slowloris Attacks
      21.7.  Stream Fragmentation and Reassembly Attacks
      21.8.  Stream Commitment Attack
@@ -252,9 +259,10 @@ Table of Contents
        22.1.2.  Selecting Codepoints
        22.1.3.  Reclaiming Provisional Codepoints
        22.1.4.  Permanent Registrations
-     22.2.  QUIC Transport Parameter Registry
-     22.3.  QUIC Frame Types Registry
-     22.4.  QUIC Transport Error Codes Registry
+     22.2.  QUIC Versions Registry
+     22.3.  QUIC Transport Parameter Registry
+     22.4.  QUIC Frame Types Registry
+     22.5.  QUIC Transport Error Codes Registry
    23. References
      23.1.  Normative References
      23.2.  Informative References
@@ -264,39 +272,40 @@ Table of Contents
      A.3.  Sample Packet Number Decoding Algorithm
      A.4.  Sample ECN Validation Algorithm
    Appendix B.  Change Log
-     B.1.  Since draft-ietf-quic-transport-31
-     B.2.  Since draft-ietf-quic-transport-30
-     B.3.  Since draft-ietf-quic-transport-29
-     B.4.  Since draft-ietf-quic-transport-28
-     B.5.  Since draft-ietf-quic-transport-27
-     B.6.  Since draft-ietf-quic-transport-26
-     B.7.  Since draft-ietf-quic-transport-25
-     B.8.  Since draft-ietf-quic-transport-24
-     B.9.  Since draft-ietf-quic-transport-23
-     B.10. Since draft-ietf-quic-transport-22
-     B.11. Since draft-ietf-quic-transport-21
-     B.12. Since draft-ietf-quic-transport-20
-     B.13. Since draft-ietf-quic-transport-19
-     B.14. Since draft-ietf-quic-transport-18
-     B.15. Since draft-ietf-quic-transport-17
-     B.16. Since draft-ietf-quic-transport-16
-     B.17. Since draft-ietf-quic-transport-15
-     B.18. Since draft-ietf-quic-transport-14
-     B.19. Since draft-ietf-quic-transport-13
-     B.20. Since draft-ietf-quic-transport-12
-     B.21. Since draft-ietf-quic-transport-11
-     B.22. Since draft-ietf-quic-transport-10
-     B.23. Since draft-ietf-quic-transport-09
-     B.24. Since draft-ietf-quic-transport-08
-     B.25. Since draft-ietf-quic-transport-07
-     B.26. Since draft-ietf-quic-transport-06
-     B.27. Since draft-ietf-quic-transport-05
-     B.28. Since draft-ietf-quic-transport-04
-     B.29. Since draft-ietf-quic-transport-03
-     B.30. Since draft-ietf-quic-transport-02
-     B.31. Since draft-ietf-quic-transport-01
-     B.32. Since draft-ietf-quic-transport-00
-     B.33. Since draft-hamilton-quic-transport-protocol-01
+     B.1.  Since draft-ietf-quic-transport-32
+     B.2.  Since draft-ietf-quic-transport-31
+     B.3.  Since draft-ietf-quic-transport-30
+     B.4.  Since draft-ietf-quic-transport-29
+     B.5.  Since draft-ietf-quic-transport-28
+     B.6.  Since draft-ietf-quic-transport-27
+     B.7.  Since draft-ietf-quic-transport-26
+     B.8.  Since draft-ietf-quic-transport-25
+     B.9.  Since draft-ietf-quic-transport-24
+     B.10. Since draft-ietf-quic-transport-23
+     B.11. Since draft-ietf-quic-transport-22
+     B.12. Since draft-ietf-quic-transport-21
+     B.13. Since draft-ietf-quic-transport-20
+     B.14. Since draft-ietf-quic-transport-19
+     B.15. Since draft-ietf-quic-transport-18
+     B.16. Since draft-ietf-quic-transport-17
+     B.17. Since draft-ietf-quic-transport-16
+     B.18. Since draft-ietf-quic-transport-15
+     B.19. Since draft-ietf-quic-transport-14
+     B.20. Since draft-ietf-quic-transport-13
+     B.21. Since draft-ietf-quic-transport-12
+     B.22. Since draft-ietf-quic-transport-11
+     B.23. Since draft-ietf-quic-transport-10
+     B.24. Since draft-ietf-quic-transport-09
+     B.25. Since draft-ietf-quic-transport-08
+     B.26. Since draft-ietf-quic-transport-07
+     B.27. Since draft-ietf-quic-transport-06
+     B.28. Since draft-ietf-quic-transport-05
+     B.29. Since draft-ietf-quic-transport-04
+     B.30. Since draft-ietf-quic-transport-03
+     B.31. Since draft-ietf-quic-transport-02
+     B.32. Since draft-ietf-quic-transport-01
+     B.33. Since draft-ietf-quic-transport-00
+     B.34. Since draft-hamilton-quic-transport-protocol-01
    Contributors
    Authors' Addresses
 
@@ -389,7 +398,7 @@ Table of Contents
       -  Section 12 describes concepts related to packets and frames,
 
       -  Section 13 defines models for the transmission, retransmission,
-         and acknowledgement of data, and
+         and acknowledgment of data, and
 
       -  Section 14 specifies rules for managing the size of datagrams
          carrying QUIC packets.
@@ -496,7 +505,7 @@ Table of Contents
    x (A..B):  Indicates that x can be any length from A to B; A can be
       omitted to indicate a minimum of zero bits and B can be omitted to
       indicate no set upper limit; values in this format always end on
-      an octet boundary
+      an byte boundary
 
    x (?) = C:  Indicates that x has a fixed value of C with the length
       described by ?, as above
@@ -780,7 +789,7 @@ Table of Contents
    flow control limits set by its peer, and continues to accept and
    process MAX_STREAM_DATA frames.  An endpoint in the "Send" state
    generates STREAM_DATA_BLOCKED frames if it is blocked from sending by
-   stream or connection flow control limits Section 4.1.
+   stream flow control limits Section 4.1.
 
    After the application indicates that all stream data has been sent
    and a STREAM frame containing the FIN bit is sent, the sending part
@@ -2198,7 +2207,7 @@ Table of Contents
    by setting a default of the most conservative value.
 
    New transport parameters can be registered according to the rules in
-   Section 22.2.
+   Section 22.3.
 
 7.5.  Cryptographic Message Buffering
 
@@ -2237,11 +2246,16 @@ Table of Contents
    that packet, the attacker can use the server to send more data toward
    the victim than it would be able to send on its own.
 
-   The primary defense against amplification attack is verifying that an
-   endpoint is able to receive packets at the transport address that it
-   claims.  Address validation is performed both during connection
-   establishment (see Section 8.1) and during connection migration (see
-   Section 8.2).
+   The primary defense against amplification attacks is verifying that a
+   peer is able to receive packets at the transport address that it
+   claims.  Therefore, after receiving packets from an address that is
+   not yet validated, an endpoint MUST limit the amount of data it sends
+   to the unvalidated address to three times the amount of data received
+   from that address.  This limit on the size of responses is known as
+   the anti-amplification limit.
+
+   Address validation is performed both during connection establishment
+   (see Section 8.1) and during connection migration (see Section 8.2).
 
 8.1.  Address Validation During Connection Establishment
 
@@ -2282,7 +2296,7 @@ Table of Contents
    Loss of an Initial or Handshake packet from the server can cause a
    deadlock if the client does not send additional Initial or Handshake
    packets.  A deadlock could occur when the server reaches its anti-
-   amplification limit and the client has received acknowledgements for
+   amplification limit and the client has received acknowledgments for
    all the data it has sent.  In this case, when the client has no
    reason to send additional packets, the server will be unable to send
    more data because it has not validated the client's address.  To
@@ -2338,8 +2352,8 @@ Table of Contents
    some control over how subsequent packets are routed.  This can be
    used to direct connections to a different server instance.
 
-   If a server receives a client Initial that can be unprotected but
-   contains an invalid Retry token, it knows the client will not accept
+   If a server receives a client Initial that contains an invalid Retry
+   token but is otherwise valid, it knows the client will not accept
    another Retry token.  The server can discard such a packet and allow
    the client to time out to detect handshake failure, but that could
    impose a significant latency penalty on the client.  Instead, the
@@ -2495,9 +2509,9 @@ Table of Contents
    when the token was issued.  Servers can use tokens from NEW_TOKEN in
    deciding not to send a Retry packet, even if the client address has
    changed.  If the client IP address has changed, the server MUST
-   adhere to the anti-amplification limits found in Section 8.1.  Note
-   that in the presence of NAT, this requirement might be insufficient
-   to protect other hosts that share the NAT from amplification attack.
+   adhere to the anti-amplification limit; see Section 8.  Note that in
+   the presence of NAT, this requirement might be insufficient to
+   protect other hosts that share the NAT from amplification attack.
 
    Attackers could replay tokens to use servers as amplifiers in DDoS
    attacks.  To protect against such attacks, servers MUST ensure that
@@ -2580,9 +2594,25 @@ Table of Contents
    corresponding PATH_CHALLENGE.
 
    An endpoint MUST expand datagrams that contain a PATH_CHALLENGE frame
-   to at least the smallest allowed maximum datagram size of 1200 bytes.
-   Sending UDP datagrams of this size ensures that the network path from
-   the endpoint to the peer can be used for QUIC; see Section 14.
+   to at least the smallest allowed maximum datagram size of 1200 bytes,
+   unless the anti-amplification limit for the path does not permit
+   sending a datagram of this size.  Sending UDP datagrams of this size
+   ensures that the network path from the endpoint to the peer can be
+   used for QUIC; see Section 14.
+
+   When an endpoint is unable to expand the datagram size to 1200 bytes
+   due to the anti-amplification limit, the path MTU will not be
+   validated.  To ensure that the path MTU is large enough, the endpoint
+   MUST perform a second path validation by sending a PATH_CHALLENGE
+   frame in a datagram of at least 1200 bytes.  This additional
+   validation can be performed after a PATH_RESPONSE is successfully
+   received or when enough bytes have been received on the path that
+   sending the larger datagram will not result in exceeding the anti-
+   amplification limit.
+
+   Unlike other cases where datagrams are expanded, endpoints MUST NOT
+   discard datagrams that appear to be too small when they contain
+   PATH_CHALLENGE or PATH_RESPONSE.
 
 8.2.2.  Path Validation Responses
 
@@ -2602,7 +2632,10 @@ Table of Contents
    An endpoint MUST expand datagrams that contain a PATH_RESPONSE frame
    to at least the smallest allowed maximum datagram size of 1200 bytes.
    This verifies that the path is able to carry datagrams of this size
-   in both directions.
+   in both directions.  However, an endpoint MUST NOT expand the
+   datagram containing the PATH_RESPONSE if the resulting data exceeds
+   the anti-amplification limit.  This is expected to only occur if the
+   received PATH_CHALLENGE was not sent in an expanded datagram.
 
    An endpoint MUST NOT send more than one PATH_RESPONSE frame in
    response to one PATH_CHALLENGE frame; see Section 13.3.  The peer is
@@ -2615,6 +2648,14 @@ Table of Contents
    contains the data that was sent in a previous PATH_CHALLENGE frame.
    A PATH_RESPONSE frame received on any network path validates the path
    on which the PATH_CHALLENGE was sent.
+
+   If the PATH_CHALLENGE frame that resulted in successful path
+   validation was sent in a datagram that was not expanded to at least
+   1200 bytes, the endpoint can regard the address as valid.  The
+   endpoint is then able to send more than three times the amount of
+   data that has been received.  However, the endpoint MUST initiate
+   another path validation with an expanded datagram to verify that the
+   path supports required MTU.
 
    Receipt of an acknowledgment for a packet containing a PATH_CHALLENGE
    frame is not adequate validation, since the acknowledgment can be
@@ -2644,7 +2685,11 @@ Table of Contents
    path is unusable.  This does not necessarily imply a failure of the
    connection - endpoints can continue sending packets over other paths
    as appropriate.  If no paths are available, an endpoint can wait for
-   a new path to become available or close the connection.
+   a new path to become available or close the connection.  An endpoint
+   that has no valid network path to its peer MAY signal this using the
+   NO_VIABLE_PATH connection error, noting that this is only possible if
+   the network path exists but does not support the required MTU
+   (Section 14).
 
    A path validation might be abandoned for other reasons besides
    failure.  Primarily, this happens if a connection migration to a new
@@ -2775,15 +2820,10 @@ Table of Contents
 
    As described in Section 9.3, an endpoint is required to validate a
    peer's new address to confirm the peer's possession of the new
-   address.  Until a peer's address is deemed valid, an endpoint MUST
-   limit the rate at which it sends data to this address.  The endpoint
-   MUST NOT send more than a minimum congestion window's worth of data
-   per estimated round-trip time (kMinimumWindow, as defined in
-   [QUIC-RECOVERY]).  In the absence of this limit, an endpoint risks
-   being used for a denial of service attack against an unsuspecting
-   victim.  Note that since the endpoint will not have any round-trip
-   time measurements to this address, the estimate SHOULD be the default
-   initial value; see [QUIC-RECOVERY].
+   address.  Until a peer's address is deemed valid, an endpoint limits
+   the amount of data it sends to that address; see Section 8.  In the
+   absence of this limit, an endpoint risks being used for a denial of
+   service attack against an unsuspecting victim.
 
    If an endpoint skips validation of a peer address as described above,
    it does not need to limit its sending rate.
@@ -3065,9 +3105,8 @@ Table of Contents
    preferred address.
 
    Servers SHOULD initiate path validation to the client's new address
-   upon receiving a probe packet from a different address.  Servers MUST
-   NOT send more than a minimum congestion window's worth of non-probing
-   packets to the new address before path validation is complete.
+   upon receiving a probe packet from a different address; see
+   Section 8.
 
    A client that migrates to a new address SHOULD use a preferred
    address from the same address family for the server.
@@ -3250,9 +3289,9 @@ Table of Contents
    state and send a packet containing a CONNECTION_CLOSE frame in
    response to any UDP datagram that is received.  However, an endpoint
    that discards packet protection keys cannot identify and discard
-   invalid packets.  To avoid being used for an amplication attack, such
-   endpoints MUST limit the cumulative size of packets it sends to three
-   times the cumulative size of the packets that are received and
+   invalid packets.  To avoid being used for an amplification attack,
+   such endpoints MUST limit the cumulative size of packets it sends to
+   three times the cumulative size of the packets that are received and
    attributed to the connection.  To minimize the state that an endpoint
    maintains for a closing connection, endpoints MAY send the exact same
    packet in response to any received packet.
@@ -3987,7 +4026,7 @@ Table of Contents
       Section 4.
 
    The "Pkts" and "Spec" columns in Table 3 do not form part of the IANA
-   registry; see Section 22.3.
+   registry; see Section 22.4.
 
    An endpoint MUST treat the receipt of a frame of unknown type as a
    connection error of type FRAME_ENCODING_ERROR.
@@ -4083,7 +4122,7 @@ Table of Contents
    did not send as a connection error of type PROTOCOL_VIOLATION, if it
    is able to detect the condition.
 
-13.2.  Generating Acknowledgements
+13.2.  Generating Acknowledgments
 
    Endpoints acknowledge all packets they receive and process.  However,
    only ack-eliciting packets cause an ACK frame to be sent within the
@@ -4128,7 +4167,7 @@ Table of Contents
    An endpoint MUST NOT send a non-ack-eliciting packet in response to a
    non-ack-eliciting packet, even if there are packet gaps that precede
    the received packet.  This avoids an infinite feedback loop of
-   acknowledgements, which could prevent the connection from ever
+   acknowledgments, which could prevent the connection from ever
    becoming idle.  Non-ack-eliciting packets are eventually acknowledged
    when the endpoint sends an ACK frame in response to other events.
 
@@ -4155,7 +4194,7 @@ Table of Contents
    network.
 
    An endpoint that is only sending ACK frames will not receive
-   acknowledgments from its peer unless those acknowledgements are
+   acknowledgments from its peer unless those acknowledgments are
    included in packets with ack-eliciting frames.  An endpoint SHOULD
    send an ACK frame with other frames when there are new ack-eliciting
    packets to acknowledge.  When only non-ack-eliciting packets need to
@@ -4164,11 +4203,11 @@ Table of Contents
 
    A receiver MUST NOT send an ack-eliciting frame in all packets that
    would otherwise be non-ack-eliciting, to avoid an infinite feedback
-   loop of acknowledgements.
+   loop of acknowledgments.
 
-13.2.2.  Acknowledgement Frequency
+13.2.2.  Acknowledgment Frequency
 
-   A receiver determines how frequently to send acknowledgements in
+   A receiver determines how frequently to send acknowledgments in
    response to ack-eliciting packets.  This determination involves a
    trade-off.
 
@@ -4179,7 +4218,7 @@ Table of Contents
    acknowledgments can adversely affect performance.
 
    On the other hand, reducing the frequency of packets that carry only
-   acknowledgements reduces packet transmission and processing cost at
+   acknowledgments reduces packet transmission and processing cost at
    both endpoints.  It can improve connection throughput on severely
    asymmetric links and reduce the volume of acknowledgment traffic
    using return path capacity; see Section 3 of [RFC3449].
@@ -4198,7 +4237,7 @@ Table of Contents
 13.2.3.  Managing ACK Ranges
 
    When an ACK frame is sent, one or more ranges of acknowledged packets
-   are included.  Including acknowledgements for older packets reduces
+   are included.  Including acknowledgments for older packets reduces
    the chance of spurious retransmissions caused by losing previously
    sent ACK frames, at the cost of larger ACK frames.
 
@@ -4214,7 +4253,7 @@ Table of Contents
    remembers and sends in ACK frames, both to limit the size of ACK
    frames and to avoid resource exhaustion.  After receiving
    acknowledgments for an ACK frame, the receiver SHOULD stop tracking
-   those acknowledged ACK Ranges.  Senders can expect acknowledgements
+   those acknowledged ACK Ranges.  Senders can expect acknowledgments
    for most packets, but QUIC does not guarantee receipt of an
    acknowledgment for every packet that the receiver processes.
 
@@ -4256,7 +4295,7 @@ Table of Contents
    ACK frame.
 
    A receiver that sends only non-ack-eliciting packets, such as ACK
-   frames, might not receive an acknowledgement for a long period of
+   frames, might not receive an acknowledgment for a long period of
    time.  This could cause the receiver to maintain state for a large
    number of ACK frames for a long period of time, and ACK frames it
    sends could be unnecessarily large.  In such a case, a receiver could
@@ -4265,9 +4304,9 @@ Table of Contents
 
    In cases without ACK frame loss, this algorithm allows for a minimum
    of 1 RTT of reordering.  In cases with ACK frame loss and reordering,
-   this approach does not guarantee that every acknowledgement is seen
-   by the sender before it is no longer included in the ACK frame.
-   Packets could be received out of order and all subsequent ACK frames
+   this approach does not guarantee that every acknowledgment is seen by
+   the sender before it is no longer included in the ACK frame.  Packets
+   could be received out of order and all subsequent ACK frames
    containing them could be lost.  In this case, the loss recovery
    algorithm could cause spurious retransmissions, but the sender will
    continue making forward progress.
@@ -4277,7 +4316,7 @@ Table of Contents
    An endpoint measures the delays intentionally introduced between the
    time the packet with the largest packet number is received and the
    time an acknowledgment is sent.  The endpoint encodes this
-   acknowledgement delay in the ACK Delay field of an ACK frame; see
+   acknowledgment delay in the ACK Delay field of an ACK frame; see
    Section 19.3.  This allows the receiver of the ACK frame to adjust
    for any intentional delays, which is important for getting a better
    estimate of the path RTT when acknowledgments are delayed.
@@ -4289,7 +4328,7 @@ Table of Contents
    unavailability of decryption keys, since these delays can be large
    and are likely to be non-repeating.
 
-   When the measured acknowledgement delay is larger than its
+   When the measured acknowledgment delay is larger than its
    max_ack_delay, an endpoint SHOULD report the measured delay.  This
    information is especially useful during the handshake when delays
    might be large; see Section 13.2.1.
@@ -4341,8 +4380,8 @@ Table of Contents
       stream.  Once an endpoint sends a RESET_STREAM frame, no further
       STREAM frames are needed.
 
-   *  ACK frames carry the most recent set of acknowledgements and the
-      acknowledgement delay from the largest acknowledged packet, as
+   *  ACK frames carry the most recent set of acknowledgments and the
+      acknowledgment delay from the largest acknowledged packet, as
       described in Section 13.2.1.  Delaying the transmission of packets
       containing ACK frames or resending old ACK frames can cause the
       peer to generate an inflated RTT sample or unnecessarily disable
@@ -4378,7 +4417,7 @@ Table of Contents
       lost or when the limit is updated, with care taken to prevent the
       frame from being sent too often.  An endpoint SHOULD stop sending
       MAX_STREAM_DATA frames when the receiving part of the stream
-      enters a "Size Known" state.
+      enters a "Size Known" or "Reset Recvd" state.
 
    *  The limit on streams of a given type is sent in MAX_STREAMS
       frames.  Like MAX_DATA, an updated value is sent when a packet
@@ -4481,7 +4520,7 @@ Table of Contents
    corresponding ECT(0), ECT(1), or CE count.  These ECN counts are
    included in subsequent ACK frames; see Section 13.2 and Section 19.3.
 
-   Each packet number space maintains separate acknowledgement state and
+   Each packet number space maintains separate acknowledgment state and
    separate ECN counts.  Coalesced QUIC packets (see Section 12.2) share
    the same IP header so the ECN counts are incremented once for each
    coalesced QUIC packet.
@@ -4557,7 +4596,7 @@ Table of Contents
    with an ECT(1) marking.  These checks can detect remarking of ECN-CE
    markings by the network.
 
-   An endpoint could miss acknowledgements for a packet when ACK frames
+   An endpoint could miss acknowledgments for a packet when ACK frames
    are lost.  It is therefore possible for the total increase in ECT(0),
    ECT(1), and ECN-CE counts to be greater than the number of packets
    that are newly acknowledged by an ACK frame.  This is why ECN counts
@@ -4610,7 +4649,7 @@ Table of Contents
    bytes for IPv6 and 20 bytes for IPv4 and a UDP header size of 8
    bytes, this results in a maximum datagram size of 1232 bytes for IPv6
    and 1252 bytes for IPv4.  Thus, modern IPv4 and all IPv6 network
-   paths will be able to support QUIC.
+   paths are expected to be able to support QUIC.
 
    Any maximum datagram size larger than 1200 bytes can be discovered
    using Path Maximum Transmission Unit Discovery (PMTUD; see
@@ -4852,21 +4891,6 @@ Table of Contents
    support for one of these versions and can expect that clients ignore
    the value.
 
-   [[RFC editor: please remove the remainder of this section before
-   publication.]]
-
-   The version number for the final version of this specification
-   (0x00000001), is reserved for the version of the protocol that is
-   published as an RFC.
-
-   Version numbers used to identify IETF drafts are created by adding
-   the draft number to 0xff000000.  For example, draft-ietf-quic-
-   transport-13 would be identified as 0xff00000d.
-
-   Implementors are encouraged to register version numbers of QUIC that
-   they are using for private experimentation on the GitHub wiki at
-   https://github.com/quicwg/base-drafts/wiki/QUIC-Versions.
-
 16.  Variable-Length Integer Encoding
 
    QUIC packets and frames commonly use a variable-length encoding for
@@ -4898,9 +4922,10 @@ Table of Contents
 
    Examples and a sample decoding algorithm are shown in Appendix A.1.
 
-   Versions (Section 15) and packet numbers sent in the header
-   (Section 17.1) are described using integers, but do not use this
-   encoding.
+   Versions (Section 15), packet numbers sent in the header
+   (Section 17.1), and the length of connection IDs in long header
+   packets (Section 17.2) are described using integers, but do not use
+   this encoding.
 
 17.  Packet Formats
 
@@ -4919,11 +4944,11 @@ Table of Contents
    The encoded packet number is protected as described in Section 5.4 of
    [QUIC-TLS].
 
-   Prior to receiving an acknowledgement for a packet number space, the
+   Prior to receiving an acknowledgment for a packet number space, the
    full packet number MUST be included; it is not to be truncated as
    described below.
 
-   After an acknowledgement is received for a packet number space, the
+   After an acknowledgment is received for a packet number space, the
    sender MUST use a packet number size able to represent more than
    twice as large a range than the difference between the largest
    acknowledged packet and packet number being sent.  A peer receiving
@@ -5218,11 +5243,12 @@ Table of Contents
    message.  The first CRYPTO frame sent always begins at an offset of
    0; see Section 7.
 
-   Note that if the server sends a HelloRetryRequest, the client will
-   send another series of Initial packets.  These Initial packets will
-   continue the cryptographic handshake and will contain CRYPTO frames
-   starting at an offset matching the size of the CRYPTO frames sent in
-   the first flight of Initial packets.
+   Note that if the server sends a TLS HelloRetryRequest (see
+   Section 4.7 of [QUIC-TLS]), the client will send another series of
+   Initial packets.  These Initial packets will continue the
+   cryptographic handshake and will contain CRYPTO frames starting at an
+   offset matching the size of the CRYPTO frames sent in the first
+   flight of Initial packets.
 
 17.2.2.1.  Abandoning Initial Packets
 
@@ -5441,12 +5467,13 @@ Table of Contents
    restrictions as the first Initial packet.  A client MUST use the same
    cryptographic handshake message it included in this packet.  A server
    MAY treat a packet that contains a different cryptographic handshake
-   message as a connection error or discard it.
+   message as a connection error or discard it.  Note that including a
+   Token field reduces the available space for the cryptographic
+   handshake message, which might result in the client needing to send
+   multiple Initial packets.
 
    A client MAY attempt 0-RTT after receiving a Retry packet by sending
-   0-RTT packets to the connection ID provided by the server.  A client
-   MUST NOT change the cryptographic handshake message it sends in
-   response to receiving a Retry.
+   0-RTT packets to the connection ID provided by the server.
 
    A client MUST NOT reset the packet number for any packet number space
    after processing a Retry packet.  In particular, 0-RTT packets
@@ -5732,21 +5759,20 @@ Table of Contents
       Setting this parameter is equivalent to sending a MAX_STREAMS
       (Section 19.11) of the corresponding type with the same value.
 
-   ack_delay_exponent (0x0a):  The acknowledgement delay exponent is an
+   ack_delay_exponent (0x0a):  The acknowledgment delay exponent is an
       integer value indicating an exponent used to decode the ACK Delay
       field in the ACK frame (Section 19.3).  If this value is absent, a
       default value of 3 is assumed (indicating a multiplier of 8).
       Values above 20 are invalid.
 
-   max_ack_delay (0x0b):  The maximum acknowledgement delay is an
-      integer value indicating the maximum amount of time in
-      milliseconds by which the endpoint will delay sending
-      acknowledgments.  This value SHOULD include the receiver's
-      expected delays in alarms firing.  For example, if a receiver sets
-      a timer for 5ms and alarms commonly fire up to 1ms late, then it
-      should send a max_ack_delay of 6ms.  If this value is absent, a
-      default of 25 milliseconds is assumed.  Values of 2^14 or greater
-      are invalid.
+   max_ack_delay (0x0b):  The maximum acknowledgment delay is an integer
+      value indicating the maximum amount of time in milliseconds by
+      which the endpoint will delay sending acknowledgments.  This value
+      SHOULD include the receiver's expected delays in alarms firing.
+      For example, if a receiver sets a timer for 5ms and alarms
+      commonly fire up to 1ms late, then it should send a max_ack_delay
+      of 6ms.  If this value is absent, a default of 25 milliseconds is
+      assumed.  Values of 2^14 or greater are invalid.
 
    disable_active_migration (0x0c):  The disable active migration
       transport parameter is included if the endpoint does not support
@@ -5895,7 +5921,7 @@ Table of Contents
    and, if they have enabled ECN for packets they send, they SHOULD use
    the information in the ECN section to manage their congestion state.
 
-   QUIC acknowledgements are irrevocable.  Once acknowledged, a packet
+   QUIC acknowledgments are irrevocable.  Once acknowledged, a packet
    remains acknowledged, even if it does not appear in a future ACK
    frame.  This is unlike reneging for TCP SACKs ([RFC2018]).
 
@@ -5932,7 +5958,7 @@ Table of Contents
       generating the ACK frame.  Unlike the packet number in the QUIC
       long or short header, the value in an ACK frame is not truncated.
 
-   ACK Delay:  A variable-length integer encoding the acknowledgement
+   ACK Delay:  A variable-length integer encoding the acknowledgment
       delay in microseconds; see Section 13.2.5.  It is decoded by
       multiplying the value in the field by 2 to the power of the
       ack_delay_exponent transport parameter sent by the sender of the
@@ -6731,7 +6757,7 @@ Table of Contents
    control unless specified in the extension.
 
    An IANA registry is used to manage the assignment of frame types; see
-   Section 22.3.
+   Section 22.4.
 
 20.  Error Codes
 
@@ -6806,13 +6832,18 @@ Table of Contents
       confidentiality or integrity limit for the AEAD algorithm used by
       the given connection.
 
+   NO_VIABLE_PATH (0x10):  An endpoint has determined that the network
+      path is incapable of supporting QUIC.  An endpoint is unlikely to
+      receive CONNECTION_CLOSE carrying this code except when the path
+      does not support a large enough MTU.
+
    CRYPTO_ERROR (0x1XX):  The cryptographic handshake failed.  A range
       of 256 values is reserved for carrying error codes specific to the
       cryptographic handshake that is used.  Codes for errors occurring
       when TLS is used for the crypto handshake are described in
       Section 4.8 of [QUIC-TLS].
 
-   See Section 22.4 for details of registering new error codes.
+   See Section 22.5 for details of registering new error codes.
 
    In defining these error codes, several principles are applied.  Error
    conditions that might require specific action on the part of a
@@ -6895,10 +6926,15 @@ Table of Contents
    Address validation limits amplification attack targets to addresses
    for which an attacker can observe packets.
 
-   Prior to validation, endpoints are limited in what they are able to
-   send.  During the handshake, a server cannot send more than three
-   times the data it receives; clients that initiate new connections or
-   migrate to a new network path are limited.
+   Prior to address validation, endpoints are limited in what they are
+   able to send.  Endpoints cannot send data toward an unvalidated
+   address in excess of three times the data received from that address.
+
+   Note:  The anti-amplification limit only applies when an endpoint
+      responds to packets received from an unvalidated address.  The
+      anti-amplification limit does not apply to clients when
+      establishing a new connection or when initiating connection
+      migration.
 
 21.1.1.2.  Server-Side DoS
 
@@ -7315,15 +7351,18 @@ Table of Contents
       populating DNS records;
 
    *  preferred addresses (Section 9.6), where a server is able to
-      choose where a client sends datagrams; and
+      choose where a client sends datagrams;
 
    *  spoofed connection migrations (Section 9.3.1), where a client is
       able to use source address spoofing to select where a server sends
-      subsequent datagrams.
+      subsequent datagrams; and
 
-   In all three cases, the attacker can cause its peer to send datagrams
-   to a victim that might not understand QUIC.  That is, these packets
-   are sent by the peer prior to address validation; see Section 8.
+   *  spoofed packets that cause a server to send a Version Negotiation
+      packet Section 21.5.5.
+
+   In all cases, the attacker can cause its peer to send datagrams to a
+   victim that might not understand QUIC.  That is, these packets are
+   sent by the peer prior to address validation; see Section 8.
 
    Outside of the encrypted portion of packets, QUIC offers an endpoint
    several options for controlling the content of UDP datagrams that its
@@ -7405,7 +7444,7 @@ Table of Contents
 
    This document does not offer any additional countermeasures that are
    specific to use of preferred addresses and can be implemented by
-   endpoints.  The generic measures described in Section 21.5.5 could be
+   endpoints.  The generic measures described in Section 21.5.6 could be
    used as further mitigation.
 
 21.5.4.  Request Forgery with Spoofed Migration
@@ -7428,12 +7467,29 @@ Table of Contents
 
    This document does not offer specific countermeasures that can be
    implemented by endpoints aside from the generic measures described in
-   Section 21.5.5.  However, countermeasures for address spoofing at the
+   Section 21.5.6.  However, countermeasures for address spoofing at the
    network level, in particular ingress filtering [BCP38], are
    especially effective against attacks that use spoofing and originate
    from an external network.
 
-21.5.5.  Generic Request Forgery Countermeasures
+21.5.5.  Request Forgery with Version Negotiation
+
+   Clients that are able to present a spoofed source address on a packet
+   can cause a server to send a Version Negotiation packet
+   Section 17.2.1 to that address.
+
+   The absence of size restrictions on the connection ID fields for
+   packets of an unknown version increases the amount of data that the
+   client controls from the resulting datagram.  The first byte of this
+   packet is not under client control and the next four bytes are zero,
+   but the client is able to control up to 512 bytes starting from the
+   fifth byte.
+
+   No specific countermeasures are provided for this attack, though
+   generic protections Section 21.5.6 could apply.  In this case,
+   ingress filtering [BCP38] is also effective.
+
+21.5.6.  Generic Request Forgery Countermeasures
 
    The most effective defense against request forgery attacks is to
    modify vulnerable services to use strong authentication.  However,
@@ -7629,12 +7685,10 @@ Table of Contents
 21.13.  Targeted Attacks by Routing
 
    Deployments should limit the ability of an attacker to target a new
-   connection to a particular server instance.  This means that client-
-   controlled fields, such as the initial Destination Connection ID used
-   on Initial and 0-RTT packets SHOULD NOT be used by themselves to make
-   routing decisions.  Ideally, routing decisions are made independently
-   of client-selected values; a Source Connection ID can be selected to
-   route later packets to the same server.
+   connection to a particular server instance.  Ideally, routing
+   decisions are made independently of client-selected values, including
+   addresses.  Once an instance is selected, a connection ID can be
+   selected so that later packets are routed to the same instance.
 
 21.14.  Traffic Analysis
 
@@ -7775,13 +7829,12 @@ Table of Contents
 
    The creation of a registry MAY identify a range of codepoints where
    registrations are governed by a different registration policy.  For
-   instance, the registries for 62-bit codepoints in this document have
-   stricter policies for codepoints in the range from 0 to 63.
+   instance, the frame type registry in Section 22.4 has a stricter
+   policy for codepoints in the range from 0 to 63.
 
    Any stricter requirements for permanent registrations do not prevent
    provisional registrations for affected codepoints.  For instance, a
-   provisional registration for a frame type (Section 22.3) of 61 could
-   be requested.
+   provisional registration for a frame type of 61 could be requested.
 
    All registrations made by Standards Track publications MUST be
    permanent.
@@ -7790,7 +7843,36 @@ Table of Contents
    and list a change controller of the IETF and a contact of the QUIC
    working group (quic@ietf.org).
 
-22.2.  QUIC Transport Parameter Registry
+22.2.  QUIC Versions Registry
+
+   IANA [SHALL add/has added] a registry for "QUIC Versions" under a
+   "QUIC" heading.
+
+   The "QUIC Versions" registry governs a 32-bit space; see Section 15.
+   This registry follows the registration policy from Section 22.1.
+   Permanent registrations in this registry are assigned using the
+   Specification Required policy ([RFC8126]).
+
+   The codepoint of 0x00000001 to the protocol is assigned with
+   permanent status to the protocol defined in this document.  The
+   codepoint of 0x00000000 is permanently reserved; the note for this
+   codepoint [shall] indicate[s] that this version is reserved for
+   Version Negotiation.
+
+   All codepoints that follow the pattern 0x?a?a?a?a are reserved and
+   MUST NOT be assigned by IANA and MUST NOT appear in the listing of
+   assigned values.
+
+   [[RFC editor: please remove the following note before publication.]]
+
+   IANA note:  Several pre-standardization versions will likely be in
+      use at the time of publication.  There is no need to document
+      these in an RFC, but recording information about these version
+      will ensure that the information in the registry is accurate.  The
+      document editors or working group chairs can facilitate getting
+      the necessary information.
+
+22.3.  QUIC Transport Parameter Registry
 
    IANA [SHALL add/has added] a registry for "QUIC Transport Parameters"
    under a "QUIC" heading.
@@ -7847,11 +7929,11 @@ Table of Contents
 
              Table 6: Initial QUIC Transport Parameters Entries
 
-   Additionally, each value of the format "31 * N + 27" for integer
-   values of N (that is, 27, 58, 89, ...) are reserved and MUST NOT be
-   assigned by IANA.
+   Each value of the format "31 * N + 27" for integer values of N (that
+   is, 27, 58, 89, ...) are reserved; these values MUST NOT be assigned
+   by IANA and MUST NOT appear in the listing of assigned values.
 
-22.3.  QUIC Frame Types Registry
+22.4.  QUIC Frame Types Registry
 
    IANA [SHALL add/has added] a registry for "QUIC Frame Types" under a
    "QUIC" heading.
@@ -7873,7 +7955,7 @@ Table of Contents
    permanent registrations SHOULD describe the means by which an
    endpoint might determine that it can send the identified type of
    frame.  An accompanying transport parameter registration is expected
-   for most registrations; see Section 22.2.  Specifications for
+   for most registrations; see Section 22.3.  Specifications for
    permanent registrations also need to describe the format and assigned
    semantics of any fields in the frame.
 
@@ -7881,7 +7963,7 @@ Table of Contents
    that the registry does not include the "Pkts" and "Spec" columns from
    Table 3.
 
-22.4.  QUIC Transport Error Codes Registry
+22.5.  QUIC Transport Error Codes Registry
 
    IANA [SHALL add/has added] a registry for "QUIC Transport Error
    Codes" under a "QUIC" heading.
@@ -7960,6 +8042,10 @@ Table of Contents
    |      |                           |packet          |               |
    |      |                           |protection keys |               |
    +------+---------------------------+----------------+---------------+
+   |0x10  | NO_VIABLE_PATH            |No viable       | Section 20    |
+   |      |                           |network path    |               |
+   |      |                           |exists          |               |
+   +------+---------------------------+----------------+---------------+
 
             Table 7: Initial QUIC Transport Error Codes Entries
 
@@ -7981,15 +8067,21 @@ Table of Contents
               DOI 10.17487/RFC0791, September 1981,
               <https://www.rfc-editor.org/info/rfc791>.
 
+   [QUIC-INVARIANTS]
+              Thomson, M., "Version-Independent Properties of QUIC",
+              Work in Progress, Internet-Draft, draft-ietf-quic-
+              invariants, 7 January 2021,
+              <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
+
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 8 December 2020,
+              draft-ietf-quic-recovery, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 8 December 2020,
+              Internet-Draft, draft-ietf-quic-tls, 7 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
@@ -8101,12 +8193,6 @@ Table of Contents
               (IPv6) Specification", STD 86, RFC 8200,
               DOI 10.17487/RFC8200, July 2017,
               <https://www.rfc-editor.org/info/rfc8200>.
-
-   [QUIC-INVARIANTS]
-              Thomson, M., "Version-Independent Properties of QUIC",
-              Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 8 December 2020,
-              <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-MANAGEABILITY]
               Kuehlewind, M. and B. Trammell, "Manageability of the QUIC
@@ -8357,7 +8443,34 @@ Appendix B.  Change Log
 
    Issue and pull request numbers are listed with a leading octothorp.
 
-B.1.  Since draft-ietf-quic-transport-31
+B.1.  Since draft-ietf-quic-transport-32
+
+   *  Endpoints are required to limit the total data they send in
+      response to an apparent connection migration to three times what
+      was received (#4257, #4264)
+
+   *  Added an error code for path validation failures (#4257, #4331)
+
+   *  Defined DoS protections for clients during the handshake (#4259,
+      #4330, #4344)
+
+   *  Prohibited connection errors when datagrams are not the required
+      size (#4273, #4342)
+
+   *  Stop using initial timeout for path validation (#4261, #4262,
+      #4263).
+
+   *  A number of improvements to IANA considerations:
+
+      -  Added a registry for versions (#4345, #4280)
+
+      -  Clarified rules for first reserved value (#4378, #4389)
+
+      -  Reserved values are not added to the registry (#4372, #4428)
+
+   *  Added final version numbers (#4430)
+
+B.2.  Since draft-ietf-quic-transport-31
 
    *  Require expansion of datagrams to ensure that a path supports at
       least 1200 bytes in both directions:
@@ -8375,7 +8488,7 @@ B.1.  Since draft-ietf-quic-transport-31
    *  Split contact into contact and change controller for IANA
       registrations (#4230, #4239)
 
-B.2.  Since draft-ietf-quic-transport-30
+B.3.  Since draft-ietf-quic-transport-30
 
    *  Use TRANSPORT_PARAMETER_ERROR for an invalid transport parameter
       (#4099, #4100)
@@ -8386,7 +8499,7 @@ B.2.  Since draft-ietf-quic-transport-30
    *  Allow use of address validation token when server address changes
       (#4076, #4089)
 
-B.3.  Since draft-ietf-quic-transport-29
+B.4.  Since draft-ietf-quic-transport-29
 
    *  Require the same connection ID on coalesced packets (#3800, #3930)
 
@@ -8419,7 +8532,7 @@ B.3.  Since draft-ietf-quic-transport-29
    *  Limit recommendation for immediate acknowledgment to when ack-
       eliciting packets are reordered (#4001, #4000)
 
-B.4.  Since draft-ietf-quic-transport-28
+B.5.  Since draft-ietf-quic-transport-28
 
    *  Made SERVER_BUSY error (0x2) more generic, now CONNECTION_REFUSED
       (#3709, #3690, #3694)
@@ -8433,7 +8546,7 @@ B.4.  Since draft-ietf-quic-transport-28
    *  disable_active_migration does not apply to the addresses offered
       in server_preferred_address (#3608, #3670)
 
-B.5.  Since draft-ietf-quic-transport-27
+B.6.  Since draft-ietf-quic-transport-27
 
    *  Allowed CONNECTION_CLOSE in any packet number space, with a
       requirement to use a new transport-level error for application-
@@ -8482,12 +8595,12 @@ B.5.  Since draft-ietf-quic-transport-27
 
    *  Opening a stream in the wrong direction is an error (#3527)
 
-B.6.  Since draft-ietf-quic-transport-26
+B.7.  Since draft-ietf-quic-transport-26
 
    *  Change format of transport parameters to use varints (#3294,
       #3169)
 
-B.7.  Since draft-ietf-quic-transport-25
+B.8.  Since draft-ietf-quic-transport-25
 
    *  Define the use of CONNECTION_CLOSE prior to establishing
       connection state (#3269, #3297, #3292)
@@ -8497,7 +8610,7 @@ B.7.  Since draft-ietf-quic-transport-25
 
    *  Define the timer for address validation (#2910, #3339)
 
-B.8.  Since draft-ietf-quic-transport-24
+B.9.  Since draft-ietf-quic-transport-24
 
    *  Added HANDSHAKE_DONE to signal handshake confirmation (#2863,
       #3142, #3145)
@@ -8549,7 +8662,7 @@ B.8.  Since draft-ietf-quic-transport-24
    *  Packets on one path must not adjust values for a different path
       (#2909, #3139)
 
-B.9.  Since draft-ietf-quic-transport-23
+B.10.  Since draft-ietf-quic-transport-23
 
    *  Allow ClientHello to span multiple packets (#2928, #3045)
 
@@ -8585,7 +8698,7 @@ B.9.  Since draft-ietf-quic-transport-23
 
    *  Servers have to change connection IDs in Retry (#2837, #3147)
 
-B.10.  Since draft-ietf-quic-transport-22
+B.11.  Since draft-ietf-quic-transport-22
 
    *  Rules for preventing correlation by connection ID tightened
       (#2084, #2929)
@@ -8639,12 +8752,12 @@ B.10.  Since draft-ietf-quic-transport-22
    *  Moved ACK generation guidance from recovery draft to transport
       draft (#1860, #2916).
 
-B.11.  Since draft-ietf-quic-transport-21
+B.12.  Since draft-ietf-quic-transport-21
 
    *  Connection ID lengths are now one octet, but limited in version 1
       to 20 octets of length (#2736, #2749)
 
-B.12.  Since draft-ietf-quic-transport-20
+B.13.  Since draft-ietf-quic-transport-20
 
    *  Error codes are encoded as variable-length integers (#2672, #2680)
 
@@ -8688,7 +8801,7 @@ B.12.  Since draft-ietf-quic-transport-20
    *  Document hack for enabling routing of ICMP when doing PMTU probing
       (#1243, #2402)
 
-B.13.  Since draft-ietf-quic-transport-19
+B.14.  Since draft-ietf-quic-transport-19
 
    *  Refine discussion of 0-RTT transport parameters (#2467, #2464)
 
@@ -8715,7 +8828,7 @@ B.13.  Since draft-ietf-quic-transport-19
 
    *  Stateless reset uses a short header packet (#2599, #2600)
 
-B.14.  Since draft-ietf-quic-transport-18
+B.15.  Since draft-ietf-quic-transport-18
 
    *  Removed version negotiation; version negotiation, including
       authentication of the result, will be addressed in the next
@@ -8734,7 +8847,7 @@ B.14.  Since draft-ietf-quic-transport-18
 
    *  Increased the set of permissible frames in 0-RTT (#2344, #2355)
 
-B.15.  Since draft-ietf-quic-transport-17
+B.16.  Since draft-ietf-quic-transport-17
 
    *  Stream-related errors now use STREAM_STATE_ERROR (#2305)
 
@@ -8773,7 +8886,7 @@ B.15.  Since draft-ietf-quic-transport-17
 
    *  ACK of non-existent packet is illegal (#2298, #2302)
 
-B.16.  Since draft-ietf-quic-transport-16
+B.17.  Since draft-ietf-quic-transport-16
 
    *  Stream limits are defined as counts, not maximums (#1850, #1906)
 
@@ -8828,11 +8941,11 @@ B.16.  Since draft-ietf-quic-transport-16
 
    *  ICMP PTB validation clarifications (#2161, #2109, #2108)
 
-B.17.  Since draft-ietf-quic-transport-15
+B.18.  Since draft-ietf-quic-transport-15
 
    Substantial editorial reorganization; no technical changes.
 
-B.18.  Since draft-ietf-quic-transport-14
+B.19.  Since draft-ietf-quic-transport-14
 
    *  Merge ACK and ACK_ECN (#1778, #1801)
 
@@ -8851,7 +8964,7 @@ B.18.  Since draft-ietf-quic-transport-14
 
    *  Prevent handshake deadlock (#1764, #1824)
 
-B.19.  Since draft-ietf-quic-transport-13
+B.20.  Since draft-ietf-quic-transport-13
 
    *  Streams open when higher-numbered streams of the same type open
       (#1342, #1549)
@@ -8889,7 +9002,7 @@ B.19.  Since draft-ietf-quic-transport-13
 
    *  Remove frame type field from APPLICATION_CLOSE (#1508, #1528)
 
-B.20.  Since draft-ietf-quic-transport-12
+B.21.  Since draft-ietf-quic-transport-12
 
    *  Changes to integration of the TLS handshake (#829, #1018, #1094,
       #1165, #1190, #1233, #1242, #1252, #1450, #1458)
@@ -8932,7 +9045,7 @@ B.20.  Since draft-ietf-quic-transport-12
 
    *  Added frame type extension mechanism (#58, #1473)
 
-B.21.  Since draft-ietf-quic-transport-11
+B.22.  Since draft-ietf-quic-transport-11
 
    *  Enable server to transition connections to a preferred address
       (#560, #1251)
@@ -8944,7 +9057,7 @@ B.21.  Since draft-ietf-quic-transport-11
 
    *  STREAM frames can now be empty (#1350)
 
-B.22.  Since draft-ietf-quic-transport-10
+B.23.  Since draft-ietf-quic-transport-10
 
    *  Swap payload length and packed number fields in long header
       (#1294)
@@ -8980,7 +9093,7 @@ B.22.  Since draft-ietf-quic-transport-10
    *  Remove implication that Version Negotiation is sent when a packet
       of the wrong version is received (#1197)
 
-B.23.  Since draft-ietf-quic-transport-09
+B.24.  Since draft-ietf-quic-transport-09
 
    *  Added PATH_CHALLENGE and PATH_RESPONSE frames to replace PING with
       Data and PONG frame.  Changed ACK frame type from 0x0e to 0x0d.
@@ -9007,7 +9120,7 @@ B.23.  Since draft-ietf-quic-transport-09
       omit_connection_id transport parameter and the corresponding short
       header flag. (#1089, #1052, #1146, #821, #745, #821, #1166, #1151)
 
-B.24.  Since draft-ietf-quic-transport-08
+B.25.  Since draft-ietf-quic-transport-08
 
    *  Clarified requirements for BLOCKED usage (#65, #924)
 
@@ -9035,7 +9148,7 @@ B.24.  Since draft-ietf-quic-transport-08
 
    *  Removed transport parameters from NewSessionTicket (#1015)
 
-B.25.  Since draft-ietf-quic-transport-07
+B.26.  Since draft-ietf-quic-transport-07
 
    *  The long header now has version before packet number (#926, #939)
 
@@ -9079,7 +9192,7 @@ B.25.  Since draft-ietf-quic-transport-07
    *  Increased the range over which packet numbers are randomized
       (#864, #850, #964)
 
-B.26.  Since draft-ietf-quic-transport-06
+B.27.  Since draft-ietf-quic-transport-06
 
    *  Replaced FNV-1a with AES-GCM for all "Cleartext" packets (#554)
 
@@ -9097,7 +9210,7 @@ B.26.  Since draft-ietf-quic-transport-06
 
    *  Require transport parameters to only appear once (#792)
 
-B.27.  Since draft-ietf-quic-transport-05
+B.28.  Since draft-ietf-quic-transport-05
 
    *  Stateless token is server-only (#726)
 
@@ -9112,7 +9225,7 @@ B.27.  Since draft-ietf-quic-transport-05
 
    *  Clarify Keep-alive requirements (#729)
 
-B.28.  Since draft-ietf-quic-transport-04
+B.29.  Since draft-ietf-quic-transport-04
 
    *  Introduce STOP_SENDING frame, RESET_STREAM only resets in one
       direction (#165)
@@ -9146,13 +9259,13 @@ B.28.  Since draft-ietf-quic-transport-04
 
    *  Update labels used in HKDF-Expand-Label to match TLS 1.3 (#642)
 
-B.29.  Since draft-ietf-quic-transport-03
+B.30.  Since draft-ietf-quic-transport-03
 
    *  Change STREAM and RESET_STREAM layout
 
    *  Add MAX_STREAM_ID settings
 
-B.30.  Since draft-ietf-quic-transport-02
+B.31.  Since draft-ietf-quic-transport-02
 
    *  The size of the initial packet payload has a fixed minimum (#267,
       #472)
@@ -9198,7 +9311,7 @@ B.30.  Since draft-ietf-quic-transport-02
 
    *  Expanded security considerations (#440, #444, #445, #448)
 
-B.31.  Since draft-ietf-quic-transport-01
+B.32.  Since draft-ietf-quic-transport-01
 
    *  Defined short and long packet headers (#40, #148, #361)
 
@@ -9293,7 +9406,7 @@ B.31.  Since draft-ietf-quic-transport-01
    *  Defined priority as the responsibility of the application protocol
       (#104, #303)
 
-B.32.  Since draft-ietf-quic-transport-00
+B.33.  Since draft-ietf-quic-transport-00
 
    *  Replaced DIVERSIFICATION_NONCE flag with KEY_PHASE flag
 
@@ -9305,7 +9418,7 @@ B.32.  Since draft-ietf-quic-transport-00
 
    *  Use big endian for all numeric values
 
-B.33.  Since draft-hamilton-quic-transport-protocol-01
+B.34.  Since draft-hamilton-quic-transport-protocol-01
 
    *  Adopted as base for draft-ietf-quic-tls
 
