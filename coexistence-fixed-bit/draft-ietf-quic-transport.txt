@@ -5008,7 +5008,7 @@ Table of Contents
    Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
       containing a zero value for this bit are not valid packets in this
       version and MUST be discarded.  A value of 1 for this bit allows
-      QUIC to coexist with other protocols, for example [RFC7983].
+      QUIC to coexist with other protocols; see [RFC7983].
 
    Long Packet Type:  The next two bits (those with a mask of 0x30) of
       byte 0 contain a packet type.  Packet types are listed in Table 5.
@@ -5524,7 +5524,7 @@ Table of Contents
    Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
       containing a zero value for this bit are not valid packets in this
       version and MUST be discarded.  A value of 1 for this bit allows
-      QUIC to coexist with other protocols, for example [RFC7983].
+      QUIC to coexist with other protocols; see [RFC7983].
 
    Spin Bit:  The third most significant bit (0x20) of byte 0 is the
       latency spin bit, set as described in Section 17.4.
