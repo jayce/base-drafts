@@ -2091,7 +2091,7 @@ an initial value.  Endpoints SHOULD use an initial congestion window of 10 times
 the maximum datagram size (max_datagram_size), limited to the larger of 14720
 bytes or twice the maximum datagram size. This follows the analysis and
 recommendations in <span>[<a href="#RFC6928" class="xref">RFC6928</a>]</span>, increasing the byte limit to account for the
-smaller 8 byte overhead of UDP compared to the 20 byte overhead for TCP.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+smaller 8-byte overhead of UDP compared to the 20-byte overhead for TCP.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <p id="section-7.2-2">If the maximum datagram size changes during the connection, the initial
 congestion window SHOULD be recalculated with the new size.  If the maximum
 datagram size is decreased in order to complete the handshake, the
@@ -3489,8 +3489,8 @@ RemoveFromBytesInFlight(discarded_packets):
       <h2 id="name-change-log">
 <a href="#section-appendix.c" class="section-number selfRef">Appendix C. </a><a href="#name-change-log" class="section-name selfRef">Change Log</a>
       </h2>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-appendix.c-1.1">
+<ul class="ulEmpty normal">
+<li class="ulEmpty normal" id="section-appendix.c-1.1">
           <strong>RFC Editor's Note:</strong>  Please remove this section prior to
 publication of a final version of this document.<a href="#section-appendix.c-1.1" class="pilcrow">¶</a>
 </li>
