@@ -1338,6 +1338,10 @@ Table of Contents
    connection ID to be routed back to the endpoint and to be identified
    by the endpoint upon receipt.
 
+   Multiple connection IDs are used so that endpoints can send packets
+   that cannot be identified by an observer as being for the same
+   connection without cooperation from an endpoint; see Section 9.5.
+
    Connection IDs MUST NOT contain any information that can be used by
    an external observer (that is, one that does not cooperate with the
    issuer) to correlate them with other connection IDs for the same
@@ -2485,8 +2489,9 @@ Table of Contents
 8.1.4.  Address Validation Token Integrity
 
    An address validation token MUST be difficult to guess.  Including a
-   large enough random value in the token would be sufficient, but this
-   depends on the server remembering the value it sends to clients.
+   random value with at least 128 bits of entropy in the token would be
+   sufficient, but this depends on the server remembering the value it
+   sends to clients.
 
    A token-based scheme allows the server to offload any state
    associated with validation to the client.  For this design to work,
@@ -5011,7 +5016,8 @@ Table of Contents
 
    Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
       containing a zero value for this bit are not valid packets in this
-      version and MUST be discarded.
+      version and MUST be discarded.  A value of 1 for this bit allows
+      QUIC to coexist with other protocols; see [RFC7983].
 
    Long Packet Type:  The next two bits (those with a mask of 0x30) of
       byte 0 contain a packet type.  Packet types are listed in Table 5.
@@ -5527,7 +5533,8 @@ Table of Contents
 
    Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
       containing a zero value for this bit are not valid packets in this
-      version and MUST be discarded.
+      version and MUST be discarded.  A value of 1 for this bit allows
+      QUIC to coexist with other protocols; see [RFC7983].
 
    Spin Bit:  The third most significant bit (0x20) of byte 0 is the
       latency spin bit, set as described in Section 17.4.
@@ -8260,6 +8267,12 @@ Table of Contents
               Key Derivation Function (HKDF)", RFC 5869,
               DOI 10.17487/RFC5869, May 2010,
               <https://www.rfc-editor.org/info/rfc5869>.
+
+   [RFC7983]  Petit-Huguenin, M. and G. Salgueiro, "Multiplexing Scheme
+              Updates for Secure Real-time Transport Protocol (SRTP)
+              Extension for Datagram Transport Layer Security (DTLS)",
+              RFC 7983, DOI 10.17487/RFC7983, September 2016,
+              <https://www.rfc-editor.org/info/rfc7983>.
 
    [RFC8087]  Fairhurst, G. and M. Welzl, "The Benefits of Using
               Explicit Congestion Notification (ECN)", RFC 8087,
