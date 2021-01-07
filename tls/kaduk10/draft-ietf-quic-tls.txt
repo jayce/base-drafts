@@ -941,7 +941,7 @@ Table of Contents
    An endpoint cannot discard keys for a given encryption level unless
    it has received all CRYPTO frames for that encryption level,
    acknowledged the packets containing those frames, and received
-   acknowledgements for all sent packets containing CRYPTO frames for
+   acknowledgements for packets containing all CRYPTO frames sent for
    that encryption level.  However, this does not guarantee that no
    further packets will need to be received or sent at that encryption
    level because a peer might not have received all the acknowledgments
