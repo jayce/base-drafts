@@ -314,29 +314,26 @@ Table of Contents
 4.7.  Probe Timeout Replaces RTO and TLP
 
    QUIC uses a probe timeout (PTO; see Section 6.2), with a timer based
-   on TCP's RTO computation.  QUIC's PTO includes the peer's maximum
-   expected acknowledgment delay instead of using a fixed minimum
-   timeout.  QUIC does not collapse the congestion window until
-   persistent congestion (Section 7.6) is declared, unlike TCP, which
-   collapses the congestion window upon expiry of an RTO.  Instead of
-   collapsing the congestion window and declaring everything in-flight
-   lost, QUIC allows probe packets to temporarily exceed the congestion
-   window whenever the timer expires.
+   on TCP's RTO computation; see [RFC6297].  QUIC's PTO includes the
+   peer's maximum expected acknowledgment delay instead of using a fixed
+   minimum timeout.
 
-   In doing this, QUIC avoids unnecessary congestion window reductions,
-   obviating the need for correcting mechanisms such as F-RTO
-   ([RFC5682]).  Since QUIC does not collapse the congestion window on a
-   PTO expiration, a QUIC sender is not limited from sending more in-
-   flight packets after a PTO expiration if it still has available
-   congestion window.  This occurs when a sender is application-limited
-   and the PTO timer expires.  This is more aggressive than TCP's RTO
-   mechanism when application-limited, but identical when not
-   application-limited.
+   Similar to the RACK-TLP loss detection algorithm for TCP ([RACK]),
+   QUIC does not collapse the congestion window when the PTO expires,
+   since a single packet loss at the tail does not indicate persistent
+   congestion.  Instead, QUIC collapses the congestion window when
+   persistent congestion is declared; see Section 7.6.  In doing this,
+   QUIC avoids unnecessary congestion window reductions, obviating the
+   need for correcting mechanisms such as F-RTO ([RFC5682]).  Since QUIC
+   does not collapse the congestion window on a PTO expiration, a QUIC
+   sender is not limited from sending more in-flight packets after a PTO
+   expiration if it still has available congestion window.  This occurs
+   when a sender is application-limited and the PTO timer expires.  This
+   is more aggressive than TCP's RTO mechanism when application-limited,
+   but identical when not application-limited.
 
-   A single packet loss at the tail does not indicate persistent
-   congestion, so QUIC specifies a time-based definition to ensure one
-   or more packets are sent prior to a dramatic decrease in congestion
-   window; see Section 7.6.
+   QUIC allows probe packets to temporarily exceed the congestion window
+   whenever the timer expires.
 
 4.8.  The Minimum Congestion Window is Two Packets
 
@@ -559,9 +556,9 @@ Table of Contents
 
    Acknowledgment-based loss detection implements the spirit of TCP's
    Fast Retransmit ([RFC5681]), Early Retransmit ([RFC5827]), FACK
-   ([FACK]), SACK loss recovery ([RFC6675]), and RACK ([RACK]).  This
-   section provides an overview of how these algorithms are implemented
-   in QUIC.
+   ([FACK]), SACK loss recovery ([RFC6675]), and RACK-TLP ([RACK]).
+   This section provides an overview of how these algorithms are
+   implemented in QUIC.
 
    A packet is declared lost if it meets all the following conditions:
 
@@ -1399,6 +1396,10 @@ Table of Contents
               Transmission Protocol (SCTP)", RFC 5827,
               DOI 10.17487/RFC5827, May 2010,
               <https://www.rfc-editor.org/info/rfc5827>.
+
+   [RFC6297]  Welzl, M. and D. Ros, "A Survey of Lower-than-Best-Effort
+              Transport Protocols", RFC 6297, DOI 10.17487/RFC6297, June
+              2011, <https://www.rfc-editor.org/info/rfc6297>.
 
    [RFC6298]  Paxson, V., Allman, M., Chu, J., and M. Sargent,
               "Computing TCP's Retransmission Timer", RFC 6298,
