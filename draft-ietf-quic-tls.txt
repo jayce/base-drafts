@@ -2384,7 +2384,7 @@ A.2.  Client Initial
 
    The client sends an Initial packet.  The unprotected payload of this
    packet contains the following CRYPTO frame, plus enough PADDING
-   frames to make a 1162 byte payload:
+   frames to make a 1162-byte payload:
 
    060040f1010000ed0303ebf8fa56f129 39b9584a3896472ec40bb863cfd3e868
    04fe3a47f06a2b69484c000004130113 02010000c000000010000e00000b6578
