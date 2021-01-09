@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 12 July 2021                                            Mozilla
-                                                          8 January 2021
+Expires: 13 July 2021                                            Mozilla
+                                                          9 January 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 July 2021.
+   This Internet-Draft will expire on 13 July 2021.
 
 Copyright Notice
 
@@ -874,8 +874,8 @@ Table of Contents
    receiving part of a stream is "Recv".
 
    For a bidirectional stream, the receiving part enters the "Recv"
-   state when the sending part of the stream initiated by the endpoint
-   (type 0 for a client, type 1 for a server) enters the "Ready" state.
+   state when the sending part initiated by the endpoint (type 0 for a
+   client, type 1 for a server) enters the "Ready" state.
 
    An endpoint opens a bidirectional stream when a MAX_STREAM_DATA or
    STOP_SENDING frame is received from the peer for that stream.
@@ -8072,18 +8072,18 @@ Table of Contents
    [QUIC-INVARIANTS]
               Thomson, M., "Version-Independent Properties of QUIC",
               Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 8 January 2021,
+              invariants, 9 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 8 January 2021,
+              draft-ietf-quic-recovery, 9 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 8 January 2021,
+              Internet-Draft, draft-ietf-quic-tls, 9 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
