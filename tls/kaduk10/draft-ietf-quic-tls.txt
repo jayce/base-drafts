@@ -5,8 +5,8 @@
 QUIC                                                     M. Thomson, Ed.
 Internet-Draft                                                   Mozilla
 Intended status: Standards Track                          S. Turner, Ed.
-Expires: 11 July 2021                                              sn3rd
-                                                          7 January 2021
+Expires: 15 July 2021                                              sn3rd
+                                                         11 January 2021
 
 
                         Using TLS to Secure QUIC
@@ -42,7 +42,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 July 2021.
+   This Internet-Draft will expire on 15 July 2021.
 
 Copyright Notice
 
@@ -939,13 +939,13 @@ Table of Contents
    newer encryption level are available.
 
    An endpoint cannot discard keys for a given encryption level unless
-   it has received all CRYPTO frames for that encryption level,
-   acknowledged the packets containing those frames, and received
-   acknowledgements for packets containing all CRYPTO frames sent for
-   that encryption level.  However, this does not guarantee that no
-   further packets will need to be received or sent at that encryption
+   it has received all the cryptographic handshake messages from its
+   peer at that encryption level and its peer has done the same.
+   Different methods for determining this are provided for Initial keys
+   (Section 4.9.1) and Handshake keys (Section 4.9.2).  These methods do
+   not prevent packets from being received or sent at that encryption
    level because a peer might not have received all the acknowledgments
-   necessary to reach the same state.
+   necessary.
 
    Though an endpoint might retain older keys, new data MUST be sent at
    the highest currently-available encryption level.  Only ACK frames
@@ -2212,13 +2212,14 @@ Table of Contents
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 7 January 2021,
+              draft-ietf-quic-recovery, 11 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 7 January 2021,
+              Internet-Draft, draft-ietf-quic-transport, 11 January
+              2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -2300,7 +2301,7 @@ Table of Contents
    [QUIC-HTTP]
               Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 7 January 2021,
+              quic-http, 11 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818,
