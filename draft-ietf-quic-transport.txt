@@ -3579,7 +3579,7 @@ Table of Contents
 
    The stateless reset token MUST be difficult to guess.  In order to
    create a Stateless Reset Token, an endpoint could randomly generate
-   ([RFC4086]) a secret for every connection that it creates.  However,
+   ([RANDOM]) a secret for every connection that it creates.  However,
    this presents a coordination problem when there are multiple
    instances in a cluster or a storage problem for an endpoint that
    might lose state.  Stateless reset specifically exists to handle the
@@ -8118,11 +8118,6 @@ Table of Contents
               10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
               2003, <https://www.rfc-editor.org/info/rfc3629>.
 
-   [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
-              "Randomness Requirements for Security", BCP 106, RFC 4086,
-              DOI 10.17487/RFC4086, June 2005,
-              <https://www.rfc-editor.org/info/rfc4086>.
-
    [RFC6437]  Amante, S., Carpenter, B., Jiang, S., and J. Rajahalme,
               "IPv6 Flow Label Specification", RFC 6437,
               DOI 10.17487/RFC6437, November 2011,
@@ -8216,6 +8211,11 @@ Table of Contents
               draft-ietf-quic-manageability-08, 2 November 2020,
               <http://www.ietf.org/internet-drafts/draft-ietf-quic-
               manageability-08.txt>.
+
+   [RANDOM]   Eastlake 3rd, D., Schiller, J., and S. Crocker,
+              "Randomness Requirements for Security", BCP 106, RFC 4086,
+              DOI 10.17487/RFC4086, June 2005,
+              <https://www.rfc-editor.org/info/rfc4086>.
 
    [RFC1812]  Baker, F., Ed., "Requirements for IP Version 4 Routers",
               RFC 1812, DOI 10.17487/RFC1812, June 1995,
