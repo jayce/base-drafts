@@ -1581,6 +1581,9 @@ Table of Contents
    the change.  An endpoint that notices a changed Key Phase bit updates
    keys and decrypts the packet that contains the changed value.
 
+   Initiating a key update results in both endpoints updating keys.
+   This differs from TLS where endpoints can update keys independently.
+
    This mechanism replaces the key update mechanism of TLS, which relies
    on KeyUpdate messages sent using 1-RTT encryption keys.  Endpoints
    MUST NOT send a TLS KeyUpdate message.  Endpoints MUST treat the
@@ -1711,12 +1714,15 @@ Table of Contents
 
    The process of creating new packet protection keys for receiving
    packets could reveal that a key update has occurred.  An endpoint MAY
-   perform this process as part of packet processing, but this creates a
-   timing signal that can be used by an attacker to learn when key
-   updates happen and thus the value of the Key Phase bit in certain
-   packets.  Endpoints MAY instead defer the creation of the next set of
-   receive packet protection keys until some time after a key update
-   completes, up to three times the PTO; see Section 6.5.
+   generate new keys as part of packet processing, but this creates a
+   timing signal that could be used by an attacker to learn when key
+   updates happen and thus leak the value of the Key Phase bit.
+
+   Endpoints are generally expected to have current and next receive
+   packet protection keys available.  For a short period after a key
+   update completes, up to the PTO, endpoints MAY defer generation of
+   the next set of receive packet protection keys.  This allows
+   endpoints to retain only two sets of receive keys; see Section 6.5.
 
    Once generated, the next set of packet protection keys SHOULD be
    retained, even if the packet that was received was subsequently
@@ -1769,14 +1775,14 @@ Table of Contents
    Phase bit alone can be used to select keys.
 
    An endpoint MAY allow a period of approximately the Probe Timeout
-   (PTO; see [QUIC-RECOVERY]) after receiving a packet that uses the new
-   key generation before it creates the next set of packet protection
-   keys.  These updated keys MAY replace the previous keys at that time.
-   With the caveat that PTO is a subjective measure - that is, a peer
-   could have a different view of the RTT - this time is expected to be
-   long enough that any reordered packets would be declared lost by a
-   peer even if they were acknowledged and short enough to allow for
-   subsequent key updates.
+   (PTO; see [QUIC-RECOVERY]) after promoting the next set of receive
+   keys to be current before it creates the subsequent set of packet
+   protection keys.  These updated keys MAY replace the previous keys at
+   that time.  With the caveat that PTO is a subjective measure - that
+   is, a peer could have a different view of the RTT - this time is
+   expected to be long enough that any reordered packets would be
+   declared lost by a peer even if they were acknowledged and short
+   enough to allow a peer to initiate further key updates.
 
    Endpoints need to allow for the possibility that a peer might not be
    able to decrypt packets that initiate a key update during the period
