@@ -4928,6 +4928,10 @@ Table of Contents
 
    Examples and a sample decoding algorithm are shown in Appendix A.1.
 
+   Values do not need to be encoded on the minimum number of bytes
+   necessary, with the sole exception of the Frame Type field; see
+   Section 12.4.
+
    Versions (Section 15), packet numbers sent in the header
    (Section 17.1), and the length of connection IDs in long header
    packets (Section 17.2) are described using integers, but do not use
