@@ -829,7 +829,7 @@ address div.right {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Iyengar &amp; Thomson</td>
-<td class="center">Expires 11 July 2021</td>
+<td class="center">Expires 15 July 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -842,12 +842,12 @@ address div.right {
 <dd class="internet-draft">draft-ietf-quic-transport</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-01-07" class="published">7 January 2021</time>
+<time datetime="2021-01-11" class="published">11 January 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-07-11">11 July 2021</time></dd>
+<dd class="expires"><time datetime="2021-07-15">15 July 2021</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -911,7 +911,7 @@ code and issues list for this draft can be found at
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 11 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 15 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -7320,10 +7320,8 @@ the initial RTT of a connection by observing the handshake. Therefore, the spin
 bit is available after version negotiation and connection establishment are
 completed. On-path measurement and use of the latency spin bit is further
 discussed in <span>[<a href="#QUIC-MANAGEABILITY" class="xref">QUIC-MANAGEABILITY</a>]</span>.<a href="#section-17.4-2" class="pilcrow">¶</a></p>
-<p id="section-17.4-3">The spin bit is an OPTIONAL feature of this version of QUIC. A QUIC stack that
-chooses to support the spin bit MUST implement it as specified in this section.
-A QUIC stack that chooses not to support the spin bit MUST behave as if it were
-disabled for all sessions.<a href="#section-17.4-3" class="pilcrow">¶</a></p>
+<p id="section-17.4-3">The spin bit is an OPTIONAL feature of this version of QUIC. An endpoint that
+does not support this feature MUST disable it, as defined below.<a href="#section-17.4-3" class="pilcrow">¶</a></p>
 <p id="section-17.4-4">Each endpoint unilaterally decides if the spin bit is enabled or disabled for a
 connection. Implementations MUST allow administrators of clients and servers
 to disable the spin bit either globally or on a per-connection basis. Even when
@@ -7335,9 +7333,7 @@ approximately one in eight network paths.<a href="#section-17.4-4" class="pilcro
 <p id="section-17.4-5">When the spin bit is disabled, endpoints MAY set the spin bit to any value, and
 MUST ignore any incoming value. It is RECOMMENDED that endpoints set the spin
 bit to a random value either chosen independently for each packet or chosen
-independently for each connection ID. One way to accomplish this is to adjust
-the mask used for applying header protection to the first byte to also cover the
-spin bit; see Section 5.4.1 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.4-5" class="pilcrow">¶</a></p>
+independently for each connection ID.<a href="#section-17.4-5" class="pilcrow">¶</a></p>
 <p id="section-17.4-6">If the spin bit is enabled for the connection, the endpoint maintains a spin
 value for each network path and sets the spin bit in the packet header to the
 currently stored value when a 1-RTT packet is sent on that path. The spin value
@@ -10521,15 +10517,15 @@ specification reference is provided.<a href="#section-22.5-4.4.1" class="pilcrow
 <dd class="break"></dd>
 <dt id="QUIC-INVARIANTS">[QUIC-INVARIANTS]</dt>
         <dd>
-<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-invariants</span>, <time datetime="2021-01-07" class="refDate">7 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-invariants">https://tools.ietf.org/html/draft-ietf-quic-invariants</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-invariants</span>, <time datetime="2021-01-11" class="refDate">11 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-invariants">https://tools.ietf.org/html/draft-ietf-quic-invariants</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-RECOVERY">[QUIC-RECOVERY]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-01-07" class="refDate">7 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-recovery">https://tools.ietf.org/html/draft-ietf-quic-recovery</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-01-11" class="refDate">11 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-recovery">https://tools.ietf.org/html/draft-ietf-quic-recovery</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-TLS">[QUIC-TLS]</dt>
         <dd>
-<span class="refAuthor">Thomson, M., Ed.</span><span class="refAuthor"> and S. Turner, Ed.</span>, <span class="refTitle">"Using Transport Layer Security (TLS) to Secure QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-tls</span>, <time datetime="2021-01-07" class="refDate">7 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-tls">https://tools.ietf.org/html/draft-ietf-quic-tls</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M., Ed.</span><span class="refAuthor"> and S. Turner, Ed.</span>, <span class="refTitle">"Using Transport Layer Security (TLS) to Secure QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-tls</span>, <time datetime="2021-01-11" class="refDate">11 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-tls">https://tools.ietf.org/html/draft-ietf-quic-tls</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC1191">[RFC1191]</dt>
         <dd>
@@ -10894,8 +10890,8 @@ incurred.<a href="#section-a.4-8" class="pilcrow">¶</a></p>
       <h2 id="name-change-log">
 <a href="#section-appendix.b" class="section-number selfRef">Appendix B. </a><a href="#name-change-log" class="section-name selfRef">Change Log</a>
       </h2>
-<ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-appendix.b-1.1">
+<ul class="ulEmpty normal">
+<li class="ulEmpty normal" id="section-appendix.b-1.1">
           <strong>RFC Editor's Note:</strong> Please remove this section prior to publication of a
 final version of this document.<a href="#section-appendix.b-1.1" class="pilcrow">¶</a>
 </li>
