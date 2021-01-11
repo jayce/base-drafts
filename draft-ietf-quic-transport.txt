@@ -5019,8 +5019,8 @@ Table of Contents
    Long Packet Type:  The next two bits (those with a mask of 0x30) of
       byte 0 contain a packet type.  Packet types are listed in Table 5.
 
-   Type-Specific Bits:  The lower four bits (those with a mask of 0x0f)
-      of byte 0 are type-specific.
+   Type-Specific Bits:  The semantics of the lower four bits (those with
+      a mask of 0x0f) of byte 0 are determined by the packet type.
 
    Version:  The QUIC Version is a 32-bit field that follows the first
       byte.  This field indicates the version of QUIC that is in use and
