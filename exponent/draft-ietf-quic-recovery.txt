@@ -1700,7 +1700,7 @@ A.8.  Setting the Loss Detection Timer
    particularly if timers wake up late.  Timers set in the past fire
    immediately.
 
-   Pseudocode for SetLossDetectionTimer follows (where the ^ operator
+   Pseudocode for SetLossDetectionTimer follows (where the "^" operator
    represents exponentiation):
 
    GetLossTimeAndSpace():
