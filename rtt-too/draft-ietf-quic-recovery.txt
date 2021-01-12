@@ -1274,12 +1274,12 @@ Table of Contents
 
 8.1.  Loss and Congestion Signals
 
-   Loss detection and congestion control fundamentally involve the
-   consumption of signals -- delay, loss, and ECN codepoints -- from
-   unauthenticated entities.  On-path attackers can spoof or alter these
-   signals.  An attacker can cause endpoints to reduce their sending
-   rate by dropping packets, altering path delay strategically, or by
-   changing ECN codepoints.
+   Loss detection and congestion control fundamentally involve
+   consumption of signals, such as delay, loss, and ECN markings, from
+   unauthenticated entities.  An attacker can cause endpoints to reduce
+   their sending rate by manipulating these signals; by dropping
+   packets, by altering path delay strategically, or by changing ECN
+   codepoints.
 
 8.2.  Traffic Analysis
 
