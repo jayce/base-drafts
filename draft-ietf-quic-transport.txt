@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 15 July 2021                                            Mozilla
-                                                         11 January 2021
+Expires: 16 July 2021                                            Mozilla
+                                                         12 January 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 July 2021.
+   This Internet-Draft will expire on 16 July 2021.
 
 Copyright Notice
 
@@ -1063,14 +1063,14 @@ Table of Contents
 
 4.  Flow Control
 
-   It is necessary to limit the amount of data that a receiver could
-   buffer, to prevent a fast sender from overwhelming a slow receiver,
-   or to prevent a malicious sender from consuming a large amount of
-   memory at a receiver.  To enable a receiver to limit memory
-   commitment to a connection and to apply back pressure on the sender,
-   streams are flow controlled both individually and as an aggregate.  A
-   QUIC receiver controls the maximum amount of data the sender can send
-   on a stream at any time, as described in Section 4.1 and Section 4.2.
+   Receivers need to limit the amount of data that they are required to
+   buffer, in order to prevent a fast sender from overwhelming them or a
+   malicious sender from consuming a large amount of memory.  To enable
+   a receiver to limit memory commitments for a connection, streams are
+   flow controlled both individually and across a connection as a whole.
+   A QUIC receiver controls the maximum amount of data the sender can
+   send on a stream as well as across all streams at any time, as
+   described in Section 4.1 and Section 4.2.
 
    Similarly, to limit concurrency within a connection, a QUIC endpoint
    controls the maximum cumulative number of streams that its peer can
@@ -8103,18 +8103,18 @@ Table of Contents
    [QUIC-INVARIANTS]
               Thomson, M., "Version-Independent Properties of QUIC",
               Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 11 January 2021,
+              invariants, 12 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 11 January 2021,
+              draft-ietf-quic-recovery, 12 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 11 January 2021,
+              Internet-Draft, draft-ietf-quic-tls, 12 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
