@@ -104,7 +104,7 @@ Table of Contents
      7.7.  Pacing
      7.8.  Under-utilizing the Congestion Window
    8.  Security Considerations
-     8.1.  Congestion Signals
+     8.1.  Loss and Congestion Signals
      8.2.  Traffic Analysis
      8.3.  Misreporting ECN Markings
    9.  IANA Considerations
@@ -1271,13 +1271,14 @@ Table of Contents
 
 8.  Security Considerations
 
-8.1.  Congestion Signals
+8.1.  Loss and Congestion Signals
 
-   Congestion control fundamentally involves the consumption of signals
-   -- both loss and ECN codepoints -- from unauthenticated entities.
-   On-path attackers can spoof or alter these signals.  An attacker can
-   cause endpoints to reduce their sending rate by dropping packets, or
-   alter send rate by changing ECN codepoints.
+   Loss detection and congestion control fundamentally involve
+   consumption of signals, such as delay, loss, and ECN markings, from
+   unauthenticated entities.  An attacker can cause endpoints to reduce
+   their sending rate by manipulating these signals; by dropping
+   packets, by altering path delay strategically, or by changing ECN
+   codepoints.
 
 8.2.  Traffic Analysis
 
