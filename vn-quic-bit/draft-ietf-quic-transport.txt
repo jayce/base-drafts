@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 8 July 2021                                             Mozilla
-                                                          4 January 2021
+Expires: 16 July 2021                                            Mozilla
+                                                         12 January 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 July 2021.
+   This Internet-Draft will expire on 16 July 2021.
 
 Copyright Notice
 
@@ -5005,9 +5005,10 @@ Table of Contents
    Header Form:  The most significant bit (0x80) of byte 0 (the first
       byte) is set to 1 for long headers.
 
-   Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
-      containing a zero value for this bit are not valid packets in this
-      version and MUST be discarded.
+   Fixed Bit:  The next bit (0x40) of byte 0 is set to 1, unless the
+      packet is a Version Negotiation packet.  Packets containing a zero
+      value for this bit are not valid packets in this version and MUST
+      be discarded.
 
    Long Packet Type:  The next two bits (those with a mask of 0x30) of
       byte 0 contain a packet type.  Packet types are listed in Table 5.
@@ -8070,12 +8071,12 @@ Table of Contents
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 4 January 2021,
+              draft-ietf-quic-recovery, 12 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 4 January 2021,
+              Internet-Draft, draft-ietf-quic-tls, 12 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
@@ -8191,7 +8192,7 @@ Table of Contents
    [QUIC-INVARIANTS]
               Thomson, M., "Version-Independent Properties of QUIC",
               Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 4 January 2021,
+              invariants, 12 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-MANAGEABILITY]
