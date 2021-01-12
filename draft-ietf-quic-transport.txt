@@ -7361,8 +7361,8 @@ Table of Contents
    powerful and does not have adequate countermeasures, QUIC server
    implementations should assume that attackers can cause them to
    generate arbitrary UDP payloads to arbitrary destinations.  QUIC
-   servers SHOULD NOT be deployed in networks that also have
-   inadequately secured UDP endpoints.
+   servers SHOULD NOT be deployed in networks that do not deploy ingress
+   filtering [BCP38] and also have inadequately secured UDP endpoints.
 
    Although it is not generally possible to ensure that clients are not
    co-located with vulnerable endpoints, this version of QUIC does not
@@ -8085,6 +8085,11 @@ Table of Contents
 
 23.1.  Normative References
 
+   [BCP38]    Ferguson, P. and D. Senie, "Network Ingress Filtering:
+              Defeating Denial of Service Attacks which employ IP Source
+              Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
+              May 2000, <https://www.rfc-editor.org/info/rfc2827>.
+
    [DPLPMTUD] Fairhurst, G., Jones, T., Tüxen, M., Rüngeler, I., and T.
               Völker, "Packetization Layer Path MTU Discovery for
               Datagram Transports", RFC 8899, DOI 10.17487/RFC8899,
@@ -8184,11 +8189,6 @@ Table of Contents
    [ALTSVC]   Nottingham, M., McManus, P., and J. Reschke, "HTTP
               Alternative Services", RFC 7838, DOI 10.17487/RFC7838,
               April 2016, <https://www.rfc-editor.org/info/rfc7838>.
-
-   [BCP38]    Ferguson, P. and D. Senie, "Network Ingress Filtering:
-              Defeating Denial of Service Attacks which employ IP Source
-              Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
-              May 2000, <https://www.rfc-editor.org/info/rfc2827>.
 
    [COOKIE]   Barth, A., "HTTP State Management Mechanism", RFC 6265,
               DOI 10.17487/RFC6265, April 2011,
