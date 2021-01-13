@@ -5024,10 +5024,11 @@ Table of Contents
    Header Form:  The most significant bit (0x80) of byte 0 (the first
       byte) is set to 1 for long headers.
 
-   Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
-      containing a zero value for this bit are not valid packets in this
-      version and MUST be discarded.  A value of 1 for this bit allows
-      QUIC to coexist with other protocols; see [RFC7983].
+   Fixed Bit:  The next bit (0x40) of byte 0 is set to 1, unless the
+      packet is a Version Negotiation packet.  Packets containing a zero
+      value for this bit are not valid packets in this version and MUST
+      be discarded.  A value of 1 for this bit allows QUIC to coexist
+      with other protocols; see [RFC7983].
 
    Long Packet Type:  The next two bits (those with a mask of 0x30) of
       byte 0 contain a packet type.  Packet types are listed in Table 5.
