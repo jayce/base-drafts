@@ -354,9 +354,9 @@ Table of Contents
 
    The Version Negotiation packet described in this document is not
    integrity-protected; it only has modest protection against insertion
-   by attackers.  An endpoint MUST authenticate the contents of a
-   Version Negotiation packet if it attempts a different QUIC version as
-   a result.
+   by attackers.  An endpoint MUST authenticate the semantic content of
+   a Version Negotiation packet if it attempts a different QUIC version
+   as a result.
 
 8.  IANA Considerations
 
