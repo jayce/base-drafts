@@ -3003,15 +3003,15 @@ Table of Contents
    routing of packets across multiple network paths will also allow
    activity on those paths to be linked by entities other than the peer.
 
-   A client might wish to reduce linkability by employing a new
-   connection ID and source UDP port when sending traffic after a period
-   of inactivity.  Changing the UDP port from which it sends packets at
-   the same time might cause the packet to appear as a connection
-   migration.  This ensures that the mechanisms that support migration
-   are exercised even for clients that do not experience NAT rebindings
-   or genuine migrations.  Changing port number can cause a peer to
-   reset its congestion control state (see Section 9.4), so the port
-   SHOULD only be changed infrequently.
+   A client might wish to reduce linkability by switching to a new
+   connection ID, source UDP port, or IP address (see [RFC4941]) when
+   sending traffic after a period of inactivity.  Changing the address
+   from which it sends packets at the same time might cause the server
+   to detect a connection migration.  This ensures that the mechanisms
+   that support migration are exercised even for clients that do not
+   experience NAT rebindings or genuine migrations.  Changing address
+   can cause a peer to reset its congestion control state (see
+   Section 9.4), so addresses SHOULD only be changed infrequently.
 
    An endpoint that exhausts available connection IDs cannot probe new
    paths or initiate migration, nor can it respond to probes or attempts
@@ -8275,6 +8275,11 @@ Table of Contents
               Translation (NAT) Behavioral Requirements for Unicast
               UDP", BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
               2007, <https://www.rfc-editor.org/info/rfc4787>.
+
+   [RFC4941]  Narten, T., Draves, R., and S. Krishnan, "Privacy
+              Extensions for Stateless Address Autoconfiguration in
+              IPv6", RFC 4941, DOI 10.17487/RFC4941, September 2007,
+              <https://www.rfc-editor.org/info/rfc4941>.
 
    [RFC5681]  Allman, M., Paxson, V., and E. Blanton, "TCP Congestion
               Control", RFC 5681, DOI 10.17487/RFC5681, September 2009,
