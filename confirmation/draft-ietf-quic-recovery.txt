@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                           I. Swett, Ed.
-Expires: 16 July 2021                                             Google
-                                                         12 January 2021
+Expires: 17 July 2021                                             Google
+                                                         13 January 2021
 
 
                QUIC Loss Detection and Congestion Control
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 16 July 2021.
+   This Internet-Draft will expire on 17 July 2021.
 
 Copyright Notice
 
@@ -696,7 +696,8 @@ Table of Contents
    certificate and can therefore read these 1-RTT packets.
 
    A sender SHOULD restart its PTO timer every time an ack-eliciting
-   packet is sent or acknowledged, when the handshake is confirmed
+   packet is sent or acknowledged, when Initial keys are discarded
+   (Section 4.9 of [QUIC-TLS]), or when the handshake is confirmed
    (Section 4.1.2 of [QUIC-TLS]).  This ensures the PTO is always set
    based on the latest estimate of the round-trip time and for the
    correct packet across packet number spaces.
@@ -1323,13 +1324,13 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", Work in Progress, Internet-Draft, draft-ietf-quic-
-              tls, 12 January 2021,
+              tls, 13 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 12 January
+              Internet-Draft, draft-ietf-quic-transport, 13 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
