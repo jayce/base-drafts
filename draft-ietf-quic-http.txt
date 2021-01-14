@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         13 January 2021
-Expires: 17 July 2021
+Intended status: Standards Track                         14 January 2021
+Expires: 18 July 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 July 2021.
+   This Internet-Draft will expire on 18 July 2021.
 
 Copyright Notice
 
@@ -2512,8 +2512,8 @@ Table of Contents
 
    [CACHING]  Fielding, R., Nottingham, M., and J. Reschke, "HTTP
               Caching", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-cache-13, 14 December 2020, <http://www.ietf.org/
-              internet-drafts/draft-ietf-httpbis-cache-13.txt>.
+              httpbis-cache-14, 12 January 2021, <http://www.ietf.org/
+              internet-drafts/draft-ietf-httpbis-cache-14.txt>.
 
    [HTTP-REPLAY]
               Thomson, M., Nottingham, M., and W. Tarreau, "Using Early
@@ -2522,13 +2522,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 13 January 2021,
+              Internet-Draft, draft-ietf-quic-qpack, 14 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 13 January
+              Internet-Draft, draft-ietf-quic-transport, 14 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
@@ -2574,9 +2574,9 @@ Table of Contents
    [SEMANTICS]
               Fielding, R., Nottingham, M., and J. Reschke, "HTTP
               Semantics", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-semantics-13, 14 December 2020,
+              httpbis-semantics-14, 12 January 2021,
               <http://www.ietf.org/internet-drafts/draft-ietf-httpbis-
-              semantics-13.txt>.
+              semantics-14.txt>.
 
    [URI]      Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66,
@@ -2601,8 +2601,8 @@ Table of Contents
 
    [HTTP11]   Fielding, R., Nottingham, M., and J. Reschke, "HTTP/1.1",
               Work in Progress, Internet-Draft, draft-ietf-httpbis-
-              messaging-13, 14 December 2020, <http://www.ietf.org/
-              internet-drafts/draft-ietf-httpbis-messaging-13.txt>.
+              messaging-14, 12 January 2021, <http://www.ietf.org/
+              internet-drafts/draft-ietf-httpbis-messaging-14.txt>.
 
    [HTTP2]    Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
               Transfer Protocol Version 2 (HTTP/2)", RFC 7540,
