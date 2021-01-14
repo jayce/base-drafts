@@ -1982,6 +1982,9 @@ Table of Contents
    that supports this extension if the extension is received when the
    transport is not QUIC.
 
+   Negotiating the quic_transport_parameters extension causes the
+   EndOfEarlyData to be removed; see Section 8.3.
+
 8.3.  Removing the EndOfEarlyData Message
 
    The TLS EndOfEarlyData message is not used with QUIC.  QUIC does not
