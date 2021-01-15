@@ -5,8 +5,8 @@
 QUIC                                                     M. Thomson, Ed.
 Internet-Draft                                                   Mozilla
 Intended status: Standards Track                          S. Turner, Ed.
-Expires: 18 July 2021                                              sn3rd
-                                                         14 January 2021
+Expires: 19 July 2021                                              sn3rd
+                                                         15 January 2021
 
 
                         Using TLS to Secure QUIC
@@ -42,7 +42,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 July 2021.
+   This Internet-Draft will expire on 19 July 2021.
 
 Copyright Notice
 
@@ -924,8 +924,12 @@ Table of Contents
    from the range reserved for CRYPTO_ERROR.  The resulting value is
    sent in a QUIC CONNECTION_CLOSE frame of type 0x1c.
 
-   The alert level of all TLS alerts is "fatal"; a TLS stack MUST NOT
-   generate alerts at the "warning" level.
+   QUIC is only able to convey an alert level of "fatal".  In TLS 1.3,
+   the only existing uses for the "warning" level are to signal
+   connection close; see Section 6.1 of [TLS13].  As QUIC provides
+   alternative mechanisms for connection termination and the TLS
+   connection is only closed if an error is encountered, a QUIC endpoint
+   MUST treat any alert from TLS as if it were at the "fatal" level.
 
    QUIC permits the use of a generic code in place of a specific error
    code; see Section 11 of [QUIC-TRANSPORT].  For TLS alerts, this
@@ -2236,13 +2240,13 @@ Table of Contents
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 14 January 2021,
+              draft-ietf-quic-recovery, 15 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 14 January
+              Internet-Draft, draft-ietf-quic-transport, 15 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
@@ -2325,7 +2329,7 @@ Table of Contents
    [QUIC-HTTP]
               Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 14 January 2021,
+              quic-http, 15 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818,
