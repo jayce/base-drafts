@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         15 January 2021
-Expires: 19 July 2021
+Intended status: Standards Track                         19 January 2021
+Expires: 23 July 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 July 2021.
+   This Internet-Draft will expire on 23 July 2021.
 
 Copyright Notice
 
@@ -641,10 +641,11 @@ Table of Contents
 
    This means that an intermediary transforming an HTTP/1.x message to
    HTTP/3 will need to remove any fields nominated by the Connection
-   field, along with the Connection field itself.  Such intermediaries
-   SHOULD also remove other connection-specific fields, such as Keep-
-   Alive, Proxy-Connection, Transfer-Encoding, and Upgrade, even if they
-   are not nominated by the Connection field.
+   field, along with the Connection field itself.  As part of this
+   transformation, intermediaries MUST decode and remove any HTTP/1.1
+   transfer codings.  Such intermediaries SHOULD also remove other
+   connection-specific fields, such as Keep-Alive, Proxy-Connection, and
+   Upgrade, even if they are not nominated by the Connection field.
 
 4.1.1.1.  Pseudo-Header Fields
 
@@ -2522,13 +2523,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 15 January 2021,
+              Internet-Draft, draft-ietf-quic-qpack, 19 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 15 January
+              Internet-Draft, draft-ietf-quic-transport, 19 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
