@@ -923,8 +923,8 @@ Table of Contents
    mechanism for doing so.
 
    The congestion controller is per path, so packets sent on other paths
-   do not contribute affect the path's congestion controller, as
-   described in Section 9.4 of [QUIC-TRANSPORT].
+   do not alter the current path's congestion controller, as described
+   in Section 9.4 of [QUIC-TRANSPORT].
 
    The algorithm in this document specifies and uses the controller's
    congestion window in bytes.
