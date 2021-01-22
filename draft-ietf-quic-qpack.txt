@@ -200,8 +200,8 @@ Table of Contents
    Field section:  An ordered collection of HTTP field lines associated
       with an HTTP message.  A field section can contain multiple field
       lines with the same name.  It can also contain duplicate field
-      lines.  An HTTP message can include both header field and trailer
-      field sections.
+      lines.  An HTTP message can include both header and trailer
+      sections.
 
    Representation:  An instruction that represents a field line,
       possibly by reference to the dynamic and static tables.
@@ -248,8 +248,8 @@ Table of Contents
 
 2.1.  Encoder
 
-   An encoder converts a header or trailer field section into a series
-   of representations by emitting either an indexed or a literal
+   An encoder converts a header or trailer section into a series of
+   representations by emitting either an indexed or a literal
    representation for each field line in the list; see Section 4.5.
    Indexed representations achieve high compression by replacing the
    literal name and possibly the value with an index to either the
