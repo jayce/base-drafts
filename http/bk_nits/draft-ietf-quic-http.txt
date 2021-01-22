@@ -145,7 +145,7 @@ Table of Contents
        A.2.2.  Field Compression Differences
        A.2.3.  Flow Control Differences
        A.2.4.  Guidance for New Frame Type Definitions
-       A.2.5.  Mapping Between HTTP/2 and HTTP/3 Frame Types
+       A.2.5.  Comparison Between HTTP/2 and HTTP/3 Frame Types
      A.3.  HTTP/2 SETTINGS Parameters
      A.4.  HTTP/2 Error Codes
        A.4.1.  Mapping Between HTTP/2 and HTTP/3 Errors
@@ -191,8 +191,9 @@ Table of Contents
 
    HTTP semantics ([SEMANTICS]) are used for a broad range of services
    on the Internet.  These semantics have most commonly been used with
-   HTTP/1.1, over a variety of transport and session layers, and with
-   HTTP/2 over TLS.  HTTP/3 supports the same semantics over a new
+   HTTP/1.1 and HTTP/2.  HTTP/1.1 has been used over a variety of
+   transport and session layers, while HTTP/2 has been used primarily
+   with TLS over TCP.  HTTP/3 supports the same semantics over a new
    transport protocol, QUIC.
 
 1.1.  Prior versions of HTTP
@@ -200,11 +201,13 @@ Table of Contents
    HTTP/1.1 ([HTTP11]) uses whitespace-delimited text fields to convey
    HTTP messages.  While these exchanges are human-readable, using
    whitespace for message formatting leads to parsing complexity and
-   excessive tolerance of variant behavior.  Because HTTP/1.x does not
-   include a multiplexing layer, multiple TCP connections are often used
-   to service requests in parallel.  However, that has a negative impact
-   on congestion control and network efficiency, since TCP does not
-   share congestion control across multiple connections.
+   excessive tolerance of variant behavior.
+
+   Because HTTP/1.1 does not include a multiplexing layer, multiple TCP
+   connections are often used to service requests in parallel.  However,
+   that has a negative impact on congestion control and network
+   efficiency, since TCP does not share congestion control across
+   multiple connections.
 
    HTTP/2 ([HTTP2]) introduced a binary framing and multiplexing layer
    to improve latency without modifying the transport layer.  However,
@@ -229,9 +232,9 @@ Table of Contents
    HTTP/3 relies on QUIC to provide confidentiality and integrity
    protection of data; peer authentication; and reliable, in-order, per-
    stream delivery.  While delegating stream lifetime and flow control
-   issues to QUIC, a similar binary framing is used on each stream.
-   Some HTTP/2 features are subsumed by QUIC, while other features are
-   implemented atop QUIC.
+   issues to QUIC, a binary framing similar to the HTTP/2 framing is
+   used on each stream.  Some HTTP/2 features are subsumed by QUIC,
+   while other features are implemented atop QUIC.
 
    QUIC is described in [QUIC-TRANSPORT].  For a full description of
    HTTP/2, see [HTTP2].
@@ -249,7 +252,8 @@ Table of Contents
    Within each stream, the basic unit of HTTP/3 communication is a frame
    (Section 7.2).  Each frame type serves a different purpose.  For
    example, HEADERS and DATA frames form the basis of HTTP requests and
-   responses (Section 4.1).
+   responses (Section 4.1).  Frames that apply to the entire connection
+   are conveyed on a dedicated control stream.
 
    Multiplexing of requests is performed using the QUIC stream
    abstraction, described in Section 2 of [QUIC-TRANSPORT].  Each
@@ -407,8 +411,9 @@ Table of Contents
 
    A client MAY attempt access to a resource with an "https" URI by
    resolving the host identifier to an IP address, establishing a QUIC
-   connection to that address on the indicated port, and sending an
-   HTTP/3 request message targeting the URI to the server over that
+   connection to that address on the indicated port (including
+   validation of the server certificate as described above), and sending
+   an HTTP/3 request message targeting the URI to the server over that
    secured connection.  Unless some other mechanism is used to select
    HTTP/3, the token "h3" is used in the Application Layer Protocol
    Negotiation (ALPN; see [RFC7301]) extension during the TLS handshake.
@@ -552,7 +557,7 @@ Table of Contents
    Receipt of an invalid sequence of frames MUST be treated as a
    connection error of type H3_FRAME_UNEXPECTED; see Section 8.  In
    particular, a DATA frame before any HEADERS frame, or a HEADERS or
-   DATA frame after the trailing HEADERS frame is considered invalid.
+   DATA frame after the trailing HEADERS frame, is considered invalid.
    Other frame types, especially unknown frame types, might be permitted
    subject to their own rules; see Section 9.
 
@@ -579,7 +584,7 @@ Table of Contents
    A response MAY consist of multiple messages when and only when one or
    more interim responses (1xx; see Section 15.2 of [SEMANTICS]) precede
    a final response to the same request.  Interim responses do not
-   contain content or trailers.
+   contain content or trailer sections.
 
    An HTTP request/response exchange fully consumes a client-initiated
    bidirectional QUIC stream.  After sending a request, a client MUST
@@ -664,8 +669,8 @@ Table of Contents
    Pseudo-header fields are only valid in the context in which they are
    defined.  Pseudo-header fields defined for requests MUST NOT appear
    in responses; pseudo-header fields defined for responses MUST NOT
-   appear in requests.  Pseudo-header fields MUST NOT appear in
-   trailers.  Endpoints MUST treat a request or response that contains
+   appear in requests.  Pseudo-header fields MUST NOT appear in trailer
+   sections.  Endpoints MUST treat a request or response that contains
    undefined or invalid pseudo-header fields as malformed
    (Section 4.1.3).
 
@@ -681,17 +686,18 @@ Table of Contents
    ":scheme":  Contains the scheme portion of the target URI
       (Section 3.1 of [URI])
 
-      ":scheme" is not restricted to "http" and "https" schemed URIs.  A
-      proxy or gateway can translate requests for non-HTTP schemes,
-      enabling the use of HTTP to interact with non-HTTP services.
+      ":scheme" is not restricted to URIs with scheme "http" and
+      "https".  A proxy or gateway can translate requests for non-HTTP
+      schemes, enabling the use of HTTP to interact with non-HTTP
+      services.
 
       See Section 3.1.2 for guidance on using a scheme other than
       "https".
 
    ":authority":  Contains the authority portion of the target URI
       (Section 3.2 of [URI]).  The authority MUST NOT include the
-      deprecated "userinfo" subcomponent for "http" or "https" schemed
-      URIs.
+      deprecated "userinfo" subcomponent for URIs of scheme "http" or
+      "https".
 
       To ensure that the HTTP/1.1 request line can be reproduced
       accurately, this pseudo-header field MUST be omitted when
@@ -1107,7 +1113,8 @@ Table of Contents
       Requests on Stream IDs less than the Stream ID in a GOAWAY frame
       from the server might have been processed; their status cannot be
       known until a response is received, the stream is reset
-      individually, another GOAWAY is received, or the connection
+      individually, another GOAWAY is received with a lower Stream ID
+      than that of the request in question, or the connection
       terminates.
 
       Servers MAY reject individual requests on streams below the
@@ -1179,6 +1186,10 @@ Table of Contents
    same packet as the QUIC CONNECTION_CLOSE frame improves the chances
    of the frame being received by clients.
 
+   If there are open streams that have not been explicitly closed, they
+   are implicitly closed when the connection is closed; see Section 10.2
+   of [QUIC-TRANSPORT].
+
 5.4.  Transport Closure
 
    For various reasons, the QUIC transport could indicate to the
@@ -1194,12 +1205,12 @@ Table of Contents
 
    A QUIC stream provides reliable in-order delivery of bytes, but makes
    no guarantees about order of delivery with regard to bytes on other
-   streams.  On the wire, data is framed into QUIC STREAM frames, but
-   this framing is invisible to the HTTP framing layer.  The transport
-   layer buffers and orders received QUIC STREAM frames, exposing the
-   data contained within as a reliable byte stream to the application.
-   Although QUIC permits out-of-order delivery within a stream, HTTP/3
-   does not make use of this feature.
+   streams.  On the wire, the stream data containing HTTP frames is
+   carried by QUIC STREAM frames, but this framing is invisible to the
+   HTTP framing layer.  The transport layer buffers and orders received
+   QUIC STREAM frames, exposing the data contained within as a reliable
+   byte stream to the application.  Although QUIC permits out-of-order
+   delivery within a stream, HTTP/3 does not make use of this feature.
 
    QUIC streams can be either unidirectional, carrying data only from
    initiator to receiver, or bidirectional.  Streams can be initiated by
@@ -1318,9 +1329,9 @@ Table of Contents
 
    A pair of unidirectional streams is used rather than a single
    bidirectional stream.  This allows either peer to send data as soon
-   as it is able.  Depending on whether 0-RTT is enabled on the QUIC
+   as it is able.  Depending on whether 0-RTT is available on the QUIC
    connection, either client or server might be able to send stream data
-   first after the cryptographic handshake completes.
+   first.
 
 6.2.2.  Push Streams
 
@@ -1407,9 +1418,9 @@ Table of Contents
 
               Table 1: HTTP/3 Frames and Stream Type Overview
 
-   Certain frames can only occur as the first frame of a particular
-   stream type; these are indicated in Table 1 with a (1).  Specific
-   guidance is provided in the relevant section.
+   The SETTINGS frame can only occur as the first frame of a Control
+   stream; this is indicated in Table 1 with a (1).  Specific guidance
+   is provided in the relevant section.
 
    Note that, unlike QUIC frames, HTTP/3 frames can span multiple
    packets.
@@ -1440,7 +1451,9 @@ Table of Contents
    its description.  A frame payload that contains additional bytes
    after the identified fields or a frame payload that terminates before
    the end of the identified fields MUST be treated as a connection
-   error of type H3_FRAME_ERROR; see Section 8.
+   error of type H3_FRAME_ERROR; see Section 8.  In particular,
+   redundant length encodings MUST be verified to be self-consistent;
+   see Section 10.8.
 
    When a stream terminates cleanly, if the last frame on the stream was
    truncated, this MUST be treated as a connection error of type
@@ -1525,7 +1538,7 @@ Table of Contents
    CANCEL_PUSH Frame {
      Type (i) = 0x3,
      Length (i),
-     Push ID (..),
+     Push ID (i),
    }
 
                         Figure 6: CANCEL_PUSH Frame
@@ -1598,8 +1611,8 @@ Table of Contents
 
                           Figure 7: SETTINGS Frame
 
-   An implementation MUST ignore the contents for any SETTINGS
-   identifier it does not understand.
+   An implementation MUST ignore any parameter with an identifier it
+   does not understand.
 
 7.2.4.1.  Defined SETTINGS Parameters
 
@@ -2073,7 +2086,7 @@ Table of Contents
    field compression -- have legitimate uses.  These features become a
    burden only when they are used unnecessarily or to excess.
 
-   An endpoint that does not monitor this behavior exposes itself to a
+   An endpoint that does not monitor such behavior exposes itself to a
    risk of denial-of-service attack.  Implementations SHOULD track the
    use of these features and set limits on their use.  An endpoint MAY
    treat activity that is suspicious as a connection error of type
@@ -2406,81 +2419,80 @@ Table of Contents
    codes were selected from the range that operates on a Specification
    Required policy to avoid collisions with HTTP/2 error codes.
 
-   +===========================+========+==============+===============+
-   | Name                      | Value  | Description  | Specification |
-   +===========================+========+==============+===============+
-   | H3_NO_ERROR               | 0x0100 | No error     | Section 8.1   |
-   +---------------------------+--------+--------------+---------------+
-   | H3_GENERAL_PROTOCOL_ERROR | 0x0101 | General      | Section 8.1   |
-   |                           |        | protocol     |               |
-   |                           |        | error        |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_INTERNAL_ERROR         | 0x0102 | Internal     | Section 8.1   |
-   |                           |        | error        |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_STREAM_CREATION_ERROR  | 0x0103 | Stream       | Section 8.1   |
-   |                           |        | creation     |               |
-   |                           |        | error        |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_CLOSED_CRITICAL_STREAM | 0x0104 | Critical     | Section 8.1   |
-   |                           |        | stream was   |               |
-   |                           |        | closed       |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_FRAME_UNEXPECTED       | 0x0105 | Frame not    | Section 8.1   |
-   |                           |        | permitted    |               |
-   |                           |        | in the       |               |
-   |                           |        | current      |               |
-   |                           |        | state        |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_FRAME_ERROR            | 0x0106 | Frame        | Section 8.1   |
-   |                           |        | violated     |               |
-   |                           |        | layout or    |               |
-   |                           |        | size rules   |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_EXCESSIVE_LOAD         | 0x0107 | Peer         | Section 8.1   |
-   |                           |        | generating   |               |
-   |                           |        | excessive    |               |
-   |                           |        | load         |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_ID_ERROR               | 0x0108 | An           | Section 8.1   |
-   |                           |        | identifier   |               |
-   |                           |        | was used     |               |
-   |                           |        | incorrectly  |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_SETTINGS_ERROR         | 0x0109 | SETTINGS     | Section 8.1   |
-   |                           |        | frame        |               |
-   |                           |        | contained    |               |
-   |                           |        | invalid      |               |
-   |                           |        | values       |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_MISSING_SETTINGS       | 0x010a | No SETTINGS  | Section 8.1   |
-   |                           |        | frame        |               |
-   |                           |        | received     |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_REQUEST_REJECTED       | 0x010b | Request not  | Section 8.1   |
-   |                           |        | processed    |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_REQUEST_CANCELLED      | 0x010c | Data no      | Section 8.1   |
-   |                           |        | longer       |               |
-   |                           |        | needed       |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_REQUEST_INCOMPLETE     | 0x010d | Stream       | Section 8.1   |
-   |                           |        | terminated   |               |
-   |                           |        | early        |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_MESSAGE_ERROR          | 0x010e | Malformed    | Section 8.1   |
-   |                           |        | message      |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_CONNECT_ERROR          | 0x010f | TCP reset    | Section 8.1   |
-   |                           |        | or error on  |               |
-   |                           |        | CONNECT      |               |
-   |                           |        | request      |               |
-   +---------------------------+--------+--------------+---------------+
-   | H3_VERSION_FALLBACK       | 0x0110 | Retry over   | Section 8.1   |
-   |                           |        | HTTP/1.1     |               |
-   +---------------------------+--------+--------------+---------------+
+   +===========================+=======+==============+===============+
+   | Name                      | Value | Description  | Specification |
+   +===========================+=======+==============+===============+
+   | H3_NO_ERROR               | 0x100 | No error     | Section 8.1   |
+   +---------------------------+-------+--------------+---------------+
+   | H3_GENERAL_PROTOCOL_ERROR | 0x101 | General      | Section 8.1   |
+   |                           |       | protocol     |               |
+   |                           |       | error        |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_INTERNAL_ERROR         | 0x102 | Internal     | Section 8.1   |
+   |                           |       | error        |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_STREAM_CREATION_ERROR  | 0x103 | Stream       | Section 8.1   |
+   |                           |       | creation     |               |
+   |                           |       | error        |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_CLOSED_CRITICAL_STREAM | 0x104 | Critical     | Section 8.1   |
+   |                           |       | stream was   |               |
+   |                           |       | closed       |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_FRAME_UNEXPECTED       | 0x105 | Frame not    | Section 8.1   |
+   |                           |       | permitted in |               |
+   |                           |       | the current  |               |
+   |                           |       | state        |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_FRAME_ERROR            | 0x106 | Frame        | Section 8.1   |
+   |                           |       | violated     |               |
+   |                           |       | layout or    |               |
+   |                           |       | size rules   |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_EXCESSIVE_LOAD         | 0x107 | Peer         | Section 8.1   |
+   |                           |       | generating   |               |
+   |                           |       | excessive    |               |
+   |                           |       | load         |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_ID_ERROR               | 0x108 | An           | Section 8.1   |
+   |                           |       | identifier   |               |
+   |                           |       | was used     |               |
+   |                           |       | incorrectly  |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_SETTINGS_ERROR         | 0x109 | SETTINGS     | Section 8.1   |
+   |                           |       | frame        |               |
+   |                           |       | contained    |               |
+   |                           |       | invalid      |               |
+   |                           |       | values       |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_MISSING_SETTINGS       | 0x10a | No SETTINGS  | Section 8.1   |
+   |                           |       | frame        |               |
+   |                           |       | received     |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_REQUEST_REJECTED       | 0x10b | Request not  | Section 8.1   |
+   |                           |       | processed    |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_REQUEST_CANCELLED      | 0x10c | Data no      | Section 8.1   |
+   |                           |       | longer       |               |
+   |                           |       | needed       |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_REQUEST_INCOMPLETE     | 0x10d | Stream       | Section 8.1   |
+   |                           |       | terminated   |               |
+   |                           |       | early        |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_MESSAGE_ERROR          | 0x10e | Malformed    | Section 8.1   |
+   |                           |       | message      |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_CONNECT_ERROR          | 0x10f | TCP reset or | Section 8.1   |
+   |                           |       | error on     |               |
+   |                           |       | CONNECT      |               |
+   |                           |       | request      |               |
+   +---------------------------+-------+--------------+---------------+
+   | H3_VERSION_FALLBACK       | 0x110 | Retry over   | Section 8.1   |
+   |                           |       | HTTP/1.1     |               |
+   +---------------------------+-------+--------------+---------------+
 
-                    Table 4: Initial HTTP/3 Error Codes
+                   Table 4: Initial HTTP/3 Error Codes
 
    Each code of the format "0x1f * N + 0x21" for non-negative integer
    values of N (that is, 0x21, 0x40, ..., through 0x3ffffffffffffffe)
@@ -2666,7 +2678,7 @@ Appendix A.  Considerations for Transitioning from HTTP/2
    requests and responses to streams.  However, the details of the
    HTTP/3 design are substantially different from HTTP/2.
 
-   These departures are noted in this section.
+   Some important departures are noted in this section.
 
 A.1.  Streams
 
@@ -2714,8 +2726,8 @@ A.2.  HTTP Frame Types
    As a result, several HTTP/2 frame types are not required in HTTP/3.
    Where an HTTP/2-defined frame is no longer used, the frame ID has
    been reserved in order to maximize portability between HTTP/2 and
-   HTTP/3 implementations.  However, even equivalent frames between the
-   two mappings are not identical.
+   HTTP/3 implementations.  However, even frame types that appear in
+   both mappings do not have identical semantics.
 
    Many of the differences arise from the fact that HTTP/2 provides an
    absolute ordering between frames across all streams, while QUIC
@@ -2767,7 +2779,7 @@ A.2.4.  Guidance for New Frame Type Definitions
    Frame type definitions in HTTP/3 often use the QUIC variable-length
    integer encoding.  In particular, Stream IDs use this encoding, which
    allows for a larger range of possible values than the encoding used
-   in HTTP/2.  Some frames in HTTP/3 use an identifier rather than a
+   in HTTP/2.  Some frames in HTTP/3 use an identifier other than a
    Stream ID (e.g., Push IDs).  Redefinition of the encoding of
    extension frame types might be necessary if the encoding includes a
    Stream ID.
@@ -2779,10 +2791,10 @@ A.2.4.  Guidance for New Frame Type Definitions
    Other than these issues, frame type HTTP/2 extensions are typically
    portable to QUIC simply by replacing Stream 0 in HTTP/2 with a
    control stream in HTTP/3.  HTTP/3 extensions will not assume
-   ordering, but would not be harmed by ordering, and would be portable
-   to HTTP/2 in the same manner.
+   ordering, but would not be harmed by ordering, and are expected to be
+   portable to HTTP/2.
 
-A.2.5.  Mapping Between HTTP/2 and HTTP/3 Frame Types
+A.2.5.  Comparison Between HTTP/2 and HTTP/3 Frame Types
 
    DATA (0x0):  Padding is not defined in HTTP/3 frames.  See
       Section 7.2.1.
@@ -2835,7 +2847,7 @@ A.3.  HTTP/2 SETTINGS Parameters
 
    Some transport-level options that HTTP/2 specifies via the SETTINGS
    frame are superseded by QUIC transport parameters in HTTP/3.  The
-   HTTP-level options that are retained in HTTP/3 have the same value as
+   HTTP-level setting that is retained in HTTP/3 has the same value as
    in HTTP/2.  The superseded settings are reserved, and their receipt
    is an error.  See Section 7.2.4.1 for discussion of both the retained
    and reserved values.
