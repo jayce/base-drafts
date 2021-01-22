@@ -5,10 +5,10 @@
 QUIC                                                           C. Krasic
 Internet-Draft                                                   Netflix
 Intended status: Standards Track                               M. Bishop
-Expires: 23 July 2021                                Akamai Technologies
+Expires: 26 July 2021                                Akamai Technologies
                                                         A. Frindell, Ed.
                                                                 Facebook
-                                                         19 January 2021
+                                                         22 January 2021
 
 
                   QPACK: Header Compression for HTTP/3
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 July 2021.
+   This Internet-Draft will expire on 26 July 2021.
 
 Copyright Notice
 
@@ -529,10 +529,10 @@ Table of Contents
 3.2.  Dynamic Table
 
    The dynamic table consists of a list of field lines maintained in
-   first-in, first-out order.  Each QPACK decoder holds a dynamic table
-   that is initially empty.  Entries are added by encoder instructions
-   received on the encoder stream; see Section 4.3.  The encoder tracks
-   the contents of the dynamic table maintained by the decoder.
+   first-in, first-out order.  A QPACK encoder and decoder share a
+   dynamic table that is initially empty.  The encoder adds entries to
+   the dynamic table and sends them to the decoder via instructions on
+   the encoder stream; see Section 4.3.
 
    The dynamic table can contain duplicate entries (i.e., entries with
    the same name and same value).  Therefore, duplicate entries MUST NOT
@@ -1532,13 +1532,13 @@ Table of Contents
 
    [HTTP3]    Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 19 January 2021,
+              quic-http, 22 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 19 January
+              Internet-Draft, draft-ietf-quic-transport, 22 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
