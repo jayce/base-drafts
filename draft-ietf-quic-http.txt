@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         20 January 2021
-Expires: 24 July 2021
+Intended status: Standards Track                         22 January 2021
+Expires: 26 July 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 July 2021.
+   This Internet-Draft will expire on 26 July 2021.
 
 Copyright Notice
 
@@ -191,8 +191,9 @@ Table of Contents
 
    HTTP semantics ([SEMANTICS]) are used for a broad range of services
    on the Internet.  These semantics have most commonly been used with
-   HTTP/1.1, over a variety of transport and session layers, and with
-   HTTP/2 over TLS.  HTTP/3 supports the same semantics over a new
+   HTTP/1.1 and HTTP/2.  HTTP/1.1 has been used over a variety of
+   transport and session layers, while HTTP/2 has been used primarily
+   with TLS over TCP.  HTTP/3 supports the same semantics over a new
    transport protocol, QUIC.
 
 1.1.  Prior versions of HTTP
@@ -200,11 +201,13 @@ Table of Contents
    HTTP/1.1 ([HTTP11]) uses whitespace-delimited text fields to convey
    HTTP messages.  While these exchanges are human-readable, using
    whitespace for message formatting leads to parsing complexity and
-   excessive tolerance of variant behavior.  Because HTTP/1.x does not
-   include a multiplexing layer, multiple TCP connections are often used
-   to service requests in parallel.  However, that has a negative impact
-   on congestion control and network efficiency, since TCP does not
-   share congestion control across multiple connections.
+   excessive tolerance of variant behavior.
+
+   Because HTTP/1.1 does not include a multiplexing layer, multiple TCP
+   connections are often used to service requests in parallel.  However,
+   that has a negative impact on congestion control and network
+   efficiency, since TCP does not share congestion control across
+   multiple connections.
 
    HTTP/2 ([HTTP2]) introduced a binary framing and multiplexing layer
    to improve latency without modifying the transport layer.  However,
@@ -1167,6 +1170,10 @@ Table of Contents
    the client to retry some requests.  Including the GOAWAY frame in the
    same packet as the QUIC CONNECTION_CLOSE frame improves the chances
    of the frame being received by clients.
+
+   If there are open streams that have not been explicitly closed, they
+   are implicitly closed when the connection is closed; see Section 10.2
+   of [QUIC-TRANSPORT].
 
 5.4.  Transport Closure
 
@@ -2522,13 +2529,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 20 January 2021,
+              Internet-Draft, draft-ietf-quic-qpack, 22 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 20 January
+              Internet-Draft, draft-ietf-quic-transport, 22 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
