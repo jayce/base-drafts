@@ -193,8 +193,8 @@ Table of Contents
    on the Internet.  These semantics have most commonly been used with
    HTTP/1.1 and HTTP/2.  HTTP/1.1 has been used over a variety of
    transport and session layers, while HTTP/2 has been used primarily
-   over TLS.  HTTP/3 supports the same semantics over a new transport
-   protocol, QUIC.
+   with TLS over TCP.  HTTP/3 supports the same semantics over a new
+   transport protocol, QUIC.
 
 1.1.  Prior versions of HTTP
 
