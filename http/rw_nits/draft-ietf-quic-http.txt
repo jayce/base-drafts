@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         22 January 2021
-Expires: 26 July 2021
+Intended status: Standards Track                         25 January 2021
+Expires: 29 July 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 July 2021.
+   This Internet-Draft will expire on 29 July 2021.
 
 Copyright Notice
 
@@ -745,10 +745,12 @@ Table of Contents
 
 4.1.1.2.  Field Compression
 
-   [QPACK] describes a variation of HPACK that allows the flexibility to
-   avoid compression-induced head-of-line blocking.  HTTP/3 uses QPACK
-   to compress header and trailer sections, including the pseudo-header
-   fields present in the header section.
+   [QPACK] describes a variation of HPACK that gives an encoder some
+   control over how much head-of-line blocking can be caused by
+   compression.  This allows an encoder to balance compression
+   efficiency with latency.  HTTP/3 uses QPACK to compress header and
+   trailer sections, including the pseudo-header fields present in the
+   header section.
 
    To allow for better compression efficiency, the "Cookie" field
    ([RFC6265]) MAY be split into separate field lines, each with one or
@@ -2534,13 +2536,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 22 January 2021,
+              Internet-Draft, draft-ietf-quic-qpack, 25 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 22 January
+              Internet-Draft, draft-ietf-quic-transport, 25 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 

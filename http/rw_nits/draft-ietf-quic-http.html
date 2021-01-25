@@ -28,7 +28,7 @@ subsumed by QUIC, and describes how HTTP/2 extensions can be ported to HTTP/3.
     lxml 4.5.0
     pycountry 19.8.18
     pyflakes 2.1.1
-    PyYAML 5.3.1
+    PyYAML 5.4.1
     requests 2.22.0
     setuptools 45.2.0
     six 1.14.0
@@ -44,7 +44,21 @@ html {
   --link-color: #2a6496;
   --highlight-color: #f9f9f9;
   --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
   --small-font-size: 14.5px;
+}
+@media (prefers-color-scheme: dark) {
+html {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+}
 }
 body {
   max-width: 600px;
@@ -335,14 +349,14 @@ a.pilcrow {
   opacity: 0.2;
   user-select: none;
 }
-a.pilcrow[href] { color: #ddd; }
+a.pilcrow[href] { color: var(--pilcrow-weak); }
 a.pilcrow[href]:hover { text-decoration: none; }
-@media screen {
+@media not print {
   :hover > a.pilcrow {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
-    color: #bbb;
+    color: var(--pilcrow-strong);
     background-color: transparent;
   }
 }
@@ -828,7 +842,7 @@ address div.right {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Bishop</td>
-<td class="center">Expires 26 July 2021</td>
+<td class="center">Expires 29 July 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -841,12 +855,12 @@ address div.right {
 <dd class="internet-draft">draft-ietf-quic-http</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-01-22" class="published">22 January 2021</time>
+<time datetime="2021-01-25" class="published">25 January 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-07-26">26 July 2021</time></dd>
+<dd class="expires"><time datetime="2021-07-29">29 July 2021</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -903,7 +917,7 @@ code and issues list for this draft can be found at
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 26 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1948,10 +1962,11 @@ included in an HTTP/1.1 status line.<a href="#section-4.1.1.1-12" class="pilcrow
             <h5 id="name-field-compression">
 <a href="#section-4.1.1.2" class="section-number selfRef">4.1.1.2. </a><a href="#name-field-compression" class="section-name selfRef">Field Compression</a>
             </h5>
-<p id="section-4.1.1.2-1"><span>[<a href="#QPACK" class="xref">QPACK</a>]</span> describes a variation of HPACK that allows the flexibility to avoid
-compression-induced head-of-line blocking.  HTTP/3 uses QPACK to compress header
-and trailer sections, including the pseudo-header fields present in the header
-section.<a href="#section-4.1.1.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1.2-1"><span>[<a href="#QPACK" class="xref">QPACK</a>]</span> describes a variation of HPACK that gives an encoder some control over
+how much head-of-line blocking can be caused by compression.  This allows an
+encoder to balance compression efficiency with latency.  HTTP/3 uses QPACK to
+compress header and trailer sections, including the pseudo-header fields present
+in the header section.<a href="#section-4.1.1.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.1.1.2-2">To allow for better compression efficiency, the "Cookie" field (<span>[<a href="#RFC6265" class="xref">RFC6265</a>]</span>)
 MAY be split into separate field lines, each with one or more cookie-pairs,
 before compression. If a decompressed field section contains multiple cookie
@@ -4152,11 +4167,11 @@ IANA and MUST NOT appear in the listing of assigned values.<a href="#section-11.
 <dd class="break"></dd>
 <dt id="QPACK">[QPACK]</dt>
         <dd>
-<span class="refAuthor">Krasic, C.</span><span class="refAuthor">, Bishop, M.</span><span class="refAuthor">, and A. Frindell, Ed.</span>, <span class="refTitle">"QPACK: Header Compression for HTTP over QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-qpack</span>, <time datetime="2021-01-22" class="refDate">22 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-qpack">https://tools.ietf.org/html/draft-ietf-quic-qpack</a>&gt;</span>. </dd>
+<span class="refAuthor">Krasic, C.</span><span class="refAuthor">, Bishop, M.</span><span class="refAuthor">, and A. Frindell, Ed.</span>, <span class="refTitle">"QPACK: Header Compression for HTTP over QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-qpack</span>, <time datetime="2021-01-25" class="refDate">25 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-qpack">https://tools.ietf.org/html/draft-ietf-quic-qpack</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-TRANSPORT">[QUIC-TRANSPORT]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-01-22" class="refDate">22 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-01-25" class="refDate">25 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC0793">[RFC0793]</dt>
         <dd>
