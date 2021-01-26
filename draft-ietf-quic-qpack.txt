@@ -5,10 +5,10 @@
 QUIC                                                           C. Krasic
 Internet-Draft                                                   Netflix
 Intended status: Standards Track                               M. Bishop
-Expires: 29 July 2021                                Akamai Technologies
+Expires: 30 July 2021                                Akamai Technologies
                                                         A. Frindell, Ed.
                                                                 Facebook
-                                                         25 January 2021
+                                                         26 January 2021
 
 
                   QPACK: Header Compression for HTTP/3
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 July 2021.
+   This Internet-Draft will expire on 30 July 2021.
 
 Copyright Notice
 
@@ -1532,13 +1532,13 @@ Table of Contents
 
    [HTTP3]    Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 25 January 2021,
+              quic-http, 26 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 25 January
+              Internet-Draft, draft-ietf-quic-transport, 26 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
