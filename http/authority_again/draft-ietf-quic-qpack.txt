@@ -5,10 +5,10 @@
 QUIC                                                           C. Krasic
 Internet-Draft                                                   Netflix
 Intended status: Standards Track                               M. Bishop
-Expires: 29 July 2021                                Akamai Technologies
+Expires: 30 July 2021                                Akamai Technologies
                                                         A. Frindell, Ed.
                                                                 Facebook
-                                                         25 January 2021
+                                                         26 January 2021
 
 
                   QPACK: Header Compression for HTTP/3
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 July 2021.
+   This Internet-Draft will expire on 30 July 2021.
 
 Copyright Notice
 
@@ -200,8 +200,8 @@ Table of Contents
    Field section:  An ordered collection of HTTP field lines associated
       with an HTTP message.  A field section can contain multiple field
       lines with the same name.  It can also contain duplicate field
-      lines.  An HTTP message can include both header field and trailer
-      field sections.
+      lines.  An HTTP message can include both header and trailer
+      sections.
 
    Representation:  An instruction that represents a field line,
       possibly by reference to the dynamic and static tables.
@@ -248,8 +248,8 @@ Table of Contents
 
 2.1.  Encoder
 
-   An encoder converts a header or trailer field section into a series
-   of representations by emitting either an indexed or a literal
+   An encoder converts a header or trailer section into a series of
+   representations by emitting either an indexed or a literal
    representation for each field line in the list; see Section 4.5.
    Indexed representations achieve high compression by replacing the
    literal name and possibly the value with an index to either the
@@ -529,9 +529,10 @@ Table of Contents
 3.2.  Dynamic Table
 
    The dynamic table consists of a list of field lines maintained in
-   first-in, first-out order.  Each HTTP/3 endpoint holds a dynamic
-   table that is initially empty.  Entries are added by encoder
-   instructions received on the encoder stream; see Section 4.3.
+   first-in, first-out order.  A QPACK encoder and decoder share a
+   dynamic table that is initially empty.  The encoder adds entries to
+   the dynamic table and sends them to the decoder via instructions on
+   the encoder stream; see Section 4.3.
 
    The dynamic table can contain duplicate entries (i.e., entries with
    the same name and same value).  Therefore, duplicate entries MUST NOT
@@ -544,9 +545,9 @@ Table of Contents
    The size of the dynamic table is the sum of the size of its entries.
 
    The size of an entry is the sum of its name's length in bytes, its
-   value's length in bytes, and 32.  The size of an entry is calculated
-   using the length of its name and value without Huffman encoding
-   applied.
+   value's length in bytes, and 32 additional bytes.  The size of an
+   entry is calculated using the length of its name and value without
+   Huffman encoding applied.
 
 3.2.2.  Dynamic Table Capacity and Eviction
 
@@ -1531,13 +1532,13 @@ Table of Contents
 
    [HTTP3]    Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 25 January 2021,
+              quic-http, 26 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-http>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 25 January
+              Internet-Draft, draft-ietf-quic-transport, 26 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
@@ -1824,7 +1825,7 @@ Appendix B.  Encoding and Decoding Examples
    encoder and a decoder.  The exchanges are designed to exercise most
    QPACK instructions, and highlight potentially common patterns and
    their impact on dynamic table state.  The encoder sends three encoded
-   field sections containing one field line each, as wells as two
+   field sections containing one field line each, as well as two
    speculative inserts that are not referenced.
 
    The state of the encoder's dynamic table is shown, along with its
