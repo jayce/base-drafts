@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         26 January 2021
-Expires: 30 July 2021
+Intended status: Standards Track                         27 January 2021
+Expires: 31 July 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 July 2021.
+   This Internet-Draft will expire on 31 July 2021.
 
 Copyright Notice
 
@@ -392,22 +392,13 @@ Table of Contents
 
    The "https" scheme associates authority with possession of a
    certificate that the client considers to be trustworthy for the host
-   identified by the authority component of the URI.
-
-   If a server presents a valid certificate and proof that it controls
-   the corresponding private key, then a client will accept a secured
-   TLS session with that server as being authoritative for all origins
-   with the "https" scheme and a host identified in the certificate.
-   The host must be listed either as the CN field of the certificate
-   subject or as a dNSName in the subjectAltName field of the
-   certificate; see [RFC6125].  For a host that is an IP address, the
-   client MUST verify that the address appears as an iPAddress in the
-   subjectAltName field of the certificate.
-
-   If the hostname or address is not present in the certificate, the
-   client MUST NOT consider the server authoritative for origins
-   containing that hostname or address.  See Section 4.3 of [SEMANTICS]
-   for more detail on authoritative access.
+   identified by the authority component of the URI.  Upon receiving a
+   server certificate in the TLS handshake, the client MUST verify that
+   the certificate is an acceptable match for the URI's origin server
+   using the process described in Section 4.3.4 of [SEMANTICS].  If the
+   certificate cannot be verified with respect to the URI's origin
+   server, the client MUST NOT consider the server authoritative for
+   that origin.
 
    A client MAY attempt access to a resource with an "https" URI by
    resolving the host identifier to an IP address, establishing a QUIC
@@ -497,12 +488,31 @@ Table of Contents
 
    Once a connection exists to a server endpoint, this connection MAY be
    reused for requests with multiple different URI authority components.
-   Clients SHOULD NOT open more than one HTTP/3 connection to a given
-   host and port pair, where the host is derived from a URI, a selected
-   alternative service ([ALTSVC]), or a configured proxy.  A client MAY
-   open multiple HTTP/3 connections to the same IP address and UDP port
-   using different transport or TLS configurations but SHOULD avoid
-   creating multiple connections with the same configuration.
+   To use an existing connection for a new origin, clients MUST validate
+   the certificate presented by the server for the new origin server
+   using the process described in Section 4.3.4 of [SEMANTICS].  This
+   implies that clients will need to retain the server certificate and
+   any additional information needed to verify that certificate; clients
+   which do not do so will be unable to reuse the connection for
+   additional origins.
+
+   If the certificate is not acceptable with regard to the new origin
+   for any reason, the connection MUST NOT be reused and a new
+   connection SHOULD be established for the new origin.  If the reason
+   the certificate cannot be verified might apply to other origins
+   already associated with the connection, the client SHOULD re-validate
+   the server certificate for those origins.  For instance, if
+   validation of a certificate fails because the certificate has expired
+   or been revoked, this might be used to invalidate all other origins
+   for which that certificate was used to establish authority.
+
+   Clients SHOULD NOT open more than one HTTP/3 connection to a given IP
+   address and UDP port, where the IP address and port might be derived
+   from a URI, a selected alternative service ([ALTSVC]), a configured
+   proxy, or name resolution of any of these.  A client MAY open
+   multiple HTTP/3 connections to the same IP address and UDP port using
+   different transport or TLS configurations but SHOULD avoid creating
+   multiple connections with the same configuration.
 
    Servers are encouraged to maintain open HTTP/3 connections for as
    long as possible but are permitted to terminate idle connections if
@@ -515,7 +525,7 @@ Table of Contents
    A server that does not wish clients to reuse HTTP/3 connections for a
    particular origin can indicate that it is not authoritative for a
    request by sending a 421 (Misdirected Request) status code in
-   response to the request; see Section 9.1.2 of [HTTP2].
+   response to the request; see Section 7.4 of [SEMANTICS].
 
 4.  HTTP Request Lifecycle
 
@@ -997,7 +1007,12 @@ Table of Contents
    *  does not include a request body or trailer section
 
    The server MUST include a value in the ":authority" pseudo-header
-   field for which the server is authoritative; see Section 3.3.
+   field for which the server is authoritative.  If the client has not
+   yet validated the connection for the origin indicated by the pushed
+   request, it MUST perform the same verification process it would do
+   before sending a request for that origin on the connection; see
+   Section 3.3.  If this verification fails, the client MUST NOT
+   consider the server authoritative for that origin.
 
    Clients SHOULD send a CANCEL_PUSH frame upon receipt of a
    PUSH_PROMISE frame carrying a request that is not cacheable, is not
@@ -2546,6 +2561,10 @@ Table of Contents
 
 12.1.  Normative References
 
+   [ALTSVC]   Nottingham, M., McManus, P., and J. Reschke, "HTTP
+              Alternative Services", RFC 7838, DOI 10.17487/RFC7838,
+              April 2016, <https://www.rfc-editor.org/info/rfc7838>.
+
    [CACHING]  Fielding, R., Nottingham, M., and J. Reschke, "HTTP
               Caching", Work in Progress, Internet-Draft, draft-ietf-
               httpbis-cache-14, 12 January 2021, <http://www.ietf.org/
@@ -2558,13 +2577,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 26 January 2021,
+              Internet-Draft, draft-ietf-quic-qpack, 27 January 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 26 January
+              Internet-Draft, draft-ietf-quic-transport, 27 January
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
@@ -2581,13 +2600,6 @@ Table of Contents
               Extensions: Extension Definitions", RFC 6066,
               DOI 10.17487/RFC6066, January 2011,
               <https://www.rfc-editor.org/info/rfc6066>.
-
-   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
-              Verification of Domain-Based Application Service Identity
-              within Internet Public Key Infrastructure Using X.509
-              (PKIX) Certificates in the Context of Transport Layer
-              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <https://www.rfc-editor.org/info/rfc6125>.
 
    [RFC6265]  Barth, A., "HTTP State Management Mechanism", RFC 6265,
               DOI 10.17487/RFC6265, April 2011,
@@ -2620,10 +2632,6 @@ Table of Contents
               <https://www.rfc-editor.org/info/rfc3986>.
 
 12.2.  Informative References
-
-   [ALTSVC]   Nottingham, M., McManus, P., and J. Reschke, "HTTP
-              Alternative Services", RFC 7838, DOI 10.17487/RFC7838,
-              April 2016, <https://www.rfc-editor.org/info/rfc7838>.
 
    [BREACH]   Gluck, Y., Harris, N., and A. Prado, "BREACH: Reviving the
               CRIME Attack", July 2013,
