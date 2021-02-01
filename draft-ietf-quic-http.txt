@@ -4,8 +4,8 @@
 
 QUIC                                                      M. Bishop, Ed.
 Internet-Draft                                                    Akamai
-Intended status: Standards Track                         28 January 2021
-Expires: 1 August 2021
+Intended status: Standards Track                         1 February 2021
+Expires: 5 August 2021
 
 
              Hypertext Transfer Protocol Version 3 (HTTP/3)
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 1 August 2021.
+   This Internet-Draft will expire on 5 August 2021.
 
 Copyright Notice
 
@@ -1218,12 +1218,12 @@ Table of Contents
 
    A QUIC stream provides reliable in-order delivery of bytes, but makes
    no guarantees about order of delivery with regard to bytes on other
-   streams.  On the wire, the stream data containing HTTP frames is
-   carried by QUIC STREAM frames, but this framing is invisible to the
-   HTTP framing layer.  The transport layer buffers and orders received
-   QUIC STREAM frames, exposing the data contained within as a reliable
-   byte stream to the application.  Although QUIC permits out-of-order
-   delivery within a stream, HTTP/3 does not make use of this feature.
+   streams.  In version 1 of QUIC, the stream data containing HTTP
+   frames is carried by QUIC STREAM frames, but this framing is
+   invisible to the HTTP framing layer.  The transport layer buffers and
+   orders received stream data, exposing a reliable byte stream to the
+   application.  Although QUIC permits out-of-order delivery within a
+   stream, HTTP/3 does not make use of this feature.
 
    QUIC streams can be either unidirectional, carrying data only from
    initiator to receiver, or bidirectional.  Streams can be initiated by
@@ -2577,13 +2577,13 @@ Table of Contents
 
    [QPACK]    Krasic, C., Bishop, M., and A. Frindell, Ed., "QPACK:
               Header Compression for HTTP over QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-qpack, 28 January 2021,
+              Internet-Draft, draft-ietf-quic-qpack, 1 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-qpack>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 28 January
+              Internet-Draft, draft-ietf-quic-transport, 1 February
               2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
