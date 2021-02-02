@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 25 July 2021                                            Mozilla
-                                                         21 January 2021
+Expires: 6 August 2021                                           Mozilla
+                                                         2 February 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 July 2021.
+   This Internet-Draft will expire on 6 August 2021.
 
 Copyright Notice
 
@@ -2791,9 +2791,9 @@ Table of Contents
    If the recipient permits the migration, it MUST send subsequent
    packets to the new peer address and MUST initiate path validation
    (Section 8.2) to verify the peer's ownership of the address if
-   validation is not already underway.  If the receipient has no
-   available connection IDs, it will not be able to send on the new path
-   until the peer provides one; see Section 9.5.
+   validation is not already underway.  If the recipient has no unused
+   connection IDs from the peer, it will not be able to send anything on
+   the new path until the peer provides one; see Section 9.5.
 
    An endpoint only changes the address to which it sends packets in
    response to the highest-numbered non-probing packet.  This ensures
@@ -8112,18 +8112,18 @@ Table of Contents
    [QUIC-INVARIANTS]
               Thomson, M., "Version-Independent Properties of QUIC",
               Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 21 January 2021,
+              invariants, 2 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 21 January 2021,
+              draft-ietf-quic-recovery, 2 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 21 January 2021,
+              Internet-Draft, draft-ietf-quic-tls, 2 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
@@ -8229,9 +8229,9 @@ Table of Contents
    [QUIC-MANAGEABILITY]
               Kuehlewind, M. and B. Trammell, "Manageability of the QUIC
               Transport Protocol", Work in Progress, Internet-Draft,
-              draft-ietf-quic-manageability-08, 2 November 2020,
+              draft-ietf-quic-manageability-09, 22 January 2021,
               <http://www.ietf.org/internet-drafts/draft-ietf-quic-
-              manageability-08.txt>.
+              manageability-09.txt>.
 
    [RANDOM]   Eastlake 3rd, D., Schiller, J., and S. Crocker,
               "Randomness Requirements for Security", BCP 106, RFC 4086,
