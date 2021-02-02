@@ -801,7 +801,7 @@ Table of Contents
    issue for clients.  Clients can choose not to enable resumption to
    avoid creating this correlation.  Clients SHOULD NOT reuse tickets as
    that allows entities other than the server to correlate connections;
-   see Section C.4 of [TLS13].
+   see Appendix C.4 of [TLS13].
 
 4.6.  0-RTT
 

@@ -191,7 +191,7 @@ Table of Contents
       and trailer fields; this document uses "fields" for generality.
 
    HTTP field line:  A name-value pair sent as part of an HTTP field
-      section.  See Sections 6.3 and Section 6.5 of [SEMANTICS].
+      section.  See Sections 6.3 and 6.5 of [SEMANTICS].
 
    HTTP field value:  Data associated with a field name, composed from
       all field line values with that field name in that section,
