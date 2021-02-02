@@ -2791,7 +2791,9 @@ Table of Contents
    If the recipient permits the migration, it MUST send subsequent
    packets to the new peer address and MUST initiate path validation
    (Section 8.2) to verify the peer's ownership of the address if
-   validation is not already underway.
+   validation is not already underway.  If the recipient has no unused
+   connection IDs from the peer, it will not be able to send anything on
+   the new path until the peer provides one; see Section 9.5.
 
    An endpoint only changes the address to which it sends packets in
    response to the highest-numbered non-probing packet.  This ensures
