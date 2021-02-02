@@ -1484,8 +1484,9 @@ Table of Contents
    implementation can be configured to accept.
 
    If an implementation encounters a value larger than it is able to
-   decode, this MUST be treated as a stream error of
-   QPACK_DECOMPRESSION_FAILED.
+   decode, this MUST be treated as a stream error of type
+   QPACK_DECOMPRESSION_FAILED if on a request stream, or a connection
+   error of the appropriate type if on the encoder or decoder stream.
 
 8.  IANA Considerations
 
