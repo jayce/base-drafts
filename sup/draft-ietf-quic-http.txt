@@ -1039,9 +1039,9 @@ Table of Contents
    stream with an as-yet-unknown Push ID, both the associated client
    request and the pushed request header fields are unknown.  The client
    can buffer the stream data in expectation of the matching
-   PUSH_PROMISE.  The client can use stream flow control (see section
-   4.1 of [QUIC-TRANSPORT]) to limit the amount of data a server may
-   commit to the pushed stream.
+   PUSH_PROMISE.  The client can use stream flow control (see
+   Section 4.1 of [QUIC-TRANSPORT]) to limit the amount of data a server
+   may commit to the pushed stream.
 
    Push stream data can also arrive after a client has canceled a push.
    In this case, the client can abort reading the stream with an error
@@ -1218,12 +1218,12 @@ Table of Contents
 
    A QUIC stream provides reliable in-order delivery of bytes, but makes
    no guarantees about order of delivery with regard to bytes on other
-   streams.  On the wire, the stream data containing HTTP frames is
-   carried by QUIC STREAM frames, but this framing is invisible to the
-   HTTP framing layer.  The transport layer buffers and orders received
-   QUIC STREAM frames, exposing the data contained within as a reliable
-   byte stream to the application.  Although QUIC permits out-of-order
-   delivery within a stream, HTTP/3 does not make use of this feature.
+   streams.  In version 1 of QUIC, the stream data containing HTTP
+   frames is carried by QUIC STREAM frames, but this framing is
+   invisible to the HTTP framing layer.  The transport layer buffers and
+   orders received stream data, exposing a reliable byte stream to the
+   application.  Although QUIC permits out-of-order delivery within a
+   stream, HTTP/3 does not make use of this feature.
 
    QUIC streams can be either unidirectional, carrying data only from
    initiator to receiver, or bidirectional.  Streams can be initiated by
@@ -2299,7 +2299,7 @@ Table of Contents
    Permanent registrations in this registry are assigned using the
    Specification Required policy ([RFC8126]), except for values between
    0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
-   Standards Action or IESG Approval as defined in Section 4.9 and 4.10
+   Standards Action or IESG Approval as defined in Sections 4.9 and 4.10
    of [RFC8126].
 
    While this registry is separate from the "HTTP/2 Frame Type" registry
@@ -2362,7 +2362,7 @@ Table of Contents
    registrations in this registry are assigned using the Specification
    Required policy ([RFC8126]), except for values between 0x00 and 0x3f
    (in hexadecimal; inclusive), which are assigned using Standards
-   Action or IESG Approval as defined in Section 4.9 and 4.10 of
+   Action or IESG Approval as defined in Sections 4.9 and 4.10 of
    [RFC8126].
 
    While this registry is separate from the "HTTP/2 Settings" registry
@@ -2415,7 +2415,7 @@ Table of Contents
    registrations in this registry are assigned using the Specification
    Required policy ([RFC8126]), except for values between 0x00 and 0x3f
    (in hexadecimal; inclusive), which are assigned using Standards
-   Action or IESG Approval as defined in Section 4.9 and 4.10 of
+   Action or IESG Approval as defined in Sections 4.9 and 4.10 of
    [RFC8126].
 
    Registrations for error codes are required to include a description
@@ -2525,7 +2525,7 @@ Table of Contents
    Permanent registrations in this registry are assigned using the
    Specification Required policy ([RFC8126]), except for values between
    0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
-   Standards Action or IESG Approval as defined in Section 4.9 and 4.10
+   Standards Action or IESG Approval as defined in Sections 4.9 and 4.10
    of [RFC8126].
 
    In addition to common fields as described in Section 11.2, permanent
