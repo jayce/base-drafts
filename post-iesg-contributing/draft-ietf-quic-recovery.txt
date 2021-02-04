@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                           I. Swett, Ed.
-Expires: 8 July 2021                                              Google
-                                                          4 January 2021
+Expires: 8 August 2021                                            Google
+                                                         4 February 2021
 
 
                QUIC Loss Detection and Congestion Control
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 July 2021.
+   This Internet-Draft will expire on 8 August 2021.
 
 Copyright Notice
 
@@ -104,7 +104,7 @@ Table of Contents
      7.7.  Pacing
      7.8.  Under-utilizing the Congestion Window
    8.  Security Considerations
-     8.1.  Congestion Signals
+     8.1.  Loss and Congestion Signals
      8.2.  Traffic Analysis
      8.3.  Misreporting ECN Markings
    9.  IANA Considerations
@@ -205,10 +205,12 @@ Table of Contents
    All transmissions in QUIC are sent with a packet-level header, which
    indicates the encryption level and includes a packet sequence number
    (referred to below as a packet number).  The encryption level
-   indicates the packet number space, as described in [QUIC-TRANSPORT].
-   Packet numbers never repeat within a packet number space for the
-   lifetime of a connection.  Packet numbers are sent in monotonically
-   increasing order within a space, preventing ambiguity.
+   indicates the packet number space, as described in Section 12.3 of
+   [QUIC-TRANSPORT].  Packet numbers never repeat within a packet number
+   space for the lifetime of a connection.  Packet numbers are sent in
+   monotonically increasing order within a space, preventing ambiguity.
+   It is permitted for some packet numbers to never be used, leaving
+   intentional gaps.
 
    This design obviates the need for disambiguating between
    transmissions and retransmissions; this eliminates significant
@@ -291,10 +293,11 @@ Table of Contents
 
 4.4.  No Reneging
 
-   QUIC ACKs contain information that is similar to TCP SACK, but QUIC
-   does not allow any acknowledged packet to be reneged, greatly
-   simplifying implementations on both sides and reducing memory
-   pressure on the sender.
+   QUIC ACK frames contain information similar to that in TCP Selective
+   Acknowledgements (SACKs, [RFC2018]).  However, QUIC does not allow a
+   packet acknowledgement to be reneged, greatly simplifying
+   implementations on both sides and reducing memory pressure on the
+   sender.
 
 4.5.  More ACK Ranges
 
@@ -313,29 +316,26 @@ Table of Contents
 4.7.  Probe Timeout Replaces RTO and TLP
 
    QUIC uses a probe timeout (PTO; see Section 6.2), with a timer based
-   on TCP's RTO computation.  QUIC's PTO includes the peer's maximum
-   expected acknowledgment delay instead of using a fixed minimum
-   timeout.  QUIC does not collapse the congestion window until
-   persistent congestion (Section 7.6) is declared, unlike TCP, which
-   collapses the congestion window upon expiry of an RTO.  Instead of
-   collapsing the congestion window and declaring everything in-flight
-   lost, QUIC allows probe packets to temporarily exceed the congestion
-   window whenever the timer expires.
+   on TCP's RTO computation; see [RFC6297].  QUIC's PTO includes the
+   peer's maximum expected acknowledgment delay instead of using a fixed
+   minimum timeout.
 
-   In doing this, QUIC avoids unnecessary congestion window reductions,
-   obviating the need for correcting mechanisms such as F-RTO
-   ([RFC5682]).  Since QUIC does not collapse the congestion window on a
-   PTO expiration, a QUIC sender is not limited from sending more in-
-   flight packets after a PTO expiration if it still has available
-   congestion window.  This occurs when a sender is application-limited
-   and the PTO timer expires.  This is more aggressive than TCP's RTO
-   mechanism when application-limited, but identical when not
-   application-limited.
+   Similar to the RACK-TLP loss detection algorithm for TCP ([RACK]),
+   QUIC does not collapse the congestion window when the PTO expires,
+   since a single packet loss at the tail does not indicate persistent
+   congestion.  Instead, QUIC collapses the congestion window when
+   persistent congestion is declared; see Section 7.6.  In doing this,
+   QUIC avoids unnecessary congestion window reductions, obviating the
+   need for correcting mechanisms such as F-RTO ([RFC5682]).  Since QUIC
+   does not collapse the congestion window on a PTO expiration, a QUIC
+   sender is not limited from sending more in-flight packets after a PTO
+   expiration if it still has available congestion window.  This occurs
+   when a sender is application-limited and the PTO timer expires.  This
+   is more aggressive than TCP's RTO mechanism when application-limited,
+   but identical when not application-limited.
 
-   A single packet loss at the tail does not indicate persistent
-   congestion, so QUIC specifies a time-based definition to ensure one
-   or more packets are sent prior to a dramatic decrease in congestion
-   window; see Section 7.6.
+   QUIC allows probe packets to temporarily exceed the congestion window
+   whenever the timer expires.
 
 4.8.  The Minimum Congestion Window is Two Packets
 
@@ -358,11 +358,10 @@ Table of Contents
    The endpoint uses RTT samples and peer-reported host delays (see
    Section 13.2 of [QUIC-TRANSPORT]) to generate a statistical
    description of the network path's RTT.  An endpoint computes the
-   following three values for each path: the minimum value observed over
-   the lifetime of the path (min_rtt), an exponentially-weighted moving
-   average (smoothed_rtt), and the mean deviation (referred to as
-   "variation" in the rest of this document) in the observed RTT samples
-   (rttvar).
+   following three values for each path: the minimum value over a period
+   of time (min_rtt), an exponentially-weighted moving average
+   (smoothed_rtt), and the mean deviation (referred to as "variation" in
+   the rest of this document) in the observed RTT samples (rttvar).
 
 5.1.  Generating RTT samples
 
@@ -406,8 +405,8 @@ Table of Contents
 5.2.  Estimating min_rtt
 
    min_rtt is the sender's estimate of the minimum RTT observed for a
-   given network path.  In this document, min_rtt is used by loss
-   detection to reject implausibly small rtt samples.
+   given network path over a period of time.  In this document, min_rtt
+   is used by loss detection to reject implausibly small rtt samples.
 
    min_rtt MUST be set to the latest_rtt on the first RTT sample.
    min_rtt MUST be set to the lesser of min_rtt and latest_rtt
@@ -442,8 +441,8 @@ Table of Contents
 5.3.  Estimating smoothed_rtt and rttvar
 
    smoothed_rtt is an exponentially-weighted moving average of an
-   endpoint's RTT samples, and rttvar is the variation in the RTT
-   samples, estimated using a mean variation.
+   endpoint's RTT samples, and rttvar estimates the variation in the RTT
+   samples using a mean variation.
 
    The calculation of smoothed_rtt uses RTT samples after adjusting them
    for acknowledgment delays.  These delays are decoded from the ACK
@@ -453,18 +452,19 @@ Table of Contents
    The peer might report acknowledgment delays that are larger than the
    peer's max_ack_delay during the handshake (Section 13.2.1 of
    [QUIC-TRANSPORT]).  To account for this, the endpoint SHOULD ignore
-   max_ack_delay until the handshake is confirmed (Section 4.1.2 of
-   [QUIC-TLS]).  When they occur, these large acknowledgment delays are
-   likely to be non-repeating and limited to the handshake.  The
-   endpoint can therefore use them without limiting them to the
-   max_ack_delay, avoiding unnecessary inflation of the RTT estimate.
+   max_ack_delay until the handshake is confirmed, as defined in
+   Section 4.1.2 of [QUIC-TLS].  When they occur, these large
+   acknowledgment delays are likely to be non-repeating and limited to
+   the handshake.  The endpoint can therefore use them without limiting
+   them to the max_ack_delay, avoiding unnecessary inflation of the RTT
+   estimate.
 
-   Note however that a large acknowledgment delay can result in a
-   substantially inflated smoothed_rtt, if there is either an error in
-   the peer's reporting of the acknowledgment delay or in the endpoint's
-   min_rtt estimate.  Therefore, prior to handshake confirmation, an
-   endpoint MAY ignore RTT samples if adjusting the RTT sample for
-   acknowledgment delay causes the sample to be less than the min_rtt.
+   Note that a large acknowledgment delay can result in a substantially
+   inflated smoothed_rtt, if there is either an error in the peer's
+   reporting of the acknowledgment delay or in the endpoint's min_rtt
+   estimate.  Therefore, prior to handshake confirmation, an endpoint
+   MAY ignore RTT samples if adjusting the RTT sample for acknowledgment
+   delay causes the sample to be less than the min_rtt.
 
    After the handshake is confirmed, any acknowledgment delays reported
    by the peer that are greater than the peer's max_ack_delay are
@@ -558,9 +558,9 @@ Table of Contents
 
    Acknowledgment-based loss detection implements the spirit of TCP's
    Fast Retransmit ([RFC5681]), Early Retransmit ([RFC5827]), FACK
-   ([FACK]), SACK loss recovery ([RFC6675]), and RACK ([RACK]).  This
-   section provides an overview of how these algorithms are implemented
-   in QUIC.
+   ([FACK]), SACK loss recovery ([RFC6675]), and RACK-TLP ([RACK]).
+   This section provides an overview of how these algorithms are
+   implemented in QUIC.
 
    A packet is declared lost if it meets all the following conditions:
 
@@ -698,8 +698,7 @@ Table of Contents
    certificate and can therefore read these 1-RTT packets.
 
    A sender SHOULD restart its PTO timer every time an ack-eliciting
-   packet is sent or acknowledged, when the handshake is confirmed
-   (Section 4.1.2 of [QUIC-TLS]), or when Initial or Handshake keys are
+   packet is sent or acknowledged, or when Initial or Handshake keys are
    discarded (Section 4.9 of [QUIC-TLS]).  This ensures the PTO is
    always set based on the latest estimate of the round-trip time and
    for the correct packet across packet number spaces.
@@ -770,7 +769,7 @@ Table of Contents
    unblock the server until it is certain that the server has finished
    its address validation (see Section 8 of [QUIC-TRANSPORT]).  That is,
    the client MUST set the probe timer if the client has not received an
-   acknowledgment for one of its Handshake packets and the handshake is
+   acknowledgment for any of its Handshake packets and the handshake is
    not confirmed (see Section 4.1.2 of [QUIC-TLS]), even if there are no
    packets in flight.  When the PTO fires, the client MUST send a
    Handshake packet if it has Handshake keys, otherwise it MUST send an
@@ -787,13 +786,13 @@ Table of Contents
    server's Initial packets were lost.
 
    To speed up handshake completion under these conditions, an endpoint
-   MAY, for a limited number of occasions per each connection, send a
-   packet containing unacknowledged CRYPTO data earlier than the PTO
-   expiry, subject to the address validation limits in Section 8.1 of
+   MAY, for a limited number of times per connection, send a packet
+   containing unacknowledged CRYPTO data earlier than the PTO expiry,
+   subject to the address validation limits in Section 8.1 of
    [QUIC-TRANSPORT].  Doing so at most once for each connection is
-   adequate to quickly recover from a single packet loss.  Endpoints
-   that do not cease retransmitting packets in response to
-   unauthenticated data risk creating an infinite exchange of packets.
+   adequate to quickly recover from a single packet loss.  An endpoint
+   that always retransmits packets in response to receiving packets that
+   it cannot process risks creating an infinite exchange of packets.
 
    Endpoints can also use coalesced packets (see Section 12.2 of
    [QUIC-TRANSPORT]) to ensure that each datagram elicits at least one
@@ -808,7 +807,7 @@ Table of Contents
    eliciting packet in the packet number space as a probe.  An endpoint
    MAY send up to two full-sized datagrams containing ack-eliciting
    packets, to avoid an expensive consecutive PTO expiration due to a
-   single lost datagram or transmit data from multiple packet number
+   single lost datagram, or transmit data from multiple packet number
    spaces.  All probe packets sent on a PTO MUST be ack-eliciting.
 
    In addition to sending data in the packet number space for which the
@@ -822,12 +821,11 @@ Table of Contents
    If the sender wants to elicit a faster acknowledgment on PTO, it can
    skip a packet number to eliminate the acknowledgment delay.
 
-   When the PTO timer expires, an ack-eliciting packet MUST be sent.  An
-   endpoint SHOULD include new data in this packet.  Previously sent
-   data MAY be sent if no new data can be sent.  Implementations MAY use
-   alternative strategies for determining the content of probe packets,
-   including sending new or retransmitted data based on the
-   application's priorities.
+   An endpoint SHOULD include new data in packets that are sent on PTO
+   expiration.  Previously sent data MAY be sent if no new data can be
+   sent.  Implementations MAY use alternative strategies for determining
+   the content of probe packets, including sending new or retransmitted
+   data based on the application's priorities.
 
    It is possible the sender has no new or previously-sent data to send.
    As an example, consider the following sequence of events: new
@@ -876,11 +874,12 @@ Table of Contents
 
 6.4.  Discarding Keys and Packet State
 
-   When packet protection keys are discarded (see Section 4.9 of
-   [QUIC-TLS]), all packets that were sent with those keys can no longer
-   be acknowledged because their acknowledgments cannot be processed
-   anymore.  The sender MUST discard all recovery state associated with
-   those packets and MUST remove them from the count of bytes in flight.
+   When Initial and Handshake packet protection keys are discarded (see
+   Section 4.9 of [QUIC-TLS]), all packets that were sent with those
+   keys can no longer be acknowledged because their acknowledgments
+   cannot be processed.  The sender MUST discard all recovery state
+   associated with those packets and MUST remove them from the count of
+   bytes in flight.
 
    Endpoints stop sending and receiving Initial packets once they start
    exchanging Handshake packets; see Section 17.2.2.1 of
@@ -895,9 +894,10 @@ Table of Contents
    lost, but that is expected to be infrequent.
 
    It is expected that keys are discarded after packets encrypted with
-   them would be acknowledged or declared lost.  However, Initial
-   secrets are discarded as soon as handshake keys are proven to be
-   available to both client and server; see Section 4.9.1 of [QUIC-TLS].
+   them would be acknowledged or declared lost.  However, Initial and
+   Handshake secrets are discarded as soon as handshake and 1-RTT keys
+   are proven to be available to both client and server; see
+   Section 4.9.1 of [QUIC-TLS].
 
 7.  Congestion Control
 
@@ -941,10 +941,10 @@ Table of Contents
    QUIC begins every connection in slow start with the congestion window
    set to an initial value.  Endpoints SHOULD use an initial congestion
    window of 10 times the maximum datagram size (max_datagram_size),
-   limited to the larger of 14720 bytes or twice the maximum datagram
-   size.  This follows the analysis and recommendations in [RFC6928],
-   increasing the byte limit to account for the smaller 8 byte overhead
-   of UDP compared to the 20 byte overhead for TCP.
+   while limiting the window to the larger of 14720 bytes or twice the
+   maximum datagram size.  This follows the analysis and recommendations
+   in [RFC6928], increasing the byte limit to account for the smaller
+   8-byte overhead of UDP compared to the 20-byte overhead for TCP.
 
    If the maximum datagram size changes during the connection, the
    initial congestion window SHOULD be recalculated with the new size.
@@ -1150,7 +1150,9 @@ Table of Contents
    number spaces.  A sender that does not have state for all packet
    number spaces or an implementation that cannot compare send times
    across packet number spaces MAY use state for just the packet number
-   space that was acknowledged.
+   space that was acknowledged.  This might result in erroneously
+   declaring persistent congestion, but it will not lead to a failure to
+   detect persistent congestion.
 
    When persistent congestion is declared, the sender's congestion
    window MUST be reduced to the minimum congestion window
@@ -1234,13 +1236,14 @@ Table of Contents
    sender spreads packets exactly evenly over time.  For a window-based
    congestion controller, such as the one in this document, that rate
    can be computed by averaging the congestion window over the round-
-   trip time.  Expressed as a rate in bytes:
+   trip time.  Expressed as a rate in units of bytes per time, where
+   congestion_window is in bytes:
 
    rate = N * congestion_window / smoothed_rtt
 
-   Or, expressed as an inter-packet interval:
+   Or, expressed as an inter-packet interval in units of time:
 
-   interval = smoothed_rtt * packet_size / congestion_window / N
+   interval = ( smoothed_rtt * packet_size / congestion_window ) / N
 
    Using a value for "N" that is small, but at least 1 (for example,
    1.25) ensures that variations in round-trip time do not result in
@@ -1274,13 +1277,14 @@ Table of Contents
 
 8.  Security Considerations
 
-8.1.  Congestion Signals
+8.1.  Loss and Congestion Signals
 
-   Congestion control fundamentally involves the consumption of signals
-   -- both loss and ECN codepoints -- from unauthenticated entities.
-   On-path attackers can spoof or alter these signals.  An attacker can
-   cause endpoints to reduce their sending rate by dropping packets, or
-   alter send rate by changing ECN codepoints.
+   Loss detection and congestion control fundamentally involve
+   consumption of signals, such as delay, loss, and ECN markings, from
+   unauthenticated entities.  An attacker can cause endpoints to reduce
+   their sending rate by manipulating these signals; by dropping
+   packets, by altering path delay strategically, or by changing ECN
+   codepoints.
 
 8.2.  Traffic Analysis
 
@@ -1326,13 +1330,14 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", Work in Progress, Internet-Draft, draft-ietf-quic-
-              tls, 4 January 2021,
+              tls, 4 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 4 January 2021,
+              Internet-Draft, draft-ietf-quic-transport, 4 February
+              2021,
               <https://tools.ietf.org/html/draft-ietf-quic-transport>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -1374,6 +1379,11 @@ Table of Contents
               Estimates in Reliable Transport Protocols", ACM SIGCOMM
               CCR , January 1995.
 
+   [RFC2018]  Mathis, M., Mahdavi, J., Floyd, S., and A. Romanow, "TCP
+              Selective Acknowledgment Options", RFC 2018,
+              DOI 10.17487/RFC2018, October 1996,
+              <https://www.rfc-editor.org/info/rfc2018>.
+
    [RFC3465]  Allman, M., "TCP Congestion Control with Appropriate Byte
               Counting (ABC)", RFC 3465, DOI 10.17487/RFC3465, February
               2003, <https://www.rfc-editor.org/info/rfc3465>.
@@ -1393,6 +1403,10 @@ Table of Contents
               Transmission Protocol (SCTP)", RFC 5827,
               DOI 10.17487/RFC5827, May 2010,
               <https://www.rfc-editor.org/info/rfc5827>.
+
+   [RFC6297]  Welzl, M. and D. Ros, "A Survey of Lower-than-Best-Effort
+              Transport Protocols", RFC 6297, DOI 10.17487/RFC6297, June
+              2011, <https://www.rfc-editor.org/info/rfc6297>.
 
    [RFC6298]  Paxson, V., Allman, M., Chu, J., and M. Sargent,
               "Computing TCP's Retransmission Timer", RFC 6298,
@@ -1517,7 +1531,7 @@ A.3.  Variables of interest
 
    rttvar:  The RTT variation, computed as described in Section 5.3.
 
-   min_rtt:  The minimum RTT seen in the connection, ignoring
+   min_rtt:  The minimum RTT seen over a period of time, ignoring
       acknowledgment delay, as described in Section 5.2.
 
    first_rtt_sample:  The time that the first RTT sample was obtained.
@@ -1541,8 +1555,8 @@ A.3.  Variables of interest
       acknowledged in the packet number space so far.
 
    loss_time[kPacketNumberSpace]:  The time at which the next packet in
-      that packet number space will be considered lost based on
-      exceeding the reordering window in time.
+      that packet number space can be considered lost based on exceeding
+      the reordering window in time.
 
    sent_packets[kPacketNumberSpace]:  An association of packet numbers
       in a packet number space to information about them.  Described in
@@ -1667,8 +1681,7 @@ A.7.  On Receiving an Acknowledgment
      // min_rtt ignores acknowledgment delay.
      min_rtt = min(min_rtt, latest_rtt)
      // Limit ack_delay by max_ack_delay after handshake
-     // confirmation. Note that ack_delay is 0 for
-     // acknowledgments of Initial and Handshake packets.
+     // confirmation.
      if (handshake confirmed):
        ack_delay = min(ack_delay, max_ack_delay)
 
@@ -1692,7 +1705,8 @@ A.8.  Setting the Loss Detection Timer
    particularly if timers wake up late.  Timers set in the past fire
    immediately.
 
-   Pseudocode for SetLossDetectionTimer follows:
+   Pseudocode for SetLossDetectionTimer follows (where the "^" operator
+   represents exponentiation):
 
    GetLossTimeAndSpace():
      time = loss_time[Initial]
@@ -1760,7 +1774,6 @@ A.8.  Setting the Loss Detection Timer
        loss_detection_timer.cancel()
        return
 
-     // Determine which PN space to arm PTO for.
      timeout, _ = GetPtoTimeAndSpace()
      loss_detection_timer.update(timeout)
 
@@ -1876,8 +1889,9 @@ B.1.  Constants of interest
    kMinimumWindow:  Minimum congestion window in bytes as described in
       Section 7.2.
 
-   kLossReductionFactor:  Reduction in congestion window when a new loss
-      event is detected.  Section 7 recommends a value is 0.5.
+   kLossReductionFactor:  Scaling factor applied to reduce the
+      congestion window when a new loss event is detected.  Section 7
+      recommends a value is 0.5.
 
    kPersistentCongestionThreshold:  Period of time for persistent
       congestion to be established, specified as a PTO multiplier.
@@ -1908,13 +1922,11 @@ B.2.  Variables of interest
       bytes_in_flight to ensure congestion control does not impede
       congestion feedback.
 
-   congestion_window:  Maximum number of bytes-in-flight that may be
-      sent.
+   congestion_window:  Maximum number of bytes allowed to be in flight.
 
-   congestion_recovery_start_time:  The time when QUIC first detects
-      congestion due to loss or ECN, causing it to enter congestion
-      recovery.  When a packet sent after this time is acknowledged,
-      QUIC exits congestion recovery.
+   congestion_recovery_start_time:  The time the current recovery period
+      started due to the detection of loss or ECN.  When a packet sent
+      after this time is acknowledged, QUIC exits congestion recovery.
 
    ssthresh:  Slow start threshold in bytes.  When the congestion window
       is below ssthresh, the mode is slow start and the window grows by

@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                         M. Thomson, Ed.
-Expires: 8 July 2021                                             Mozilla
-                                                          4 January 2021
+Expires: 8 August 2021                                           Mozilla
+                                                         4 February 2021
 
 
            QUIC: A UDP-Based Multiplexed and Secure Transport
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 July 2021.
+   This Internet-Draft will expire on 8 August 2021.
 
 Copyright Notice
 
@@ -324,15 +324,15 @@ Table of Contents
    integration of TLS and QUIC is described in more detail in
    [QUIC-TLS].  The handshake is structured to permit the exchange of
    application data as soon as possible.  This includes an option for
-   clients to send data immediately (0-RTT), which might require prior
-   communication to enable.
+   clients to send data immediately (0-RTT), which requires some form of
+   prior communication or configuration to enable.
 
    Endpoints communicate in QUIC by exchanging QUIC packets.  Most
    packets contain frames, which carry control information and
-   application data between endpoints.  QUIC authenticates all packets
-   and encrypts as much as is practical.  QUIC packets are carried in
-   UDP datagrams ([UDP]) to better facilitate deployment in existing
-   systems and networks.
+   application data between endpoints.  QUIC authenticates the entirety
+   of each packet and encrypts as much of each packet as is practical.
+   QUIC packets are carried in UDP datagrams ([UDP]) to better
+   facilitate deployment in existing systems and networks.
 
    Application protocols exchange information over a QUIC connection via
    streams, which are ordered sequences of bytes.  Two types of stream
@@ -419,8 +419,8 @@ Table of Contents
       -  Section 20 (Errors).
 
    Accompanying documents describe QUIC's loss detection and congestion
-   control [QUIC-RECOVERY], and the use of TLS for key negotiation
-   [QUIC-TLS].
+   control [QUIC-RECOVERY], and the use of TLS and other cryptographic
+   mechanisms [QUIC-TLS].
 
    This document defines QUIC version 1, which conforms to the protocol
    invariants in [QUIC-INVARIANTS].
@@ -499,24 +499,24 @@ Table of Contents
 
    x (A):  Indicates that x is A bits long
 
-   x (i):  Indicates that x uses the variable-length encoding in
-      Section 16
+   x (i):  Indicates that x holds an integer value using the variable-
+      length encoding in Section 16
 
    x (A..B):  Indicates that x can be any length from A to B; A can be
       omitted to indicate a minimum of zero bits and B can be omitted to
-      indicate no set upper limit; values in this format always end on
-      an byte boundary
+      indicate no set upper limit; values in this format always end on a
+      byte boundary
 
-   x (?) = C:  Indicates that x has a fixed value of C with the length
-      described by ?, as above
+   x (L) = C:  Indicates that x has a fixed value of C with the length
+      described by L, which can use any of the three length forms above
 
-   x (?) = C..D:  Indicates that x has a value in the range from C to D,
-      inclusive, with the length described by ?, as above
+   x (L) = C..D:  Indicates that x has a value in the range from C to D,
+      inclusive, with the length described by L, as above
 
-   [x (E)]:  Indicates that x is optional (and has length of E)
+   [x (L)]:  Indicates that x is optional (and has length of L)
 
-   x (E) ...:  Indicates that x is repeated zero or more times (and that
-      each instance is length E)
+   x (L) ...:  Indicates that zero or more instances of x are present
+      (and that each instance is length L)
 
    This document uses network byte order (that is, big endian) values.
    Fields are placed starting from the high-order bits of each byte.
@@ -578,7 +578,7 @@ Table of Contents
 
    Streams are identified within a connection by a numeric value,
    referred to as the stream ID.  A stream ID is a 62-bit integer (0 to
-   2^62-1) that is unique for all streams on a connection.  Stream IDs
+   2^(62)-1) that is unique for all streams on a connection.  Stream IDs
    are encoded as variable-length integers; see Section 16.  A QUIC
    endpoint MUST NOT reuse a stream ID within a connection.
 
@@ -703,13 +703,14 @@ Table of Contents
    which an endpoint transmits data (Section 3.1), and another for
    streams on which an endpoint receives data (Section 3.2).
 
-   Unidirectional streams use the applicable state machine directly.
-   Bidirectional streams use both state machines.  For the most part,
-   the use of these state machines is the same whether the stream is
-   unidirectional or bidirectional.  The conditions for opening a stream
-   are slightly more complex for a bidirectional stream because the
-   opening of either the send or receive side causes the stream to open
-   in both directions.
+   Unidirectional streams use either the sending or receiving state
+   machine depending on the stream type and endpoint role.
+   Bidirectional streams use both state machines at both endpoints.  For
+   the most part, the use of these state machines is the same whether
+   the stream is unidirectional or bidirectional.  The conditions for
+   opening a stream are slightly more complex for a bidirectional stream
+   because the opening of either the send or receive side causes the
+   stream to open in both directions.
 
    The state machines shown in this section are largely informative.
    This document uses stream states to describe rules for when and how
@@ -743,9 +744,6 @@ Table of Contents
           |                           |
           | Send STREAM /             |
           |      STREAM_DATA_BLOCKED  |
-          |                           |
-          | Peer Creates              |
-          |      Bidirectional Stream |
           v                           |
       +-------+                       |
       | Send  | Send RESET_STREAM     |
@@ -789,7 +787,7 @@ Table of Contents
    flow control limits set by its peer, and continues to accept and
    process MAX_STREAM_DATA frames.  An endpoint in the "Send" state
    generates STREAM_DATA_BLOCKED frames if it is blocked from sending by
-   stream flow control limits Section 4.1.
+   stream flow control limits (Section 4.1).
 
    After the application indicates that all stream data has been sent
    and a STREAM frame containing the FIN bit is sent, the sending part
@@ -856,7 +854,7 @@ Table of Contents
       | Recvd |  Recv All Data    | Recvd |
       +-------+<-- (optional) ----+-------+
           |                           |
-          | App Read All Data         | App Read RST
+          | App Read All Data         | App Read Reset
           v                           v
       +-------+                   +-------+
       | Data  |                   | Reset |
@@ -873,9 +871,9 @@ Table of Contents
    stream also creates the receiving part.  The initial state for the
    receiving part of a stream is "Recv".
 
-   The receiving part of a stream enters the "Recv" state when the
-   sending part of a bidirectional stream initiated by the endpoint
-   (type 0 for a client, type 1 for a server) enters the "Ready" state.
+   For a bidirectional stream, the receiving part enters the "Recv"
+   state when the sending part initiated by the endpoint (type 0 for a
+   client, type 1 for a server) enters the "Ready" state.
 
    An endpoint opens a bidirectional stream when a MAX_STREAM_DATA or
    STOP_SENDING frame is received from the peer for that stream.
@@ -1043,7 +1041,7 @@ Table of Contents
    RESET_STREAM frame instead of retransmitting the data.
 
    An endpoint SHOULD copy the error code from the STOP_SENDING frame to
-   the RESET_STREAM frame it sends, but MAY use any application error
+   the RESET_STREAM frame it sends, but can use any application error
    code.  An endpoint that sends a STOP_SENDING frame MAY ignore the
    error code in any RESET_STREAM frames subsequently received for that
    stream.
@@ -1065,14 +1063,14 @@ Table of Contents
 
 4.  Flow Control
 
-   It is necessary to limit the amount of data that a receiver could
-   buffer, to prevent a fast sender from overwhelming a slow receiver,
-   or to prevent a malicious sender from consuming a large amount of
-   memory at a receiver.  To enable a receiver to limit memory
-   commitment to a connection and to apply back pressure on the sender,
-   streams are flow controlled both individually and as an aggregate.  A
-   QUIC receiver controls the maximum amount of data the sender can send
-   on a stream at any time, as described in Section 4.1 and Section 4.2.
+   Receivers need to limit the amount of data that they are required to
+   buffer, in order to prevent a fast sender from overwhelming them or a
+   malicious sender from consuming a large amount of memory.  To enable
+   a receiver to limit memory commitments for a connection, streams are
+   flow controlled both individually and across a connection as a whole.
+   A QUIC receiver controls the maximum amount of data the sender can
+   send on a stream as well as across all streams at any time, as
+   described in Section 4.1 and Section 4.2.
 
    Similarly, to limit concurrency within a connection, a QUIC endpoint
    controls the maximum cumulative number of streams that its peer can
@@ -1094,7 +1092,7 @@ Table of Contents
 
    *  Stream flow control, which prevents a single stream from consuming
       the entire receive buffer for a connection by limiting the amount
-      of data that can be sent on any stream.
+      of data that can be sent on each stream.
 
    *  Connection flow control, which prevents senders from exceeding a
       receiver's buffer capacity for the connection, by limiting the
@@ -1123,7 +1121,8 @@ Table of Contents
    advertised based on the sum of bytes consumed on all streams.
 
    Once a receiver advertises a limit for the connection or a stream, it
-   MAY advertise a smaller limit, but this has no effect.
+   is not an error to advertise a smaller limit, but the smaller limit
+   has no effect.
 
    A receiver MUST close the connection with a FLOW_CONTROL_ERROR error
    (Section 11) if the sender violates the advertised connection or
@@ -1179,7 +1178,7 @@ Table of Contents
 
    When a sender receives credit after being blocked, it might be able
    to send a large amount of data in response, resulting in short-term
-   congestion; see Section 6.9 in [QUIC-RECOVERY] for a discussion of
+   congestion; see Section 7.7 of [QUIC-RECOVERY] for a discussion of
    how a sender can avoid this congestion.
 
 4.3.  Flow Control Performance
@@ -1260,7 +1259,7 @@ Table of Contents
    bidirectional streams.
 
    If a max_streams transport parameter or a MAX_STREAMS frame is
-   received with a value greater than 2^60, this would allow a maximum
+   received with a value greater than 2^(60), this would allow a maximum
    stream ID that cannot be expressed as a variable-length integer; see
    Section 16.  If either is received, the connection MUST be closed
    immediately with a connection error of type TRANSPORT_PARAMETER_ERROR
@@ -1337,6 +1336,10 @@ Table of Contents
    connection ID to be routed back to the endpoint and to be identified
    by the endpoint upon receipt.
 
+   Multiple connection IDs are used so that endpoints can send packets
+   that cannot be identified by an observer as being for the same
+   connection without cooperation from an endpoint; see Section 9.5.
+
    Connection IDs MUST NOT contain any information that can be used by
    an external observer (that is, one that does not cooperate with the
    issuer) to correlate them with other connection IDs for the same
@@ -1367,8 +1370,8 @@ Table of Contents
    length connection IDs will cause failures in the presence of peer
    connection migration, NAT rebinding, and client port reuse.  An
    endpoint MUST NOT use the same IP address and port for multiple
-   connections with zero-length connection IDs, unless it is certain
-   that those protocol features are not in use.
+   concurrent connections with zero-length connection IDs, unless it is
+   certain that those protocol features are not in use.
 
    When an endpoint uses a non-zero-length connection ID, it needs to
    ensure that the peer has a supply of connection IDs from which to
@@ -1390,10 +1393,9 @@ Table of Contents
    Additional connection IDs are communicated to the peer using
    NEW_CONNECTION_ID frames (Section 19.15).  The sequence number on
    each newly issued connection ID MUST increase by 1.  The connection
-   ID randomly selected by the client in the Initial packet and any
-   connection ID provided by a Retry packet are not assigned sequence
-   numbers unless a server opts to retain them as its initial connection
-   ID.
+   ID that a client selects for the first Destination Connection ID
+   field it sends and any connection ID provided by a Retry packet are
+   not assigned sequence numbers.
 
    When an endpoint issues a connection ID, it MUST accept packets that
    carry this connection ID for the duration of the connection or until
@@ -1530,8 +1532,8 @@ Table of Contents
    Invalid packets that lack strong integrity protection, such as
    Initial, Retry, or Version Negotiation, MAY be discarded.  An
    endpoint MUST generate a connection error if processing the contents
-   of these packets prior to discovering an error, unless it fully
-   reverts these changes.
+   of these packets prior to discovering an error, or fully revert any
+   changes made during that processing.
 
 5.2.1.  Client Packet Handling
 
@@ -1553,11 +1555,11 @@ Table of Contents
 5.2.2.  Server Packet Handling
 
    If a server receives a packet that indicates an unsupported version
-   but is large enough to initiate a new connection for any supported
-   version, the server SHOULD send a Version Negotiation packet as
-   described in Section 6.1.  A server MAY limit the number of packets
-   to which it responds with a Version Negotiation packet.  Servers MUST
-   drop smaller packets that specify unsupported versions.
+   and if the packet is large enough to initiate a new connection for
+   any supported version, the server SHOULD send a Version Negotiation
+   packet as described in Section 6.1.  A server MAY limit the number of
+   packets to which it responds with a Version Negotiation packet.
+   Servers MUST drop smaller packets that specify unsupported versions.
 
    The first packet for an unsupported version can use different
    semantics and encodings for any version-specific field.  In
@@ -1698,9 +1700,7 @@ Table of Contents
    versions without retaining state.  Though either the Initial packet
    or the Version Negotiation packet that is sent in response could be
    lost, the client will send new packets until it successfully receives
-   a response or it abandons the connection attempt.  As a result, the
-   client discards all state for the connection and does not send any
-   more packets on the connection.
+   a response or it abandons the connection attempt.
 
    A server MAY limit the number of Version Negotiation packets it
    sends.  For instance, a server that is able to recognize packets as
@@ -1710,11 +1710,12 @@ Table of Contents
 
 6.2.  Handling Version Negotiation Packets
 
-   Version Negotiation packets are designed to allow future versions of
-   QUIC to negotiate the version in use between endpoints.  Future
-   versions of QUIC might change how implementations that support
-   multiple versions of QUIC react to Version Negotiation packets when
-   attempting to establish a connection using this version.
+   Version Negotiation packets are designed to allow for functionality
+   to be defined in the future that allows QUIC to negotiate the version
+   of QUIC to use for a connection.  Future standards-track
+   specifications might change how implementations that support multiple
+   versions of QUIC react to Version Negotiation packets received in
+   response to an attempt to establish a connection using this version.
 
    A client that supports only this version of QUIC MUST abandon the
    current connection attempt if it receives a Version Negotiation
@@ -1725,8 +1726,9 @@ Table of Contents
    lists the QUIC version selected by the client.
 
    How to perform version negotiation is left as future work defined by
-   future versions of QUIC.  In particular, that future work will ensure
-   robustness against version downgrade attacks; see Section 21.12.
+   future standards-track specifications.  In particular, that future
+   work will ensure robustness against version downgrade attacks; see
+   Section 21.12.
 
 6.2.1.  Version Negotiation Between Draft Versions
 
@@ -1770,10 +1772,11 @@ Table of Contents
 
    QUIC relies on a combined cryptographic and transport handshake to
    minimize connection establishment latency.  QUIC uses the CRYPTO
-   frame (Section 19.6) to transmit the cryptographic handshake.
-   Version 0x00000001 of QUIC uses TLS as described in [QUIC-TLS]; a
-   different QUIC version number could indicate that a different
-   cryptographic handshake protocol is in use.
+   frame (Section 19.6) to transmit the cryptographic handshake.  The
+   version of QUIC defined in this document is identified as 0x00000001
+   and uses TLS as described in [QUIC-TLS]; a different QUIC version
+   could indicate that a different cryptographic handshake protocol is
+   in use.
 
    QUIC provides reliable, ordered delivery of the cryptographic
    handshake data.  QUIC packet protection is used to encrypt as much of
@@ -1791,18 +1794,12 @@ Table of Contents
       -  keying material is usable for packet protection for both 0-RTT
          and 1-RTT packets
 
-   *  authenticated values for transport parameters of both endpoints,
-      and confidentiality protection for server transport parameters
-      (see Section 7.4)
+   *  authenticated exchange of values for transport parameters of both
+      endpoints, and confidentiality protection for server transport
+      parameters (see Section 7.4)
 
    *  authenticated negotiation of an application protocol (TLS uses
       ALPN [ALPN] for this purpose)
-
-   Endpoints can use packets sent during the handshake to test for
-   Explicit Congestion Notification (ECN) support; see Section 13.4.  An
-   endpoint verifies support for ECN by observing whether the ACK frames
-   acknowledging the first packets it sends carry ECN counts, as
-   described in Section 13.4.2.
 
    The CRYPTO frame can be sent in different packet number spaces
    (Section 12.3).  The offsets used by CRYPTO frames to ensure ordered
@@ -1812,8 +1809,8 @@ Table of Contents
    Figure 4 shows a simplified handshake and the exchange of packets and
    frames that are used to advance the handshake.  Exchange of
    application data during the handshake is enabled where possible,
-   shown with a '*'.  Once completed, endpoints are able to exchange
-   application data.
+   shown with a '*'.  Once the handshake is complete, endpoints are able
+   to exchange application data freely.
 
    Client                                               Server
 
@@ -1824,15 +1821,17 @@ Table of Contents
                           <----------                1-RTT (*)
    Handshake (CRYPTO)
    1-RTT (*)              ---------->
-                          <---------- 1-RTT (HANDSHAKE_DONE,*)
+                          <----------   1-RTT (HANDSHAKE_DONE)
 
-   1-RTT (*)              <=========>                1-RTT (*)
+   1-RTT                  <=========>                    1-RTT
 
                     Figure 4: Simplified QUIC Handshake
 
-   An endpoint validates support for Explicit Congestion Notification
-   (ECN) by observing whether the ACK frames acknowledging the first
-   packets it sends carry ECN counts, as described in Section 13.4.2.
+   Endpoints can use packets sent during the handshake to test for
+   Explicit Congestion Notification (ECN) support; see Section 13.4.  An
+   endpoint validates support for ECN by observing whether the ACK
+   frames acknowledging the first packets it sends carry ECN counts, as
+   described in Section 13.4.2.
 
    Endpoints MUST explicitly negotiate an application protocol.  This
    avoids situations where there is a disagreement about the protocol
@@ -1952,8 +1951,8 @@ Table of Contents
    during connection establishment: once in response to a Retry, and
    once in response to an Initial packet from the server.  Once a client
    has received a valid Initial packet from the server, it MUST discard
-   any subsequent packet it receives with a different Source Connection
-   ID.
+   any subsequent packet it receives on that connection with a different
+   Source Connection ID.
 
    A client MUST change the Destination Connection ID it uses for
    sending packets in response to only the first received Initial or
@@ -1991,11 +1990,13 @@ Table of Contents
 
    The values provided by a peer for these transport parameters MUST
    match the values that an endpoint used in the Destination and Source
-   Connection ID fields of Initial packets that it sent.  Including
-   connection ID values in transport parameters and verifying them
-   ensures that that an attacker cannot influence the choice of
-   connection ID for a successful connection by injecting packets
-   carrying attacker-chosen connection IDs during the handshake.
+   Connection ID fields of Initial packets that it sent (and received,
+   for servers).  Endpoints MUST validate that received transport
+   parameters match received Connection ID values.  Including connection
+   ID values in transport parameters and verifying them ensures that
+   that an attacker cannot influence the choice of connection ID for a
+   successful connection by injecting packets carrying attacker-chosen
+   connection IDs during the handshake.
 
    An endpoint MUST treat absence of the initial_source_connection_id
    transport parameter from either endpoint or absence of the
@@ -2110,9 +2111,10 @@ Table of Contents
    parameters that were negotiated from a previous connection.  To
    enable 0-RTT, endpoints store the value of the server transport
    parameters from a connection and apply them to any 0-RTT packets that
-   are sent in subsequent connections to that peer.  This information is
-   stored with any information required by the application protocol or
-   cryptographic handshake; see Section 4.6 of [QUIC-TLS].
+   are sent in subsequent connections to that peer that use a session
+   ticket issued on that connection.  This information is stored with
+   any information required by the application protocol or cryptographic
+   handshake; see Section 4.6 of [QUIC-TLS].
 
    Remembered transport parameters apply to the new connection until the
    handshake completes and the client starts sending 1-RTT packets.
@@ -2204,7 +2206,9 @@ Table of Contents
    client adds support for a discarded transport parameter, it risks
    violating the constraints that the transport parameter establishes if
    it attempts 0-RTT.  New transport parameters can avoid this problem
-   by setting a default of the most conservative value.
+   by setting a default of the most conservative value.  Clients can
+   avoid this problem by remembering all parameters, even ones not
+   currently supported.
 
    New transport parameters can be registered according to the rules in
    Section 22.3.
@@ -2320,7 +2324,7 @@ Table of Contents
 
 8.1.1.  Token Construction
 
-   A token sent in a NEW_TOKEN frames or a Retry packet MUST be
+   A token sent in a NEW_TOKEN frame or a Retry packet MUST be
    constructed in a way that allows the server to identify how it was
    provided to a client.  These tokens are carried in the same field,
    but require different handling from servers.
@@ -2432,7 +2436,7 @@ Table of Contents
 
    A token allows a server to correlate activity between the connection
    where the token was issued and any connection where it is used.
-   Clients that want to break continuity of identity with a server MAY
+   Clients that want to break continuity of identity with a server can
    discard tokens provided using the NEW_TOKEN frame.  In comparison, a
    token obtained in a Retry packet MUST be used immediately during the
    connection attempt and cannot be used in subsequent connection
@@ -2456,9 +2460,9 @@ Table of Contents
    token, it MUST attempt to validate the token, unless it has already
    completed address validation.  If the token is invalid then the
    server SHOULD proceed as if the client did not have a validated
-   address, including potentially sending a Retry.  A server SHOULD
-   encode tokens provided with NEW_TOKEN frames and Retry packets
-   differently, and validate the latter more strictly.  If the
+   address, including potentially sending a Retry.  Tokens provided with
+   NEW_TOKEN frames and Retry packets can be distinguished by servers
+   (see Section 8.1.1), and the latter validated more strictly.  If the
    validation succeeds, the server SHOULD then allow the handshake to
    proceed.
 
@@ -2487,8 +2491,9 @@ Table of Contents
 8.1.4.  Address Validation Token Integrity
 
    An address validation token MUST be difficult to guess.  Including a
-   large enough random value in the token would be sufficient, but this
-   depends on the server remembering the value it sends to clients.
+   random value with at least 128 bits of entropy in the token would be
+   sufficient, but this depends on the server remembering the value it
+   sends to clients.
 
    A token-based scheme allows the server to offload any state
    associated with validation to the client.  For this design to work,
@@ -2516,12 +2521,13 @@ Table of Contents
    Attackers could replay tokens to use servers as amplifiers in DDoS
    attacks.  To protect against such attacks, servers MUST ensure that
    replay of tokens is prevented or limited.  Servers SHOULD ensure that
-   tokens sent in Retry packets are only accepted for a short time.
-   Tokens that are provided in NEW_TOKEN frames (Section 19.7) need to
-   be valid for longer, but SHOULD NOT be accepted multiple times in a
-   short period.  Servers are encouraged to allow tokens to be used only
-   once, if possible; tokens MAY include additional information about
-   clients to further narrow applicability or reuse.
+   tokens sent in Retry packets are only accepted for a short time, as
+   they are returned immediately by clients.  Tokens that are provided
+   in NEW_TOKEN frames (Section 19.7) need to be valid for longer, but
+   SHOULD NOT be accepted multiple times.  Servers are encouraged to
+   allow tokens to be used only once, if possible; tokens MAY include
+   additional information about clients to further narrow applicability
+   or reuse.
 
 8.2.  Path Validation
 
@@ -2649,13 +2655,13 @@ Table of Contents
    A PATH_RESPONSE frame received on any network path validates the path
    on which the PATH_CHALLENGE was sent.
 
-   If the PATH_CHALLENGE frame that resulted in successful path
-   validation was sent in a datagram that was not expanded to at least
-   1200 bytes, the endpoint can regard the address as valid.  The
-   endpoint is then able to send more than three times the amount of
+   If an endpoint sends a PATH_CHALLENGE frame in a datagram that is not
+   expanded to at least 1200 bytes, and if the response to it validates
+   the peer address, the path is validated but not the path MTU.  As a
+   result, the endpoint can now send more than three times the amount of
    data that has been received.  However, the endpoint MUST initiate
    another path validation with an expanded datagram to verify that the
-   path supports required MTU.
+   path supports the required MTU.
 
    Receipt of an acknowledgment for a packet containing a PATH_CHALLENGE
    frame is not adequate validation, since the acknowledgment can be
@@ -2785,7 +2791,9 @@ Table of Contents
    If the recipient permits the migration, it MUST send subsequent
    packets to the new peer address and MUST initiate path validation
    (Section 8.2) to verify the peer's ownership of the address if
-   validation is not already underway.
+   validation is not already underway.  If the recipient has no unused
+   connection IDs from the peer, it will not be able to send anything on
+   the new path until the peer provides one; see Section 9.5.
 
    An endpoint only changes the address to which it sends packets in
    response to the highest-numbered non-probing packet.  This ensures
@@ -2897,7 +2905,7 @@ Table of Contents
 
    An endpoint could also use heuristics to improve detection of this
    style of attack.  For instance, NAT rebinding is improbable if
-   packets were recently received on the old path, similarly rebinding
+   packets were recently received on the old path; similarly, rebinding
    is rare on IPv6 paths.  Endpoints can also look for duplicated
    packets.  Conversely, a change in connection ID is more likely to
    indicate an intentional migration rather than an attack.
@@ -2997,15 +3005,15 @@ Table of Contents
    routing of packets across multiple network paths will also allow
    activity on those paths to be linked by entities other than the peer.
 
-   A client might wish to reduce linkability by employing a new
-   connection ID and source UDP port when sending traffic after a period
-   of inactivity.  Changing the UDP port from which it sends packets at
-   the same time might cause the packet to appear as a connection
-   migration.  This ensures that the mechanisms that support migration
-   are exercised even for clients that do not experience NAT rebindings
-   or genuine migrations.  Changing port number can cause a peer to
-   reset its congestion state (see Section 9.4), so the port SHOULD only
-   be changed infrequently.
+   A client might wish to reduce linkability by switching to a new
+   connection ID, source UDP port, or IP address (see [RFC4941]) when
+   sending traffic after a period of inactivity.  Changing the address
+   from which it sends packets at the same time might cause the server
+   to detect a connection migration.  This ensures that the mechanisms
+   that support migration are exercised even for clients that do not
+   experience NAT rebindings or genuine migrations.  Changing address
+   can cause a peer to reset its congestion control state (see
+   Section 9.4), so addresses SHOULD only be changed infrequently.
 
    An endpoint that exhausts available connection IDs cannot probe new
    paths or initiate migration, nor can it respond to probes or attempts
@@ -3073,9 +3081,10 @@ Table of Contents
    Once the server has completed its path validation and has received a
    non-probing packet with a new largest packet number on its preferred
    address, the server begins sending non-probing packets to the client
-   exclusively from its preferred IP address.  It SHOULD drop packets
-   for this connection received on the old IP address, but MAY continue
-   to process delayed packets.
+   exclusively from its preferred IP address.  The server SHOULD drop
+   newer packets for this connection that are received on the old IP
+   address.  The server MAY continue to process delayed packets that are
+   received on the old IP address.
 
    The addresses that a server provides in the preferred_address
    transport parameter are only valid for the connection in which they
@@ -3123,17 +3132,17 @@ Table of Contents
    in compliance with [RFC6437], unless the local API does not allow
    setting IPv6 flow labels.
 
-   The IPv6 flow label SHOULD be a pseudo-random function of the source
-   and destination addresses, source and destination UDP ports, and the
-   Destination Connection ID field.  The flow label generation MUST be
-   designed to minimize the chances of linkability with a previously
-   used flow label, as this would enable correlating activity on
-   multiple paths; see Section 9.5.
+   The flow label generation MUST be designed to minimize the chances of
+   linkability with a previously used flow label, as a stable flow label
+   would enable correlating activity on multiple paths; see Section 9.5.
 
-   A possible implementation is to compute the flow label as a
-   cryptographic hash function of the source and destination addresses,
-   source and destination UDP ports, Destination Connection ID field,
-   and a local secret.
+   [RFC6437] suggests deriving values using a pseudorandom function to
+   generate flow labels.  Including the Destination Connection ID field
+   in addition to source and destination addresses when generating flow
+   labels ensures that changes are synchronized with changes in other
+   observable identifiers.  A cryptographic hash function that combines
+   these inputs with a local secret is one way this might be
+   implemented.
 
 10.  Connection Termination
 
@@ -3158,9 +3167,10 @@ Table of Contents
 
    Each endpoint advertises a max_idle_timeout, but the effective value
    at an endpoint is computed as the minimum of the two advertised
-   values.  By announcing a max_idle_timeout, an endpoint commits to
-   initiating an immediate close (Section 10.2) if it abandons the
-   connection prior to the effective value.
+   values (or the sole advertised value, if only one endpoint advertises
+   a nonzero value).  By announcing a max_idle_timeout, an endpoint
+   commits to initiating an immediate close (Section 10.2) if it
+   abandons the connection prior to the effective value.
 
    An endpoint restarts its idle timer when a packet from its peer is
    received and processed successfully.  An endpoint also restarts its
@@ -3334,10 +3344,10 @@ Table of Contents
 
    An endpoint MAY enter the draining state from the closing state if it
    receives a CONNECTION_CLOSE frame, which indicates that the peer is
-   also closing or draining.  In this case, the draining state SHOULD
-   end when the closing state would have ended.  In other words, the
-   endpoint uses the same end time, but ceases transmission of any
-   packets on this connection.
+   also closing or draining.  In this case, the draining state ends when
+   the closing state would have ended.  In other words, the endpoint
+   uses the same end time, but ceases transmission of any packets on
+   this connection.
 
 10.2.3.  Immediate Close During the Handshake
 
@@ -3577,21 +3587,20 @@ Table of Contents
 
    The stateless reset token MUST be difficult to guess.  In order to
    create a Stateless Reset Token, an endpoint could randomly generate
-   ([RFC4086]) a secret for every connection that it creates.  However,
+   ([RANDOM]) a secret for every connection that it creates.  However,
    this presents a coordination problem when there are multiple
    instances in a cluster or a storage problem for an endpoint that
    might lose state.  Stateless reset specifically exists to handle the
    case where state is lost, so this approach is suboptimal.
 
    A single static key can be used across all connections to the same
-   endpoint by generating the proof using a second iteration of a
-   preimage-resistant function that takes a static key and the
-   connection ID chosen by the endpoint (see Section 5.1) as input.  An
-   endpoint could use HMAC [RFC2104] (for example, HMAC(static_key,
-   connection_id)) or HKDF [RFC5869] (for example, using the static key
-   as input keying material, with the connection ID as salt).  The
-   output of this function is truncated to 16 bytes to produce the
-   Stateless Reset Token for that connection.
+   endpoint by generating the proof using a pseudorandom function that
+   takes a static key and the connection ID chosen by the endpoint (see
+   Section 5.1) as input.  An endpoint could use HMAC [RFC2104] (for
+   example, HMAC(static_key, connection_id)) or HKDF [RFC5869] (for
+   example, using the static key as input keying material, with the
+   connection ID as salt).  The output of this function is truncated to
+   16 bytes to produce the Stateless Reset Token for that connection.
 
    An endpoint that loses state can use the same method to generate a
    valid Stateless Reset Token.  The connection ID comes from the packet
@@ -3697,7 +3706,7 @@ Table of Contents
    An endpoint that chooses not to retransmit packets containing a
    CONNECTION_CLOSE frame risks a peer missing the first such packet.
    The only mechanism available to an endpoint that continues to receive
-   data for a terminated connection is to use the stateless reset
+   data for a terminated connection is to attempt the stateless reset
    process (Section 10.3).
 
    As the AEAD on Initial packets does not provide strong
@@ -3831,7 +3840,7 @@ Table of Contents
 
 12.3.  Packet Numbers
 
-   The packet number is an integer in the range 0 to 2^62-1.  This
+   The packet number is an integer in the range 0 to 2^(62)-1.  This
    number is used in determining the cryptographic nonce for packet
    protection.  Each endpoint maintains a separate packet number for
    sending and receiving.
@@ -3854,7 +3863,7 @@ Table of Contents
       this space.
 
    *  Application data space: All 0-RTT (Section 17.2.3) and 1-RTT
-      (Section 17.3.1) encrypted packets are in this space.
+      (Section 17.3.1) packets are in this space.
 
    As described in [QUIC-TLS], each packet type uses different
    protection keys.
@@ -3877,7 +3886,7 @@ Table of Contents
 
    A QUIC endpoint MUST NOT reuse a packet number within the same packet
    number space in one connection.  If the packet number for sending
-   reaches 2^62 - 1, the sender MUST close the connection without
+   reaches 2^(62)-1, the sender MUST close the connection without
    sending a CONNECTION_CLOSE frame or any further packets; an endpoint
    MAY send a Stateless Reset (Section 10.3) in response to further
    packets that it receives.
@@ -3970,7 +3979,7 @@ Table of Contents
    +-------------+----------------------+---------------+------+------+
    | 0x1a        | PATH_CHALLENGE       | Section 19.17 | __01 | P    |
    +-------------+----------------------+---------------+------+------+
-   | 0x1b        | PATH_RESPONSE        | Section 19.18 | __01 | P    |
+   | 0x1b        | PATH_RESPONSE        | Section 19.18 | ___1 | P    |
    +-------------+----------------------+---------------+------+------+
    | 0x1c - 0x1d | CONNECTION_CLOSE     | Section 19.19 | ih01 | N    |
    +-------------+----------------------+---------------+------+------+
@@ -4120,7 +4129,8 @@ Table of Contents
 
    An endpoint SHOULD treat receipt of an acknowledgment for a packet it
    did not send as a connection error of type PROTOCOL_VIOLATION, if it
-   is able to detect the condition.
+   is able to detect the condition.  Further discussion of how this
+   might be achieved is in Section 21.4.
 
 13.2.  Generating Acknowledgments
 
@@ -4651,6 +4661,11 @@ Table of Contents
    and 1252 bytes for IPv4.  Thus, modern IPv4 and all IPv6 network
    paths are expected to be able to support QUIC.
 
+   Note:  This requirement to support a UDP payload of 1200 bytes limits
+      the space available for IPv6 extension headers to 32 bytes or IPv4
+      options to 52 bytes if the path only supports the IPv6 minimum MTU
+      of 1280 bytes.  This affects Initial packets and path validation.
+
    Any maximum datagram size larger than 1200 bytes can be discovered
    using Path Maximum Transmission Unit Discovery (PMTUD; see
    Section 14.2.1) or Datagram Packetization Layer PMTU Discovery
@@ -4681,15 +4696,17 @@ Table of Contents
    A client MUST expand the payload of all UDP datagrams carrying
    Initial packets to at least the smallest allowed maximum datagram
    size of 1200 bytes by adding PADDING frames to the Initial packet or
-   by coalescing the Initial packet; see Section 12.2.  Similarly, a
-   server MUST expand the payload of all UDP datagrams carrying ack-
-   eliciting Initial packets to at least the smallest allowed maximum
-   datagram size of 1200 bytes.  Sending UDP datagrams of this size
-   ensures that the network path supports a reasonable Path Maximum
-   Transmission Unit (PMTU), in both directions.  Additionally, a client
-   that expands Initial packets helps reduce the amplitude of
-   amplification attacks caused by server responses toward an unverified
-   client address; see Section 8.
+   by coalescing the Initial packet; see Section 12.2.  Initial packets
+   can even be coalesced with invalid packets, which a receiver will
+   discard.  Similarly, a server MUST expand the payload of all UDP
+   datagrams carrying ack-eliciting Initial packets to at least the
+   smallest allowed maximum datagram size of 1200 bytes.
+
+   Sending UDP datagrams of this size ensures that the network path
+   supports a reasonable Path Maximum Transmission Unit (PMTU), in both
+   directions.  Additionally, a client that expands Initial packets
+   helps reduce the amplitude of amplification attacks caused by server
+   responses toward an unverified client address; see Section 8.
 
    Datagrams containing Initial packets MAY exceed 1200 bytes if the
    sender believes that the network path and peer both support the size
@@ -4727,7 +4744,7 @@ Table of Contents
    fragmented or dropped ([RFC8085]).
 
    If a QUIC endpoint determines that the PMTU between any pair of local
-   and remote IP addresses has fallen below the smallest allowed maximum
+   and remote IP addresses cannot support the smallest allowed maximum
    datagram size of 1200 bytes, it MUST immediately cease sending QUIC
    packets, except for those in PMTU probes or those containing
    CONNECTION_CLOSE frames, on the affected path.  An endpoint MAY
@@ -4749,9 +4766,9 @@ Table of Contents
    Too Big messages) that indicate when an IP packet is dropped because
    it is larger than the local router MTU.  DPLPMTUD can also optionally
    use these messages.  This use of ICMP messages is potentially
-   vulnerable to off-path attacks that successfully guess the addresses
-   used on the path and reduce the PMTU to a bandwidth-inefficient
-   value.
+   vulnerable to attacks by entities that cannot observe packets but
+   might successfully guess the addresses used on the path.  These
+   attacks could reduce the PMTU to a bandwidth-inefficient value.
 
    An endpoint MUST ignore an ICMP message that claims the PMTU has
    decreased below QUIC's smallest allowed maximum datagram size.
@@ -4764,7 +4781,7 @@ Table of Contents
    [DPLPMTUD].
 
    QUIC endpoints using PMTUD SHOULD validate ICMP messages to protect
-   from off-path injection as specified in [RFC8201] and Section 5.2 of
+   from packet injection as specified in [RFC8201] and Section 5.2 of
    [RFC8085].  This validation SHOULD use the quoted packet supplied in
    the payload of an ICMP message to associate the message with a
    corresponding transport connection (see Section 4.6.1 of [DPLPMTUD]).
@@ -4830,7 +4847,7 @@ Table of Contents
    datagram size are more likely to be dropped by the network.  Loss of
    a QUIC packet that is carried in a PMTU probe is therefore not a
    reliable indication of congestion and SHOULD NOT trigger a congestion
-   control reaction; see Section 3, Bullet 7 of [DPLPMTUD].  However,
+   control reaction; see Bullet 7 in Section 3 of [DPLPMTUD].  However,
    PMTU probes consume congestion window, which could delay subsequent
    transmission by an application.
 
@@ -4903,8 +4920,8 @@ Table of Contents
    on the remaining bits, in network byte order.
 
    This means that integers are encoded on 1, 2, 4, or 8 bytes and can
-   encode 6, 14, 30, or 62 bit values respectively.  Table 4 summarizes
-   the encoding properties.
+   encode 6-, 14-, 30-, or 62-bit values respectively.  Table 4
+   summarizes the encoding properties.
 
           +======+========+=============+=======================+
           | 2Bit | Length | Usable Bits | Range                 |
@@ -4922,6 +4939,10 @@ Table of Contents
 
    Examples and a sample decoding algorithm are shown in Appendix A.1.
 
+   Values do not need to be encoded on the minimum number of bytes
+   necessary, with the sole exception of the Frame Type field; see
+   Section 12.4.
+
    Versions (Section 15), packet numbers sent in the header
    (Section 17.1), and the length of connection IDs in long header
    packets (Section 17.2) are described using integers, but do not use
@@ -4935,11 +4956,11 @@ Table of Contents
 
 17.1.  Packet Number Encoding and Decoding
 
-   Packet numbers are integers in the range 0 to 2^62-1 (Section 12.3).
-   When present in long or short packet headers, they are encoded in 1
-   to 4 bytes.  The number of bits required to represent the packet
-   number is reduced by including only the least significant bits of the
-   packet number.
+   Packet numbers are integers in the range 0 to 2^(62)-1
+   (Section 12.3).  When present in long or short packet headers, they
+   are encoded in 1 to 4 bytes.  The number of bits required to
+   represent the packet number is reduced by including only the least
+   significant bits of the packet number.
 
    The encoded packet number is protected as described in Section 5.4 of
    [QUIC-TLS].
@@ -4967,7 +4988,7 @@ Table of Contents
    At a receiver, protection of the packet number is removed prior to
    recovering the full packet number.  The full packet number is then
    reconstructed based on the number of significant bits present, the
-   value of those bits, and the largest packet number received on a
+   value of those bits, and the largest packet number received in a
    successfully authenticated packet.  Recovering the full packet number
    is necessary to successfully remove packet protection.
 
@@ -5005,15 +5026,17 @@ Table of Contents
    Header Form:  The most significant bit (0x80) of byte 0 (the first
       byte) is set to 1 for long headers.
 
-   Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
-      containing a zero value for this bit are not valid packets in this
-      version and MUST be discarded.
+   Fixed Bit:  The next bit (0x40) of byte 0 is set to 1, unless the
+      packet is a Version Negotiation packet.  Packets containing a zero
+      value for this bit are not valid packets in this version and MUST
+      be discarded.  A value of 1 for this bit allows QUIC to coexist
+      with other protocols; see [RFC7983].
 
    Long Packet Type:  The next two bits (those with a mask of 0x30) of
       byte 0 contain a packet type.  Packet types are listed in Table 5.
 
-   Type-Specific Bits:  The lower four bits (those with a mask of 0x0f)
-      of byte 0 are type-specific.
+   Type-Specific Bits:  The semantics of the lower four bits (those with
+      a mask of 0x0f) of byte 0 are determined by the packet type.
 
    Version:  The QUIC Version is a 32-bit field that follows the first
       byte.  This field indicates the version of QUIC that is in use and
@@ -5130,10 +5153,12 @@ Table of Contents
 
                    Figure 14: Version Negotiation Packet
 
-   The value in the Unused field is selected randomly by the server.
-   Clients MUST ignore the value of this field.  Servers SHOULD set the
-   most significant bit of this field (0x40) to 1 so that Version
-   Negotiation packets appear to have the Fixed Bit field.
+   The value in the Unused field is set to an arbitrary value by the
+   server.  Clients MUST ignore the value of this field.  Where QUIC
+   might be multiplexed with other protocols (see [RFC7983]), servers
+   SHOULD set the most significant bit of this field (0x40) to 1 so that
+   Version Negotiation packets appear to have the Fixed Bit field.  Note
+   that other versions of QUIC might not make a similar recommendation.
 
    The Version field of a Version Negotiation packet MUST be set to
    0x00000000.
@@ -5144,8 +5169,8 @@ Table of Contents
    Destination Connection ID of the received packet, which is initially
    randomly selected by a client.  Echoing both connection IDs gives
    clients some assurance that the server received the packet and that
-   the Version Negotiation packet was not generated by an off-path
-   attacker.
+   the Version Negotiation packet was not generated by an entity that
+   did not observe the Initial packet.
 
    Future versions of QUIC could have different requirements for the
    lengths of connection IDs.  In particular, connection IDs might have
@@ -5217,8 +5242,9 @@ Table of Contents
    In order to prevent tampering by version-unaware middleboxes, Initial
    packets are protected with connection- and version-specific keys
    (Initial keys) as described in [QUIC-TLS].  This protection does not
-   provide confidentiality or integrity against on-path attackers, but
-   provides some level of protection against off-path attackers.
+   provide confidentiality or integrity against attackers that can
+   observe packets, but provides some level of protection against
+   attackers that cannot observe packets.
 
    The client and server use the Initial packet type for any packet that
    contains an initial cryptographic handshake message.  This includes
@@ -5306,7 +5332,7 @@ Table of Contents
    compromise packet protection.
 
    A client only receives acknowledgments for its 0-RTT packets once the
-   handshake is complete, as defined Section 4.1.1 of [QUIC-TLS].
+   handshake is complete, as defined in Section 4.1.1 of [QUIC-TLS].
 
    A client MUST NOT send 0-RTT packets once it starts processing 1-RTT
    packets from the server.  This means that 0-RTT packets cannot
@@ -5431,10 +5457,10 @@ Table of Contents
 
    Clients MUST discard Retry packets that have a Retry Integrity Tag
    that cannot be validated; see the Retry Packet Integrity section of
-   [QUIC-TLS].  This diminishes an off-path attacker's ability to inject
-   a Retry packet and protects against accidental corruption of Retry
-   packets.  A client MUST discard a Retry packet with a zero-length
-   Retry Token field.
+   [QUIC-TLS].  This diminishes an attacker's ability to inject a Retry
+   packet and protects against accidental corruption of Retry packets.
+   A client MUST discard a Retry packet with a zero-length Retry Token
+   field.
 
    The client responds to a Retry packet with an Initial packet that
    includes the provided Retry Token to continue connection
@@ -5522,7 +5548,8 @@ Table of Contents
 
    Fixed Bit:  The next bit (0x40) of byte 0 is set to 1.  Packets
       containing a zero value for this bit are not valid packets in this
-      version and MUST be discarded.
+      version and MUST be discarded.  A value of 1 for this bit allows
+      QUIC to coexist with other protocols; see [RFC7983].
 
    Spin Bit:  The third most significant bit (0x20) of byte 0 is the
       latency spin bit, set as described in Section 17.4.
@@ -5556,10 +5583,10 @@ Table of Contents
       packet.  See Section 5.1 for more details.
 
    Packet Number:  The packet number field is 1 to 4 bytes long.  The
-      packet number has confidentiality protection separate from packet
-      protection, as described in Section 5.4 of [QUIC-TLS].  The length
-      of the packet number field is encoded in Packet Number Length
-      field.  See Section 17.1 for details.
+      packet number is protected using header protection; see
+      Section 5.4 of [QUIC-TLS].  The length of the packet number field
+      is encoded in Packet Number Length field.  See Section 17.1 for
+      details.
 
    Packet Payload:  1-RTT packets always include a 1-RTT protected
       payload.
@@ -5586,9 +5613,9 @@ Table of Contents
    measurement and use of the latency spin bit is further discussed in
    [QUIC-MANAGEABILITY].
 
-   The spin bit is an OPTIONAL feature of this version of QUIC.  A QUIC
-   stack that chooses to support the spin bit MUST implement it as
-   specified in this section.
+   The spin bit is an OPTIONAL feature of this version of QUIC.  An
+   endpoint that does not support this feature MUST disable it, as
+   defined below.
 
    Each endpoint unilaterally decides if the spin bit is enabled or
    disabled for a connection.  Implementations MUST allow administrators
@@ -5596,9 +5623,11 @@ Table of Contents
    a per-connection basis.  Even when the spin bit is not disabled by
    the administrator, endpoints MUST disable their use of the spin bit
    for a random selection of at least one in every 16 network paths, or
-   for one in every 16 connection IDs.  As each endpoint disables the
-   spin bit independently, this ensures that the spin bit signal is
-   disabled on approximately one in eight network paths.
+   for one in every 16 connection IDs, in order to ensure that QUIC
+   connections that disable the spin bit are commonly observed on the
+   network.  As each endpoint disables the spin bit independently, this
+   ensures that the spin bit signal is disabled on approximately one in
+   eight network paths.
 
    When the spin bit is disabled, endpoints MAY set the spin bit to any
    value, and MUST ignore any incoming value.  It is RECOMMENDED that
@@ -5745,18 +5774,20 @@ Table of Contents
 
    initial_max_streams_bidi (0x08):  The initial maximum bidirectional
       streams parameter is an integer value that contains the initial
-      maximum number of bidirectional streams the peer is permitted to
-      initiate.  If this parameter is absent or zero, the peer cannot
-      open bidirectional streams until a MAX_STREAMS frame is sent.
-      Setting this parameter is equivalent to sending a MAX_STREAMS
-      (Section 19.11) of the corresponding type with the same value.
+      maximum number of bidirectional streams the endpoint that receives
+      this transport parameter is permitted to initiate.  If this
+      parameter is absent or zero, the peer cannot open bidirectional
+      streams until a MAX_STREAMS frame is sent.  Setting this parameter
+      is equivalent to sending a MAX_STREAMS (Section 19.11) of the
+      corresponding type with the same value.
 
    initial_max_streams_uni (0x09):  The initial maximum unidirectional
       streams parameter is an integer value that contains the initial
-      maximum number of unidirectional streams the peer is permitted to
-      initiate.  If this parameter is absent or zero, the peer cannot
-      open unidirectional streams until a MAX_STREAMS frame is sent.
-      Setting this parameter is equivalent to sending a MAX_STREAMS
+      maximum number of unidirectional streams the endpoint that
+      receives this transport parameter is permitted to initiate.  If
+      this parameter is absent or zero, the peer cannot open
+      unidirectional streams until a MAX_STREAMS frame is sent.  Setting
+      this parameter is equivalent to sending a MAX_STREAMS
       (Section 19.11) of the corresponding type with the same value.
 
    ack_delay_exponent (0x0a):  The acknowledgment delay exponent is an
@@ -5772,13 +5803,13 @@ Table of Contents
       For example, if a receiver sets a timer for 5ms and alarms
       commonly fire up to 1ms late, then it should send a max_ack_delay
       of 6ms.  If this value is absent, a default of 25 milliseconds is
-      assumed.  Values of 2^14 or greater are invalid.
+      assumed.  Values of 2^(14) or greater are invalid.
 
    disable_active_migration (0x0c):  The disable active migration
       transport parameter is included if the endpoint does not support
       active connection migration (Section 9) on the address being used
-      during the handshake.  When a peer sets this transport parameter,
-      an endpoint MUST NOT use a new local address when sending to the
+      during the handshake.  An endpoint that receives this transport
+      parameter MUST NOT use a new local address when sending to the
       address that the peer used during the handshake.  This transport
       parameter does not prohibit connection migration after a client
       has acted on a preferred_address transport parameter.  This
@@ -5789,7 +5820,7 @@ Table of Contents
       described in Section 9.6.  This transport parameter is only sent
       by a server.  Servers MAY choose to only send a preferred address
       of one address family by sending an all-zero address and port
-      (0.0.0.0:0 or ::.0) for the other family.  IP addresses are
+      (0.0.0.0:0 or [::]:0) for the other family.  IP addresses are
       encoded in network byte order.
 
       The preferred_address transport parameter contains an address and
@@ -5852,8 +5883,8 @@ Table of Contents
       included in the Source Connection ID field of a Retry packet; see
       Section 7.3.  This transport parameter is only sent by a server.
 
-   If present, transport parameters that set initial flow control limits
-   (initial_max_stream_data_bidi_local,
+   If present, transport parameters that set initial per-stream flow
+   control limits (initial_max_stream_data_bidi_local,
    initial_max_stream_data_bidi_remote, and initial_max_stream_data_uni)
    are equivalent to sending a MAX_STREAM_DATA frame (Section 19.10) on
    every stream of the corresponding type immediately after opening.  If
@@ -5915,11 +5946,12 @@ Table of Contents
    Receivers send ACK frames (types 0x02 and 0x03) to inform senders of
    packets they have received and processed.  The ACK frame contains one
    or more ACK Ranges.  ACK Ranges identify acknowledged packets.  If
-   the frame type is 0x03, ACK frames also contain the sum of QUIC
-   packets with associated ECN marks received on the connection up until
-   this point.  QUIC implementations MUST properly handle both types
-   and, if they have enabled ECN for packets they send, they SHOULD use
-   the information in the ECN section to manage their congestion state.
+   the frame type is 0x03, ACK frames also contain the cumulative count
+   of QUIC packets with associated ECN marks received on the connection
+   up until this point.  QUIC implementations MUST properly handle both
+   types and, if they have enabled ECN for packets they send, they
+   SHOULD use the information in the ECN section to manage their
+   congestion state.
 
    QUIC acknowledgments are irrevocable.  Once acknowledged, a packet
    remains acknowledged, even if it does not appear in a future ACK
@@ -5968,15 +6000,13 @@ Table of Contents
       resolution.
 
    ACK Range Count:  A variable-length integer specifying the number of
-      Gap and ACK Range fields in the frame.
+      ACK Range fields in the frame.
 
    First ACK Range:  A variable-length integer indicating the number of
       contiguous packets preceding the Largest Acknowledged that are
-      being acknowledged.  The First ACK Range is encoded as an ACK
-      Range; see Section 19.3.1 starting from the Largest Acknowledged.
-      That is, the smallest packet acknowledged in the range is
-      determined by subtracting the First ACK Range value from the
-      Largest Acknowledged.
+      being acknowledged.  That is, the smallest packet acknowledged in
+      the range is determined by subtracting the First ACK Range value
+      from the Largest Acknowledged.
 
    ACK Ranges:  Contains additional ranges of packets that are
       alternately not acknowledged (Gap) and acknowledged (ACK Range);
@@ -5986,11 +6016,11 @@ Table of Contents
 
 19.3.1.  ACK Ranges
 
-   Each ACK Range consists of alternating Gap and ACK Range values in
-   descending packet number order.  ACK Ranges can be repeated.  The
-   number of Gap and ACK Range values is determined by the ACK Range
-   Count field; one of each value is present for each value in the ACK
-   Range Count field.
+   Each ACK Range consists of alternating Gap and ACK Range Length
+   values in descending packet number order.  ACK Ranges can be
+   repeated.  The number of Gap and ACK Range Length values is
+   determined by the ACK Range Count field; one of each value is present
+   for each value in the ACK Range Count field.
 
    ACK Ranges are structured as shown in Figure 26.
 
@@ -6011,7 +6041,7 @@ Table of Contents
       contiguous acknowledged packets preceding the largest packet
       number, as determined by the preceding Gap.
 
-   Gap and ACK Range value use a relative integer encoding for
+   Gap and ACK Range Length values use a relative integer encoding for
    efficiency.  Though each encoded value is positive, the values are
    subtracted, so that each ACK Range describes progressively lower-
    numbered packets.
@@ -6031,7 +6061,7 @@ Table of Contents
    number and the largest, inclusive.
 
    The largest value for an ACK Range is determined by cumulatively
-   subtracting the size of all preceding ACK Ranges and Gaps.
+   subtracting the size of all preceding ACK Range Lengths and Gaps.
 
    Each Gap indicates a range of packets that are not being
    acknowledged.  The number of packets in the gap is one higher than
@@ -6047,10 +6077,11 @@ Table of Contents
 
 19.3.2.  ECN Counts
 
-   The ACK frame uses the least significant bit (that is, type 0x03) to
-   indicate ECN feedback and report receipt of QUIC packets with
-   associated ECN codepoints of ECT(0), ECT(1), or CE in the packet's IP
-   header.  ECN Counts are only present when the ACK frame type is 0x03.
+   The ACK frame uses the least significant bit of the type value (that
+   is, type 0x03) to indicate ECN feedback and report receipt of QUIC
+   packets with associated ECN codepoints of ECT(0), ECT(1), or CE in
+   the packet's IP header.  ECN Counts are only present when the ACK
+   frame type is 0x03.
 
    When present, there are 3 ECN counts, as shown in Figure 27.
 
@@ -6184,8 +6215,8 @@ Table of Contents
    stream of data.
 
    The largest offset delivered on a stream - the sum of the offset and
-   data length - cannot exceed 2^62-1.  Receipt of a frame that exceeds
-   this limit MUST be treated as a connection error of type
+   data length - cannot exceed 2^(62)-1.  Receipt of a frame that
+   exceeds this limit MUST be treated as a connection error of type
    FRAME_ENCODING_ERROR or CRYPTO_BUFFER_EXCEEDED.
 
    Unlike STREAM frames, which include a Stream ID indicating to which
@@ -6291,7 +6322,7 @@ Table of Contents
 
    The first byte in the stream has an offset of 0.  The largest offset
    delivered on a stream - the sum of the offset and data length -
-   cannot exceed 2^62-1, as it is not possible to provide flow control
+   cannot exceed 2^(62)-1, as it is not possible to provide flow control
    credit for that data.  Receipt of a frame that exceeds this limit
    MUST be treated as a connection error of type FRAME_ENCODING_ERROR or
    FLOW_CONTROL_ERROR.
@@ -6391,10 +6422,10 @@ Table of Contents
 
    Maximum Streams:  A count of the cumulative number of streams of the
       corresponding type that can be opened over the lifetime of the
-      connection.  This value cannot exceed 2^60, as it is not possible
-      to encode stream IDs larger than 2^62-1.  Receipt of a frame that
-      permits opening of a stream larger than this limit MUST be treated
-      as a FRAME_ENCODING_ERROR.
+      connection.  This value cannot exceed 2^(60), as it is not
+      possible to encode stream IDs larger than 2^(62)-1.  Receipt of a
+      frame that permits opening of a stream larger than this limit MUST
+      be treated as a FRAME_ENCODING_ERROR.
 
    Loss or reordering can cause a MAX_STREAMS frame to be received that
    state a lower stream limit than an endpoint has previously received.
@@ -6488,9 +6519,9 @@ Table of Contents
 
    Maximum Streams:  A variable-length integer indicating the maximum
       number of streams allowed at the time the frame was sent.  This
-      value cannot exceed 2^60, as it is not possible to encode stream
-      IDs larger than 2^62-1.  Receipt of a frame that encodes a larger
-      stream ID MUST be treated as a STREAM_LIMIT_ERROR or a
+      value cannot exceed 2^(60), as it is not possible to encode stream
+      IDs larger than 2^(62)-1.  Receipt of a frame that encodes a
+      larger stream ID MUST be treated as a STREAM_LIMIT_ERROR or a
       FRAME_ENCODING_ERROR.
 
 19.15.  NEW_CONNECTION_ID Frames
@@ -6700,10 +6731,12 @@ Table of Contents
       frame cannot be split between packets, any limits on packet size
       will also limit the space available for a reason phrase.
 
-   Reason Phrase:  A human-readable explanation for why the connection
-      was closed.  This can be zero length if the sender chooses not to
-      give details beyond the Error Code.  This SHOULD be a UTF-8
-      encoded string [RFC3629].
+   Reason Phrase:  Additional diagnostic information for the closure.
+      This can be zero length if the sender chooses not to give details
+      beyond the Error Code.  This SHOULD be a UTF-8 encoded string
+      [RFC3629], though the frame does not carry information, such as
+      language tags, that would aid comprehension by any entity other
+      than the one that created the text.
 
    The application-specific variant of CONNECTION_CLOSE (type 0x1d) can
    only be sent using 0-RTT or 1-RTT packets; see Section 12.5.  When an
@@ -6805,8 +6838,8 @@ Table of Contents
 
    TRANSPORT_PARAMETER_ERROR (0x8):  An endpoint received transport
       parameters that were badly formatted, included an invalid value,
-      was absent even though it is mandatory, was present though it is
-      forbidden, or is otherwise in error.
+      omitted a mandatory transport parameter, included a forbidden
+      transport parameter, or were otherwise in error.
 
    CONNECTION_ID_LIMIT_ERROR (0x9):  The number of connection IDs
       provided by the peer exceeds the advertised
@@ -6887,12 +6920,13 @@ Table of Contents
    modification in the path taken by packets that comprise a connection.
 
    Attackers are additionally categorized as either on-path attackers or
-   off-path attackers; see Section 3.5 of [SEC-CONS].  An on-path
-   attacker can read, modify, or remove any packet it observes such that
-   it no longer reaches its destination, while an off-path attacker
-   observes the packets, but cannot prevent the original packet from
-   reaching its intended destination.  Both types of attackers can also
-   transmit arbitrary packets.
+   off-path attackers.  An on-path attacker can read, modify, or remove
+   any packet it observes such that it no longer reaches its
+   destination, while an off-path attacker observes the packets, but
+   cannot prevent the original packet from reaching its intended
+   destination.  Both types of attackers can also transmit arbitrary
+   packets.  This definition differs from that of Section 3.5 of
+   [SEC-CONS] in that an off-path attacker is able to observe packets.
 
    Properties of the handshake, protected packets, and connection
    migration are considered separately.
@@ -6906,11 +6940,12 @@ Table of Contents
    affect QUIC.
 
    Any attack on the TLS handshake that compromises the secrecy or
-   uniqueness of session keys affects other security guarantees provided
-   by QUIC that depends on these keys.  For instance, migration
-   (Section 9) depends on the efficacy of confidentiality protections,
-   both for the negotiation of keys using the TLS handshake and for QUIC
-   packet protection, to avoid linkability across network paths.
+   uniqueness of session keys, or the authentication of the
+   participating peers, affects other security guarantees provided by
+   QUIC that depend on those keys.  For instance, migration (Section 9)
+   depends on the efficacy of confidentiality protections, both for the
+   negotiation of keys using the TLS handshake and for QUIC packet
+   protection, to avoid linkability across network paths.
 
    An attack on the integrity of the TLS handshake might allow an
    attacker to affect the selection of application protocol or QUIC
@@ -6982,11 +7017,11 @@ Table of Contents
 
 21.1.2.  Protected Packets
 
-   Packet protection (Section 12.1) provides authentication and
-   encryption of all packets except Version Negotiation packets, though
-   Initial and Retry packets have limited encryption and authentication
-   based on version-specific inputs; see [QUIC-TLS] for more details.
-   This section considers passive and active attacks against protected
+   Packet protection (Section 12.1) applies authenticated encryption to
+   all packets except Version Negotiation packets, though Initial and
+   Retry packets have limited protection due to the use of version-
+   specific keying material; see [QUIC-TLS] for more details.  This
+   section considers passive and active attacks against protected
    packets.
 
    Both on-path and off-path attackers can mount a passive attack in
@@ -7001,7 +7036,8 @@ Table of Contents
    handshake; see Section 7 and Section 21.1.1.  Similarly, any active
    attacker that observes packets and attempts to insert new data or
    modify existing data in those packets should not be able to generate
-   packets deemed valid by the receiving endpoint.
+   packets deemed valid by the receiving endpoint, other than Initial
+   packets.
 
    A spoofing attack, in which an active attacker rewrites unprotected
    parts of a packet that it forwards or injects, such as the source or
@@ -7029,7 +7065,7 @@ Table of Contents
    number of packets sent to a spoofed address.
 
    This section describes the intended security properties of connection
-   migration when under various types of DoS attacks.
+   migration under various types of DoS attacks.
 
 21.1.3.1.  On-Path Active Attacks
 
@@ -7069,10 +7105,10 @@ Table of Contents
    following properties:
 
    1.  An on-path attacker can prevent use of a path for a connection,
-       causing it to fail if it cannot use a different path that does
-       not contain the attacker.  This can be achieved by dropping all
-       packets, modifying them so that they fail to decrypt, or other
-       methods.
+       causing the connection to fail if it cannot use a different path
+       that does not contain the attacker.  This can be achieved by
+       dropping all packets, modifying them so that they fail to
+       decrypt, or other methods.
 
    2.  An on-path attacker can prevent migration to a new path for which
        the attacker is also on-path by causing path validation to fail
@@ -7105,7 +7141,7 @@ Table of Contents
 
    An off-path attacker cannot:
 
-   *  Modify any part of a packet
+   *  Modify packets sent by endpoints
 
    *  Delay packets
 
@@ -7113,17 +7149,17 @@ Table of Contents
 
    *  Reorder original packets
 
-   An off-path attacker can modify packets that it has observed and
-   inject them back into the network, potentially with spoofed source
-   and destination addresses.
+   An off-path attacker can create modified copies of packets that it
+   has observed and inject those copies into the network, potentially
+   with spoofed source and destination addresses.
 
    For the purposes of this discussion, it is assumed that an off-path
-   attacker has the ability to observe, modify, and re-inject a packet
-   into the network that will reach the destination endpoint prior to
-   the arrival of the original packet observed by the attacker.  In
-   other words, an attacker has the ability to consistently "win" a race
-   with the legitimate packets between the endpoints, potentially
-   causing the original packet to be ignored by the recipient.
+   attacker has the ability to inject a modified copy of a packet into
+   the network that will reach the destination endpoint prior to the
+   arrival of the original packet observed by the attacker.  In other
+   words, an attacker has the ability to consistently "win" a race with
+   the legitimate packets between the endpoints, potentially causing the
+   original packet to be ignored by the recipient.
 
    It is also assumed that an attacker has the resources necessary to
    affect NAT state, potentially both causing an endpoint to lose its
@@ -7234,17 +7270,17 @@ Table of Contents
    discard packets that are received on a different network path.
 
    The Source and Destination Connection ID fields are the primary means
-   of protection against off-path attack during the handshake.  These
-   are required to match those set by a peer.  Except for an Initial and
-   stateless reset packets, an endpoint only accepts packets that
-   include a Destination Connection ID field that matches a value the
-   endpoint previously chose.  This is the only protection offered for
-   Version Negotiation packets.
+   of protection against off-path attack during the handshake; see
+   Section 8.1.  These are required to match those set by a peer.
+   Except for an Initial and stateless reset packets, an endpoint only
+   accepts packets that include a Destination Connection ID field that
+   matches a value the endpoint previously chose.  This is the only
+   protection offered for Version Negotiation packets.
 
    The Destination Connection ID field in an Initial packet is selected
    by a client to be unpredictable, which serves an additional purpose.
    The packets that carry the cryptographic handshake are protected with
-   a key that is derived from this connection ID and salt specific to
+   a key that is derived from this connection ID and a salt specific to
    the QUIC version.  This allows endpoints to use the same process for
    authenticating packets that they receive as they use after the
    cryptographic handshake completes.  Packets that cannot be
@@ -7332,8 +7368,8 @@ Table of Contents
    powerful and does not have adequate countermeasures, QUIC server
    implementations should assume that attackers can cause them to
    generate arbitrary UDP payloads to arbitrary destinations.  QUIC
-   servers SHOULD NOT be deployed in networks that also have
-   inadequately secured UDP endpoints.
+   servers SHOULD NOT be deployed in networks that do not deploy ingress
+   filtering [BCP38] and also have inadequately secured UDP endpoints.
 
    Although it is not generally possible to ensure that clients are not
    co-located with vulnerable endpoints, this version of QUIC does not
@@ -7600,10 +7636,11 @@ Table of Contents
 
    The number of active streams is limited by the
    initial_max_streams_bidi and initial_max_streams_uni transport
-   parameters, as explained in Section 4.6.  If chosen judiciously,
-   these limits mitigate the effect of the stream commitment attack.
-   However, setting the limit too low could affect performance when
-   applications expect to open large number of streams.
+   parameters as updated by any received MAX_STREAMS frames, as
+   explained in Section 4.6.  If chosen judiciously, these limits
+   mitigate the effect of the stream commitment attack.  However,
+   setting the limit too low could affect performance when applications
+   expect to open large number of streams.
 
 21.9.  Peer Denial of Service
 
@@ -7632,10 +7669,10 @@ Table of Contents
    IP header to influence the sender's rate.  [RFC3168] discusses
    manipulations and their effects in more detail.
 
-   An on-the-side attacker can duplicate and send packets with modified
-   ECN fields to affect the sender's rate.  If duplicate packets are
-   discarded by a receiver, an off-path attacker will need to race the
-   duplicate packet against the original to be successful in this
+   A limited on-path attacker can duplicate and send packets with
+   modified ECN fields to affect the sender's rate.  If duplicate
+   packets are discarded by a receiver, an attacker will need to race
+   the duplicate packet against the original to be successful in this
    attack.  Therefore, QUIC endpoints ignore the ECN field on an IP
    packet unless at least one QUIC packet in that IP packet is
    successfully processed; see Section 13.4.
@@ -7685,12 +7722,10 @@ Table of Contents
 21.13.  Targeted Attacks by Routing
 
    Deployments should limit the ability of an attacker to target a new
-   connection to a particular server instance.  This means that client-
-   controlled fields, such as the initial Destination Connection ID used
-   on Initial and 0-RTT packets SHOULD NOT be used by themselves to make
-   routing decisions.  Ideally, routing decisions are made independently
-   of client-selected values; a Source Connection ID can be selected to
-   route later packets to the same server.
+   connection to a particular server instance.  Ideally, routing
+   decisions are made independently of client-selected values, including
+   addresses.  Once an instance is selected, a connection ID can be
+   selected so that later packets are routed to the same instance.
 
 21.14.  Traffic Analysis
 
@@ -7770,19 +7805,19 @@ Table of Contents
    risk that differing semantics are attributed to the same codepoint by
    different implementations.
 
-   Use of the first available codepoint in a range is reserved for
-   allocation using the Standards Action policy; see Section 4.9 of
-   [RFC8126].  The early codepoint assignment process [EARLY-ASSIGN] can
-   be used for these values.
+   Use of the first unassigned codepoint is reserved for allocation
+   using the Standards Action policy; see Section 4.9 of [RFC8126].  The
+   early codepoint assignment process [EARLY-ASSIGN] can be used for
+   these values.
 
    For codepoints that are encoded in variable-length integers
    (Section 16), such as frame types, codepoints that encode to four or
-   eight bytes (that is, values 2^14 and above) SHOULD be used unless
+   eight bytes (that is, values 2^(14) and above) SHOULD be used unless
    the usage is especially sensitive to having a longer encoding.
 
    Applications to register codepoints in QUIC registries MAY include a
-   codepoint as part of the registration.  IANA MUST allocate the
-   selected codepoint if the codepoint is unassigned and the
+   requested codepoint as part of the registration.  IANA MUST allocate
+   the selected codepoint if the codepoint is unassigned and the
    requirements of the registration policy are met.
 
 22.1.3.  Reclaiming Provisional Codepoints
@@ -7812,11 +7847,11 @@ Table of Contents
    update the registration, the codepoint MAY be removed from the
    registry.
 
-   This process also applies to requests to change a provisional
-   registration into a permanent registration, except that the goal is
-   not to determine whether there is no use of the codepoint, but to
-   determine that the registration is an accurate representation of any
-   deployed usage.
+   This review and consultation process also applies to requests to
+   change a provisional registration into a permanent registration,
+   except that the goal is not to determine whether there is no use of
+   the codepoint, but to determine that the registration is an accurate
+   representation of any deployed usage.
 
 22.1.4.  Permanent Registrations
 
@@ -7945,7 +7980,7 @@ Table of Contents
    Permanent registrations in this registry are assigned using the
    Specification Required policy ([RFC8126]), except for values between
    0x00 and 0x3f (in hexadecimal; inclusive), which are assigned using
-   Standards Action or IESG Approval as defined in Section 4.9 and 4.10
+   Standards Action or IESG Approval as defined in Sections 4.9 and 4.10
    of [RFC8126].
 
    In addition to the fields in Section 22.1.1, permanent registrations
@@ -7976,7 +8011,7 @@ Table of Contents
    using the Specification Required policy ([RFC8126]), except for
    values between 0x00 and 0x3f (in hexadecimal; inclusive), which are
    assigned using Standards Action or IESG Approval as defined in
-   Section 4.9 and 4.10 of [RFC8126].
+   Sections 4.9 and 4.10 of [RFC8126].
 
    In addition to the fields in Section 22.1.1, permanent registrations
    in this registry MUST include the following fields:
@@ -7989,7 +8024,7 @@ Table of Contents
    The initial contents of this registry are shown in Table 7.
 
    +======+===========================+================+===============+
-   |Value | Error                     |Description     | Specification |
+   |Value | Code                      |Description     | Specification |
    +======+===========================+================+===============+
    |0x0   | NO_ERROR                  |No error        | Section 20    |
    +------+---------------------------+----------------+---------------+
@@ -8055,6 +8090,11 @@ Table of Contents
 
 23.1.  Normative References
 
+   [BCP38]    Ferguson, P. and D. Senie, "Network Ingress Filtering:
+              Defeating Denial of Service Attacks which employ IP Source
+              Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
+              May 2000, <https://www.rfc-editor.org/info/rfc2827>.
+
    [DPLPMTUD] Fairhurst, G., Jones, T., Tüxen, M., Rüngeler, I., and T.
               Völker, "Packetization Layer Path MTU Discovery for
               Datagram Transports", RFC 8899, DOI 10.17487/RFC8899,
@@ -8072,18 +8112,18 @@ Table of Contents
    [QUIC-INVARIANTS]
               Thomson, M., "Version-Independent Properties of QUIC",
               Work in Progress, Internet-Draft, draft-ietf-quic-
-              invariants, 4 January 2021,
+              invariants, 4 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-invariants>.
 
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 4 January 2021,
+              draft-ietf-quic-recovery, 4 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using Transport
               Layer Security (TLS) to Secure QUIC", Work in Progress,
-              Internet-Draft, draft-ietf-quic-tls, 4 January 2021,
+              Internet-Draft, draft-ietf-quic-tls, 4 February 2021,
               <https://tools.ietf.org/html/draft-ietf-quic-tls>.
 
    [RFC1191]  Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191,
@@ -8103,11 +8143,6 @@ Table of Contents
    [RFC3629]  Yergeau, F., "UTF-8, a transformation format of ISO
               10646", STD 63, RFC 3629, DOI 10.17487/RFC3629, November
               2003, <https://www.rfc-editor.org/info/rfc3629>.
-
-   [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
-              "Randomness Requirements for Security", BCP 106, RFC 4086,
-              DOI 10.17487/RFC4086, June 2005,
-              <https://www.rfc-editor.org/info/rfc4086>.
 
    [RFC6437]  Amante, S., Carpenter, B., Jiang, S., and J. Rajahalme,
               "IPv6 Flow Label Specification", RFC 6437,
@@ -8160,11 +8195,6 @@ Table of Contents
               Alternative Services", RFC 7838, DOI 10.17487/RFC7838,
               April 2016, <https://www.rfc-editor.org/info/rfc7838>.
 
-   [BCP38]    Ferguson, P. and D. Senie, "Network Ingress Filtering:
-              Defeating Denial of Service Attacks which employ IP Source
-              Address Spoofing", BCP 38, RFC 2827, DOI 10.17487/RFC2827,
-              May 2000, <https://www.rfc-editor.org/info/rfc2827>.
-
    [COOKIE]   Barth, A., "HTTP State Management Mechanism", RFC 6265,
               DOI 10.17487/RFC6265, April 2011,
               <https://www.rfc-editor.org/info/rfc6265>.
@@ -8199,9 +8229,14 @@ Table of Contents
    [QUIC-MANAGEABILITY]
               Kuehlewind, M. and B. Trammell, "Manageability of the QUIC
               Transport Protocol", Work in Progress, Internet-Draft,
-              draft-ietf-quic-manageability-08, 2 November 2020,
+              draft-ietf-quic-manageability-09, 22 January 2021,
               <http://www.ietf.org/internet-drafts/draft-ietf-quic-
-              manageability-08.txt>.
+              manageability-09.txt>.
+
+   [RANDOM]   Eastlake 3rd, D., Schiller, J., and S. Crocker,
+              "Randomness Requirements for Security", BCP 106, RFC 4086,
+              DOI 10.17487/RFC4086, June 2005,
+              <https://www.rfc-editor.org/info/rfc4086>.
 
    [RFC1812]  Baker, F., Ed., "Requirements for IP Version 4 Routers",
               RFC 1812, DOI 10.17487/RFC1812, June 1995,
@@ -8246,6 +8281,11 @@ Table of Contents
               UDP", BCP 127, RFC 4787, DOI 10.17487/RFC4787, January
               2007, <https://www.rfc-editor.org/info/rfc4787>.
 
+   [RFC4941]  Narten, T., Draves, R., and S. Krishnan, "Privacy
+              Extensions for Stateless Address Autoconfiguration in
+              IPv6", RFC 4941, DOI 10.17487/RFC4941, September 2007,
+              <https://www.rfc-editor.org/info/rfc4941>.
+
    [RFC5681]  Allman, M., Paxson, V., and E. Blanton, "TCP Congestion
               Control", RFC 5681, DOI 10.17487/RFC5681, September 2009,
               <https://www.rfc-editor.org/info/rfc5681>.
@@ -8254,6 +8294,12 @@ Table of Contents
               Key Derivation Function (HKDF)", RFC 5869,
               DOI 10.17487/RFC5869, May 2010,
               <https://www.rfc-editor.org/info/rfc5869>.
+
+   [RFC7983]  Petit-Huguenin, M. and G. Salgueiro, "Multiplexing Scheme
+              Updates for Secure Real-time Transport Protocol (SRTP)
+              Extension for Datagram Transport Layer Security (DTLS)",
+              RFC 7983, DOI 10.17487/RFC7983, September 2016,
+              <https://www.rfc-editor.org/info/rfc7983>.
 
    [RFC8087]  Fairhurst, G. and M. Welzl, "The Benefits of Using
               Explicit Congestion Notification (ECN)", RFC 8087,
@@ -8813,7 +8859,7 @@ B.14.  Since draft-ietf-quic-transport-19
    *  Spin bit text incorporated (#2564)
 
    *  Close the connection when maximum stream ID in MAX_STREAMS exceeds
-      2^62 - 1 (#2499, #2487)
+      2^(62)-1 (#2499, #2487)
 
    *  New connection ID required for intentional migration (#2414,
       #2413)
