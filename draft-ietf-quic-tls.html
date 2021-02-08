@@ -842,7 +842,7 @@ address div.right {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomson &amp; Turner</td>
-<td class="center">Expires 6 August 2021</td>
+<td class="center">Expires 12 August 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -855,12 +855,12 @@ address div.right {
 <dd class="internet-draft">draft-ietf-quic-tls</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-02-02" class="published">2 February 2021</time>
+<time datetime="2021-02-08" class="published">8 February 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-08-06">6 August 2021</time></dd>
+<dd class="expires"><time datetime="2021-08-12">12 August 2021</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -912,7 +912,7 @@ code and issues list for this draft can be found at
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 August 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 August 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3030,12 +3030,13 @@ the connection and only send stateless resets in response to receiving packets.
 It is RECOMMENDED that endpoints immediately close the connection with a
 connection error of type AEAD_LIMIT_REACHED before reaching a state where key
 updates are not possible.<a href="#section-6.6-4" class="pilcrow">¶</a></p>
-<p id="section-6.6-5">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the confidentiality limit is 2^23
-encrypted packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For AEAD_CHACHA20_POLY1305, the
-confidentiality limit is greater than the number of possible packets (2^62) and
-so can be disregarded. For AEAD_AES_128_CCM, the confidentiality limit is 2^21.5
-encrypted packets; see <a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying a limit reduces the probability
-that an attacker can distinguish the AEAD in use from a random permutation; see
+<p id="section-6.6-5">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the confidentiality limit is
+2<sup>23</sup> encrypted packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For
+AEAD_CHACHA20_POLY1305, the confidentiality limit is greater than the number of
+possible packets (2<sup>62</sup>) and so can be disregarded. For
+AEAD_AES_128_CCM, the confidentiality limit is 2<sup>21.5</sup> encrypted
+packets; see <a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying a limit reduces the probability that an
+attacker can distinguish the AEAD in use from a random permutation; see
 <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>, <span>[<a href="#ROBUST" class="xref">ROBUST</a>]</span>, and <span>[<a href="#GCM-MU" class="xref">GCM-MU</a>]</span>.<a href="#section-6.6-5" class="pilcrow">¶</a></p>
 <p id="section-6.6-6">In addition to counting packets sent, endpoints MUST count the number of
 received packets that fail authentication during the lifetime of a connection.
@@ -3043,12 +3044,12 @@ If the total number of received packets that fail authentication within the
 connection, across all keys, exceeds the integrity limit for the selected AEAD,
 the endpoint MUST immediately close the connection with a connection error of
 type AEAD_LIMIT_REACHED and not process any more packets.<a href="#section-6.6-6" class="pilcrow">¶</a></p>
-<p id="section-6.6-7">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the integrity limit is 2^52 invalid
-packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For AEAD_CHACHA20_POLY1305, the integrity limit is
-2^36 invalid packets; see <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>. For AEAD_AES_128_CCM, the integrity
-limit is 2^21.5 invalid packets; see <a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying this limit reduces
-the probability that an attacker can successfully forge a packet; see
-<span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>, <span>[<a href="#ROBUST" class="xref">ROBUST</a>]</span>, and <span>[<a href="#GCM-MU" class="xref">GCM-MU</a>]</span>.<a href="#section-6.6-7" class="pilcrow">¶</a></p>
+<p id="section-6.6-7">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the integrity limit is 2<sup>52</sup>
+invalid packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For AEAD_CHACHA20_POLY1305, the integrity
+limit is 2<sup>36</sup> invalid packets; see <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>. For AEAD_AES_128_CCM,
+the integrity limit is 2<sup>21.5</sup> invalid packets; see
+<a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying this limit reduces the probability that an attacker can
+successfully forge a packet; see <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>, <span>[<a href="#ROBUST" class="xref">ROBUST</a>]</span>, and <span>[<a href="#GCM-MU" class="xref">GCM-MU</a>]</span>.<a href="#section-6.6-7" class="pilcrow">¶</a></p>
 <p id="section-6.6-8">Endpoints that limit the size of packets MAY use higher confidentiality and
 integrity limits; see <a href="#aead-analysis" class="xref">Appendix B</a> for details.<a href="#section-6.6-8" class="pilcrow">¶</a></p>
 <p id="section-6.6-9">Future analyses and specifications MAY relax confidentiality or integrity limits
@@ -3309,8 +3310,9 @@ security guarantees.<a href="#section-9.4-4" class="pilcrow">¶</a></p>
 header protection. Protecting two different headers with the same key and
 ciphertext sample reveals the exclusive OR of the protected fields.  Assuming
 that the AEAD acts as a PRF, if L bits are sampled, the odds of two ciphertext
-samples being identical approach 2^(-L/2), that is, the birthday bound. For the
-algorithms described in this document, that probability is one in 2^64.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
+samples being identical approach 2<sup>-L/2</sup>, that is, the birthday bound.
+For the algorithms described in this document, that probability is one in
+2<sup>64</sup>.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
 <p id="section-9.4-6">To prevent an attacker from modifying packet headers, the header is transitively
 authenticated using packet protection; the entire packet header is part of the
 authenticated additional data.  Protected fields that are falsified or modified
@@ -3427,11 +3429,11 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="QUIC-RECOVERY">[QUIC-RECOVERY]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-02-02" class="refDate">2 February 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-recovery">https://tools.ietf.org/html/draft-ietf-quic-recovery</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-02-08" class="refDate">8 February 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-recovery">https://tools.ietf.org/html/draft-ietf-quic-recovery</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-TRANSPORT">[QUIC-TRANSPORT]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-02-02" class="refDate">2 February 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-02-08" class="refDate">8 February 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -3502,7 +3504,7 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="QUIC-HTTP">[QUIC-HTTP]</dt>
         <dd>
-<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol Version 3 (HTTP/3)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-http</span>, <time datetime="2021-02-02" class="refDate">2 February 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-http">https://tools.ietf.org/html/draft-ietf-quic-http</a>&gt;</span>. </dd>
+<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol Version 3 (HTTP/3)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-http</span>, <time datetime="2021-02-08" class="refDate">8 February 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-http">https://tools.ietf.org/html/draft-ietf-quic-http</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2818">[RFC2818]</dt>
         <dd>
@@ -3893,21 +3895,22 @@ o:  </dt>
 </dl>
 <p id="section-appendix.b-3">The analyses that follow rely on a count of the number of block operations
 involved in producing each message. This analysis is performed for packets of
-size up to 2^11 (l = 2^7) and 2^16 (l = 2^12). A size of 2^11 is expected to be
-a limit that matches common deployment patterns, whereas the 2^16 is the maximum
-possible size of a QUIC packet. Only endpoints that strictly limit packet size
-can use the larger confidentiality and integrity limits that are derived using
-the smaller packet size.<a href="#section-appendix.b-3" class="pilcrow">¶</a></p>
+size up to 2<sup>11</sup> (l = 2<sup>7</sup>) and 2<sup>16</sup> (l =
+2<sup>12</sup>). A size of 2<sup>11</sup> is expected to be a limit that matches
+common deployment patterns, whereas the 2<sup>16</sup> is the maximum possible
+size of a QUIC packet. Only endpoints that strictly limit packet size can use
+the larger confidentiality and integrity limits that are derived using the
+smaller packet size.<a href="#section-appendix.b-3" class="pilcrow">¶</a></p>
 <p id="section-appendix.b-4">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the message length (l) is the length
 of the associated data in blocks plus the length of the plaintext in blocks.<a href="#section-appendix.b-4" class="pilcrow">¶</a></p>
-<p id="section-appendix.b-5">For AEAD_AES_128_CCM, the total number of block cipher operations is the sum
-of: the length of the associated data in blocks, the length of the ciphertext
-in blocks, the length of the plaintext in blocks, plus 1. In this analysis,
-this is simplified to a value of twice the length of the packet in blocks (that
-is, <code>2l = 2^8</code> for packets that are limited to 2^11 bytes, or <code>2l = 2^13</code>
-otherwise). This simplification is based on the packet containing all of the
-associated data and ciphertext. This results in a 1 to 3 block overestimation
-of the number of operations per packet.<a href="#section-appendix.b-5" class="pilcrow">¶</a></p>
+<p id="section-appendix.b-5">For AEAD_AES_128_CCM, the total number of block cipher operations is the sum of:
+the length of the associated data in blocks, the length of the ciphertext in
+blocks, the length of the plaintext in blocks, plus 1. In this analysis, this is
+simplified to a value of twice the length of the packet in blocks (that is,
+<code>2l = 2<sup>8</sup></code> for packets that are limited to 2<sup>11</sup>
+bytes, or <code>2l = 2<sup>13</sup></code> otherwise). This simplification is based
+on the packet containing all of the associated data and ciphertext. This results
+in a 1 to 3 block overestimation of the number of operations per packet.<a href="#section-appendix.b-5" class="pilcrow">¶</a></p>
 <div id="gcm-bounds">
 <section id="section-b.1">
         <h2 id="name-analysis-of-aead_aes_128_gc">
@@ -3942,16 +3945,17 @@ attacker is:<a href="#section-b.1.1-1" class="pilcrow">¶</a></p>
 2 * (q * l)^2 / 2^n
 </pre><a href="#section-b.1.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.1-3">For a target advantage of 2^-57, this results in the relation:<a href="#section-b.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-b.1.1-3">For a target advantage of 2<sup>-57</sup>, this results in the relation:<a href="#section-b.1.1-3" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.1.1-4">
 <pre>
 q &lt;= 2^35 / l
 </pre><a href="#section-b.1.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.1-5">Thus, endpoints that do not send packets larger than 2^11 bytes cannot protect
-more than 2^28 packets in a single connection without causing an attacker to
-gain an larger advantage than the target of 2^-57. The limit for endpoints that
-allow for the packet size to be as large as 2^16 is instead 2^23.<a href="#section-b.1.1-5" class="pilcrow">¶</a></p>
+<p id="section-b.1.1-5">Thus, endpoints that do not send packets larger than 2<sup>11</sup> bytes cannot
+protect more than 2<sup>28</sup> packets in a single connection without causing
+an attacker to gain an larger advantage than the target of 2<sup>-57</sup>. The
+limit for endpoints that allow for the packet size to be as large as
+2<sup>16</sup> is instead 2<sup>23</sup>.<a href="#section-b.1.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="integrity-limit">
@@ -3967,18 +3971,19 @@ an advantage in successfully forging a packet of no more than:<a href="#section-
         + ((2 * o * v) / 2^(k + n)) + (n * (v + (v * l)) / 2^k)
 </pre><a href="#section-b.1.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.2-3">The goal is to limit this advantage to 2^-57.  For AEAD_AES_128_GCM, the fourth
-term in this inequality dominates the rest, so the others can be removed without
-significant effect on the result. This produces the following approximation:<a href="#section-b.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-b.1.2-3">The goal is to limit this advantage to 2<sup>-57</sup>.  For AEAD_AES_128_GCM,
+the fourth term in this inequality dominates the rest, so the others can be
+removed without significant effect on the result. This produces the following
+approximation:<a href="#section-b.1.2-3" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.1.2-4">
 <pre>
 v &lt;= 2^64 / l
 </pre><a href="#section-b.1.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.2-5">Endpoints that do not attempt to remove protection from packets larger than 2^11
-bytes can attempt to remove protection from at most 2^57 packets. Endpoints that
-do not restrict the size of processed packets can attempt to remove protection
-from at most 2^52 packets.<a href="#section-b.1.2-5" class="pilcrow">¶</a></p>
+<p id="section-b.1.2-5">Endpoints that do not attempt to remove protection from packets larger than
+2<sup>11</sup> bytes can attempt to remove protection from at most
+2<sup>57</sup> packets. Endpoints that do not restrict the size of processed
+packets can attempt to remove protection from at most 2<sup>52</sup> packets.<a href="#section-b.1.2-5" class="pilcrow">¶</a></p>
 <p id="section-b.1.2-6">For AEAD_AES_256_GCM, the same term dominates, but the larger value of k
 produces the following approximation:<a href="#section-b.1.2-6" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.1.2-7">
@@ -4028,16 +4033,16 @@ v / 2^t + (2l * (v + q))^2 / 2^n
 second, so that term can be removed without a significant effect on the result.<a href="#section-b.2-8" class="pilcrow">¶</a></p>
 <p id="section-b.2-9">This produces a relation that combines both encryption and decryption attempts
 with the same limit as that produced by the theorem for confidentiality alone.
-For a target advantage of 2^-57, this results in:<a href="#section-b.2-9" class="pilcrow">¶</a></p>
+For a target advantage of 2<sup>-57</sup>, this results in:<a href="#section-b.2-9" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.2-10">
 <pre>
 v + q &lt;= 2^34.5 / l
 </pre><a href="#section-b.2-10" class="pilcrow">¶</a>
 </div>
 <p id="section-b.2-11">By setting <code>q = v</code>, values for both confidentiality and integrity limits can be
-produced. Endpoints that limit packets to 2^11 bytes therefore have both
-confidentiality and integrity limits of 2^26.5 packets. Endpoints that do not
-restrict packet size have a limit of 2^21.5.<a href="#section-b.2-11" class="pilcrow">¶</a></p>
+produced. Endpoints that limit packets to 2<sup>11</sup> bytes therefore have
+both confidentiality and integrity limits of 2<sup>26.5</sup> packets. Endpoints
+that do not restrict packet size have a limit of 2<sup>21.5</sup>.<a href="#section-b.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
