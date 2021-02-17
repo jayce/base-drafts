@@ -5,10 +5,10 @@
 QUIC                                                           C. Krasic
 Internet-Draft                                                   Netflix
 Intended status: Standards Track                               M. Bishop
-Expires: 12 August 2021                              Akamai Technologies
+Expires: 21 August 2021                              Akamai Technologies
                                                         A. Frindell, Ed.
                                                                 Facebook
-                                                         8 February 2021
+                                                        17 February 2021
 
 
                   QPACK: Header Compression for HTTP/3
@@ -47,7 +47,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 August 2021.
+   This Internet-Draft will expire on 21 August 2021.
 
 Copyright Notice
 
@@ -1556,15 +1556,16 @@ Table of Contents
 
    [HTTP3]    Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 8 February 2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-http>.
+              quic-http, 17 February 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              http.txt>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 8 February
-              2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-transport>.
+              Internet-Draft, draft-ietf-quic-transport, 17 February
+              2021, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              quic-transport.txt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1584,10 +1585,10 @@ Table of Contents
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
    [SEMANTICS]
-              Fielding, R., Nottingham, M., and J. Reschke, "HTTP
+              Fielding, R. T., Nottingham, M., and J. Reschke, "HTTP
               Semantics", Work in Progress, Internet-Draft, draft-ietf-
               httpbis-semantics-14, 12 January 2021,
-              <http://www.ietf.org/internet-drafts/draft-ietf-httpbis-
+              <https://www.ietf.org/archive/id/draft-ietf-httpbis-
               semantics-14.txt>.
 
 9.2.  Informative References
