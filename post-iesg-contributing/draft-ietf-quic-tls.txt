@@ -5,8 +5,8 @@
 QUIC                                                     M. Thomson, Ed.
 Internet-Draft                                                   Mozilla
 Intended status: Standards Track                          S. Turner, Ed.
-Expires: 12 August 2021                                            sn3rd
-                                                         8 February 2021
+Expires: 21 August 2021                                            sn3rd
+                                                        17 February 2021
 
 
                         Using TLS to Secure QUIC
@@ -42,7 +42,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 August 2021.
+   This Internet-Draft will expire on 21 August 2021.
 
 Copyright Notice
 
@@ -2241,15 +2241,16 @@ Table of Contents
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 8 February 2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
+              draft-ietf-quic-recovery, 17 February 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              recovery.txt>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 8 February
-              2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-transport>.
+              Internet-Draft, draft-ietf-quic-transport, 17 February
+              2021, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              quic-transport.txt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -2298,7 +2299,7 @@ Table of Contents
    [COMPRESS] Ghedini, A. and V. Vasiliev, "TLS Certificate
               Compression", Work in Progress, Internet-Draft, draft-
               ietf-tls-certificate-compression-10, 6 January 2020,
-              <http://www.ietf.org/internet-drafts/draft-ietf-tls-
+              <https://www.ietf.org/archive/id/draft-ietf-tls-
               certificate-compression-10.txt>.
 
    [GCM-MU]   Hoang, V., Tessaro, S., and A. Thiruvengadam, "The Multi-
@@ -2330,8 +2331,9 @@ Table of Contents
    [QUIC-HTTP]
               Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 8 February 2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-http>.
+              quic-http, 17 February 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              http.txt>.
 
    [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818,
               DOI 10.17487/RFC2818, May 2000,
