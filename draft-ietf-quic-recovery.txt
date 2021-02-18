@@ -5,8 +5,8 @@
 QUIC                                                     J. Iyengar, Ed.
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                           I. Swett, Ed.
-Expires: 21 August 2021                                           Google
-                                                        17 February 2021
+Expires: 22 August 2021                                           Google
+                                                        18 February 2021
 
 
                QUIC Loss Detection and Congestion Control
@@ -43,7 +43,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 August 2021.
+   This Internet-Draft will expire on 22 August 2021.
 
 Copyright Notice
 
@@ -1330,34 +1330,35 @@ Table of Contents
 
    [QUIC-TLS] Thomson, M., Ed. and S. Turner, Ed., "Using TLS to Secure
               QUIC", Work in Progress, Internet-Draft, draft-ietf-quic-
-              tls, 17 February 2021,
+              tls, 18 February 2021,
               <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
               tls.txt>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 17 February
+              Internet-Draft, draft-ietf-quic-transport, 18 February
               2021, <https://datatracker.ietf.org/doc/html/draft-ietf-
               quic-transport.txt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
+              <https://datatracker.ietf.org/doc/html/rfc2119>.
 
    [RFC3168]  Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
               of Explicit Congestion Notification (ECN) to IP",
               RFC 3168, DOI 10.17487/RFC3168, September 2001,
-              <https://www.rfc-editor.org/info/rfc3168>.
+              <https://datatracker.ietf.org/doc/html/rfc3168>.
 
    [RFC8085]  Eggert, L., Fairhurst, G., and G. Shepherd, "UDP Usage
               Guidelines", BCP 145, RFC 8085, DOI 10.17487/RFC8085,
-              March 2017, <https://www.rfc-editor.org/info/rfc8085>.
+              March 2017,
+              <https://datatracker.ietf.org/doc/html/rfc8085>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+              May 2017, <https://datatracker.ietf.org/doc/html/rfc8174>.
 
 10.2.  Informative References
 
@@ -1367,13 +1368,13 @@ Table of Contents
 
    [PRR]      Mathis, M., Dukkipati, N., and Y. Cheng, "Proportional
               Rate Reduction for TCP", RFC 6937, DOI 10.17487/RFC6937,
-              May 2013, <https://www.rfc-editor.org/info/rfc6937>.
+              May 2013, <https://datatracker.ietf.org/doc/html/rfc6937>.
 
    [RACK]     Cheng, Y., Cardwell, N., Dukkipati, N., and P. Jha, "The
               RACK-TLP loss detection algorithm for TCP", Work in
               Progress, Internet-Draft, draft-ietf-tcpm-rack-15, 22
-              December 2020, <https://www.ietf.org/archive/id/draft-
-              ietf-tcpm-rack-15.txt>.
+              December 2020, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-tcpm-rack-15.txt>.
 
    [RETRANSMISSION]
               Karn, P. and C. Partridge, "Improving Round-Trip Time
@@ -1383,72 +1384,72 @@ Table of Contents
    [RFC2018]  Mathis, M., Mahdavi, J., Floyd, S., and A. Romanow, "TCP
               Selective Acknowledgment Options", RFC 2018,
               DOI 10.17487/RFC2018, October 1996,
-              <https://www.rfc-editor.org/info/rfc2018>.
+              <https://datatracker.ietf.org/doc/html/rfc2018>.
 
    [RFC3465]  Allman, M., "TCP Congestion Control with Appropriate Byte
               Counting (ABC)", RFC 3465, DOI 10.17487/RFC3465, February
-              2003, <https://www.rfc-editor.org/info/rfc3465>.
+              2003, <https://datatracker.ietf.org/doc/html/rfc3465>.
 
    [RFC5681]  Allman, M., Paxson, V., and E. Blanton, "TCP Congestion
               Control", RFC 5681, DOI 10.17487/RFC5681, September 2009,
-              <https://www.rfc-editor.org/info/rfc5681>.
+              <https://datatracker.ietf.org/doc/html/rfc5681>.
 
    [RFC5682]  Sarolahti, P., Kojo, M., Yamamoto, K., and M. Hata,
               "Forward RTO-Recovery (F-RTO): An Algorithm for Detecting
               Spurious Retransmission Timeouts with TCP", RFC 5682,
               DOI 10.17487/RFC5682, September 2009,
-              <https://www.rfc-editor.org/info/rfc5682>.
+              <https://datatracker.ietf.org/doc/html/rfc5682>.
 
    [RFC5827]  Allman, M., Avrachenkov, K., Ayesta, U., Blanton, J., and
               P. Hurtig, "Early Retransmit for TCP and Stream Control
               Transmission Protocol (SCTP)", RFC 5827,
               DOI 10.17487/RFC5827, May 2010,
-              <https://www.rfc-editor.org/info/rfc5827>.
+              <https://datatracker.ietf.org/doc/html/rfc5827>.
 
    [RFC6297]  Welzl, M. and D. Ros, "A Survey of Lower-than-Best-Effort
               Transport Protocols", RFC 6297, DOI 10.17487/RFC6297, June
-              2011, <https://www.rfc-editor.org/info/rfc6297>.
+              2011, <https://datatracker.ietf.org/doc/html/rfc6297>.
 
    [RFC6298]  Paxson, V., Allman, M., Chu, J., and M. Sargent,
               "Computing TCP's Retransmission Timer", RFC 6298,
               DOI 10.17487/RFC6298, June 2011,
-              <https://www.rfc-editor.org/info/rfc6298>.
+              <https://datatracker.ietf.org/doc/html/rfc6298>.
 
    [RFC6582]  Henderson, T., Floyd, S., Gurtov, A., and Y. Nishida, "The
               NewReno Modification to TCP's Fast Recovery Algorithm",
               RFC 6582, DOI 10.17487/RFC6582, April 2012,
-              <https://www.rfc-editor.org/info/rfc6582>.
+              <https://datatracker.ietf.org/doc/html/rfc6582>.
 
    [RFC6675]  Blanton, E., Allman, M., Wang, L., Jarvinen, I., Kojo, M.,
               and Y. Nishida, "A Conservative Loss Recovery Algorithm
               Based on Selective Acknowledgment (SACK) for TCP",
               RFC 6675, DOI 10.17487/RFC6675, August 2012,
-              <https://www.rfc-editor.org/info/rfc6675>.
+              <https://datatracker.ietf.org/doc/html/rfc6675>.
 
    [RFC6928]  Chu, J., Dukkipati, N., Cheng, Y., and M. Mathis,
               "Increasing TCP's Initial Window", RFC 6928,
               DOI 10.17487/RFC6928, April 2013,
-              <https://www.rfc-editor.org/info/rfc6928>.
+              <https://datatracker.ietf.org/doc/html/rfc6928>.
 
    [RFC7661]  Fairhurst, G., Sathiaseelan, A., and R. Secchi, "Updating
               TCP to Support Rate-Limited Traffic", RFC 7661,
               DOI 10.17487/RFC7661, October 2015,
-              <https://www.rfc-editor.org/info/rfc7661>.
+              <https://datatracker.ietf.org/doc/html/rfc7661>.
 
    [RFC8311]  Black, D., "Relaxing Restrictions on Explicit Congestion
               Notification (ECN) Experimentation", RFC 8311,
               DOI 10.17487/RFC8311, January 2018,
-              <https://www.rfc-editor.org/info/rfc8311>.
+              <https://datatracker.ietf.org/doc/html/rfc8311>.
 
    [RFC8312]  Rhee, I., Xu, L., Ha, S., Zimmermann, A., Eggert, L., and
               R. Scheffenegger, "CUBIC for Fast Long-Distance Networks",
               RFC 8312, DOI 10.17487/RFC8312, February 2018,
-              <https://www.rfc-editor.org/info/rfc8312>.
+              <https://datatracker.ietf.org/doc/html/rfc8312>.
 
    [RFC8511]  Khademi, N., Welzl, M., Armitage, G., and G. Fairhurst,
               "TCP Alternative Backoff with ECN (ABE)", RFC 8511,
               DOI 10.17487/RFC8511, December 2018,
-              <https://www.rfc-editor.org/info/rfc8511>.
+              <https://datatracker.ietf.org/doc/html/rfc8511>.
 
 Appendix A.  Loss Recovery Pseudocode
 
