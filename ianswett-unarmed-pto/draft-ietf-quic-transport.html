@@ -20,21 +20,21 @@ congestion control algorithm.
 <meta content="draft-ietf-quic-transport" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.5.0
-    Python 3.8.5
+    Python 3.8.7
     appdirs 1.4.4
     ConfigArgParse 1.2.3
     google-i18n-address 2.4.0
     html5lib 1.1
-    intervaltree 3.0.2
+    intervaltree 3.1.0
     Jinja2 2.11.2
     kitchen 1.2.6
-    lxml 4.5.0
-    pycountry 19.8.18
-    pyflakes 2.1.1
-    PyYAML 5.3.1
-    requests 2.22.0
-    setuptools 45.2.0
-    six 1.14.0
+    lxml 4.6.2
+    pycountry 20.7.3
+    pyflakes 2.2.0
+    PyYAML 5.4.1
+    requests 2.25.1
+    setuptools 51.3.3
+    six 1.15.0
 -->
 <link href="draft-ietf-quic-transport.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -47,7 +47,23 @@ html {
   --link-color: #2a6496;
   --highlight-color: #f9f9f9;
   --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
   --small-font-size: 14.5px;
+  scrollbar-color: #bbb #eee;
+}
+@media (prefers-color-scheme: dark) {
+html {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
 }
 body {
   max-width: 600px;
@@ -338,14 +354,14 @@ a.pilcrow {
   opacity: 0.2;
   user-select: none;
 }
-a.pilcrow[href] { color: #ddd; }
+a.pilcrow[href] { color: var(--pilcrow-weak); }
 a.pilcrow[href]:hover { text-decoration: none; }
-@media screen {
+@media not print {
   :hover > a.pilcrow {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
-    color: #bbb;
+    color: var(--pilcrow-strong);
     background-color: transparent;
   }
 }
@@ -827,11 +843,11 @@ address div.right {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">QUIC Transport Protocol</td>
-<td class="right">January 2021</td>
+<td class="right">February 2021</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Iyengar &amp; Thomson</td>
-<td class="center">Expires 24 July 2021</td>
+<td class="center">Expires 27 August 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -844,12 +860,12 @@ address div.right {
 <dd class="internet-draft">draft-ietf-quic-transport</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-01-20" class="published">20 January 2021</time>
+<time datetime="2021-02-23" class="published">23 February 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-07-24">24 July 2021</time></dd>
+<dd class="expires"><time datetime="2021-08-27">27 August 2021</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -913,7 +929,7 @@ code and issues list for this draft can be found at
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 August 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2110,10 +2126,10 @@ constraints and stream limits; see <a href="#flow-control" class="xref">Section 
 data in one direction: from the initiator of the stream to its peer.
 Bidirectional streams allow for data to be sent in both directions.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
 <p id="section-2.1-2">Streams are identified within a connection by a numeric value, referred to as
-the stream ID.  A stream ID is a 62-bit integer (0 to 2^62-1) that is unique for
-all streams on a connection.  Stream IDs are encoded as variable-length
-integers; see <a href="#integer-encoding" class="xref">Section 16</a>.  A QUIC endpoint MUST NOT reuse a stream ID
-within a connection.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+the stream ID.  A stream ID is a 62-bit integer (0 to 2<sup>62</sup>-1) that is
+unique for all streams on a connection.  Stream IDs are encoded as
+variable-length integers; see <a href="#integer-encoding" class="xref">Section 16</a>.  A QUIC endpoint MUST NOT
+reuse a stream ID within a connection.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
 <p id="section-2.1-3">The least significant bit (0x1) of the stream ID identifies the initiator of the
 stream.  Client-initiated streams have even-numbered stream IDs (with the bit
 set to 0), and server-initiated streams have odd-numbered stream IDs (with the
@@ -2738,7 +2754,7 @@ the sender sends these frames, waiting for them will result in the sender being
 blocked for at least an entire round trip.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
 <p id="section-4.2-6">When a sender receives credit after being blocked, it might be able to send a
 large amount of data in response, resulting in short-term congestion; see
-Section 7.7 in <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span> for a discussion of how a sender can avoid this
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-7.7" class="relref">Section 7.7</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span> for a discussion of how a sender can avoid this
 congestion.<a href="#section-4.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2819,10 +2835,10 @@ limits are set in the transport parameters; see
 MAX_STREAMS frames; see <a href="#frame-max-streams" class="xref">Section 19.11</a>. Separate limits apply to
 unidirectional and bidirectional streams.<a href="#section-4.6-1" class="pilcrow">¶</a></p>
 <p id="section-4.6-2">If a max_streams transport parameter or a MAX_STREAMS frame is received with a
-value greater than 2^60, this would allow a maximum stream ID that cannot be
-expressed as a variable-length integer; see <a href="#integer-encoding" class="xref">Section 16</a>.  If either is
-received, the connection MUST be closed immediately with a connection error of
-type TRANSPORT_PARAMETER_ERROR if the offending value was received in a
+value greater than 2<sup>60</sup>, this would allow a maximum stream ID that
+cannot be expressed as a variable-length integer; see <a href="#integer-encoding" class="xref">Section 16</a>.  If
+either is received, the connection MUST be closed immediately with a connection
+error of type TRANSPORT_PARAMETER_ERROR if the offending value was received in a
 transport parameter or of type FRAME_ENCODING_ERROR if it was received in a
 frame; see <a href="#immediate-close" class="xref">Section 10.2</a>.<a href="#section-4.6-2" class="pilcrow">¶</a></p>
 <p id="section-4.6-3">Endpoints MUST NOT exceed the limit set by their peer.  An endpoint that
@@ -2861,7 +2877,7 @@ establish a shared secret using the cryptographic handshake protocol
 <p id="section-5-3">An application protocol can use the connection during the handshake phase with
 some limitations.  0-RTT allows application data to be sent by a client before
 receiving a response from the server.  However, 0-RTT provides no protection
-against replay attacks; see Section 9.2 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.  A server can also send
+against replay attacks; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-9.2" class="relref">Section 9.2</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.  A server can also send
 application data to a client before it receives the final cryptographic
 handshake messages that allow it to confirm the identity and liveness of the
 client.  These capabilities allow an application protocol to offer the option of
@@ -3470,7 +3486,7 @@ the client MUST use the same Destination Connection ID value on all packets in
 this connection.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <p id="section-7.2-4">The Destination Connection ID field from the first Initial packet sent by a
 client is used to determine packet protection keys for Initial packets.  These
-keys change after receiving a Retry packet; see Section 5.2 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+keys change after receiving a Retry packet; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.2" class="relref">Section 5.2</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
 <p id="section-7.2-5">The client populates the Source Connection ID field with a value of its choosing
 and sets the Source Connection ID Length field to indicate the length.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
 <p id="section-7.2-6">The first flight of 0-RTT packets use the same Destination Connection ID and
@@ -3640,7 +3656,7 @@ the value of the server transport parameters from a connection and apply them
 to any 0-RTT packets that are sent in subsequent connections to that peer that
 use a session ticket issued on that connection.  This
 information is stored with any information required by the application
-protocol or cryptographic handshake; see Section 4.6 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-7.4.1-1" class="pilcrow">¶</a></p>
+protocol or cryptographic handshake; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.6" class="relref">Section 4.6</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-7.4.1-1" class="pilcrow">¶</a></p>
 <p id="section-7.4.1-2">Remembered transport parameters apply to the new connection until the handshake
 completes and the client starts sending 1-RTT packets.  Once the handshake
 completes, the client uses the transport parameters established in the
@@ -3794,11 +3810,10 @@ uses a connection ID chosen by the endpoint and the connection ID contains at
 least 64 bits of entropy.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
 <p id="section-8.1-3">For the client, the value of the Destination Connection ID field in its first
 Initial packet allows it to validate the server address as a part of
-successfully processing any packet.  Initial packets from the server are
-protected with keys that are derived from this value (see Section 5.2 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>). Alternatively, the value is echoed by the server in Version
+successfully processing any packet. Initial packets from the server are
+protected with keys that are derived from this value (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.2" class="relref">Section 5.2</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>). Alternatively, the value is echoed by the server in Version
 Negotiation packets (<a href="#version-negotiation" class="xref">Section 6</a>) or included in the Integrity Tag
-in Retry packets (Section 5.8 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>).<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+in Retry packets (<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.8" class="relref">Section 5.8</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>).<a href="#section-8.1-3" class="pilcrow">¶</a></p>
 <p id="section-8.1-4">Prior to validating the client address, servers MUST NOT send more than three
 times as many bytes as the number of bytes they have received.  This limits the
 magnitude of any amplification attack that can be mounted using spoofed source
@@ -3817,8 +3832,7 @@ could occur when the server reaches its anti-amplification limit and the client
 has received acknowledgments for all the data it has sent.  In this case, when
 the client has no reason to send additional packets, the server will be unable
 to send more data because it has not validated the client's address. To prevent
-this deadlock, clients MUST send a packet on a probe timeout (PTO, see Section
-6.2 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>). Specifically, the client MUST send an Initial packet
+this deadlock, clients MUST send a packet on a probe timeout (PTO, see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.2" class="relref">Section 6.2</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>). Specifically, the client MUST send an Initial packet
 in a UDP datagram that contains at least 1200 bytes if it does not have
 Handshake keys, and otherwise send a Handshake packet.<a href="#section-8.1-6" class="pilcrow">¶</a></p>
 <p id="section-8.1-7">A server might wish to validate the client address before starting the
@@ -4269,7 +4283,9 @@ indicates that the peer has migrated to that address.<a href="#section-9.3-1" cl
 <p id="section-9.3-2">If the recipient permits the migration, it MUST send subsequent packets
 to the new peer address and MUST initiate path validation (<a href="#migrate-validate" class="xref">Section 8.2</a>)
 to verify the peer's ownership of the address if validation is not already
-underway.<a href="#section-9.3-2" class="pilcrow">¶</a></p>
+underway. If the recipient has no unused connection IDs from the peer, it will
+not be able to send anything on the new path until the peer provides one; see
+<a href="#migration-linkability" class="xref">Section 9.5</a>.<a href="#section-9.3-2" class="pilcrow">¶</a></p>
 <p id="section-9.3-3">An endpoint only changes the address to which it sends packets in response to
 the highest-numbered non-probing packet. This ensures that an endpoint does not
 send packets to an old peer address in the case that it receives reordered
@@ -4412,7 +4428,7 @@ sending rate.  An endpoint might set a separate timer when a PATH_CHALLENGE is
 sent, which is cancelled if the corresponding PATH_RESPONSE is received. If the
 timer fires before the PATH_RESPONSE is received, the endpoint might send a new
 PATH_CHALLENGE, and restart the timer for a longer period of time.  This timer
-SHOULD be set as described in Section 6.2.1 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span> and MUST NOT be
+SHOULD be set as described in <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.2.1" class="relref">Section 6.2.1</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span> and MUST NOT be
 more aggressive.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -4642,7 +4658,7 @@ them be discarded at the peer, since the idle timeout period might have expired
 at the peer before these packets arrive.<a href="#section-10.1.1-1" class="pilcrow">¶</a></p>
 <p id="section-10.1.1-2">An endpoint can send a PING or another ack-eliciting frame to test the
 connection for liveness if the peer could time out soon, such as within a PTO;
-see Section 6.2 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.  This is especially useful if any
+see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.2" class="relref">Section 6.2</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.  This is especially useful if any
 available application data cannot be safely retried. Note that the application
 determines what data is safe to retry.<a href="#section-10.1.1-2" class="pilcrow">¶</a></p>
 </section>
@@ -4760,10 +4776,9 @@ endpoint in the closing state MUST either discard packets received from an
 unvalidated address or limit the cumulative size of packets it sends to an
 unvalidated address to three times the size of packets it receives from that
 address.<a href="#section-10.2.1-7" class="pilcrow">¶</a></p>
-<p id="section-10.2.1-8">An endpoint is not expected to handle key updates when it is closing (Section 6
-of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>). A key update might prevent the endpoint from moving from the
-closing state to the draining state, as the endpoint will not be able to process
-subsequently received packets, but it otherwise has no impact.<a href="#section-10.2.1-8" class="pilcrow">¶</a></p>
+<p id="section-10.2.1-8">An endpoint is not expected to handle key updates when it is closing (<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-6" class="relref">Section 6</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>). A key update might prevent the endpoint from moving from the
+closing state to the draining state, as the endpoint will not be able to
+process subsequently received packets, but it otherwise has no impact.<a href="#section-10.2.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="draining">
@@ -4796,7 +4811,7 @@ transmission of any packets on this connection.<a href="#section-10.2.2-3" class
 <p id="section-10.2.3-1">When sending CONNECTION_CLOSE, the goal is to ensure that the peer will process
 the frame.  Generally, this means sending the frame in a packet with the highest
 level of packet protection to avoid the packet being discarded.  After the
-handshake is confirmed (see Section 4.1.2 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>), an endpoint MUST
+handshake is confirmed (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.1.2" class="relref">Section 4.1.2</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>), an endpoint MUST
 send any CONNECTION_CLOSE frames in a 1-RTT packet.  However, prior to
 confirming the handshake, it is possible that more advanced packet protection
 keys are not available to the peer, so another CONNECTION_CLOSE frame MAY be
@@ -5187,7 +5202,7 @@ packets.  Packets protected with 0-RTT and 1-RTT keys have strong
 confidentiality and integrity protection.<a href="#section-12.1-5" class="pilcrow">¶</a></p>
 <p id="section-12.1-6">The Packet Number field that appears in some packet types has alternative
 confidentiality protection that is applied as part of header protection; see
-Section 5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span> for details. The underlying packet number increases
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span> for details. The underlying packet number increases
 with each packet sent in a given packet number space; see <a href="#packet-numbers" class="xref">Section 12.3</a> for
 details.<a href="#section-12.1-6" class="pilcrow">¶</a></p>
 </section>
@@ -5209,7 +5224,7 @@ cryptographic handshake and start sending data.  This can also be used to
 construct PMTU probes; see <a href="#pmtu-probes-src-cid" class="xref">Section 14.4.1</a>.  Receivers MUST be able to
 process coalesced packets.<a href="#section-12.2-2" class="pilcrow">¶</a></p>
 <p id="section-12.2-3">Coalescing packets in order of increasing encryption levels (Initial, 0-RTT,
-Handshake, 1-RTT; see Section 4.1.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>) makes it more likely the
+Handshake, 1-RTT; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.1.4" class="relref">Section 4.1.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>) makes it more likely the
 receiver will be able to process all the packets in a single pass. A packet
 with a short header does not include a length, so it can only be the last
 packet included in a UDP datagram.  An endpoint SHOULD include multiple frames
@@ -5239,9 +5254,9 @@ Negotiation packet is coalesced with another packet.<a href="#section-12.2-6" cl
         <h3 id="name-packet-numbers">
 <a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-packet-numbers" class="section-name selfRef">Packet Numbers</a>
         </h3>
-<p id="section-12.3-1">The packet number is an integer in the range 0 to 2^62-1.  This number is used
-in determining the cryptographic nonce for packet protection.  Each endpoint
-maintains a separate packet number for sending and receiving.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
+<p id="section-12.3-1">The packet number is an integer in the range 0 to 2<sup>62</sup>-1.  This number
+is used in determining the cryptographic nonce for packet protection.  Each
+endpoint maintains a separate packet number for sending and receiving.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
 <p id="section-12.3-2">Packet numbers are limited to this range because they need to be representable
 in whole in the Largest Acknowledged field of an ACK frame (<a href="#frame-ack" class="xref">Section 19.3</a>).
 When present in a long or short header however, packet numbers are reduced and
@@ -5272,14 +5287,14 @@ number by at least one.<a href="#section-12.3-8" class="pilcrow">¶</a></p>
 <p id="section-12.3-9">0-RTT and 1-RTT data exist in the same packet number space to make loss recovery
 algorithms easier to implement between the two packet types.<a href="#section-12.3-9" class="pilcrow">¶</a></p>
 <p id="section-12.3-10">A QUIC endpoint MUST NOT reuse a packet number within the same packet number
-space in one connection.  If the packet number for sending reaches 2^62 - 1, the
-sender MUST close the connection without sending a CONNECTION_CLOSE frame or any
-further packets; an endpoint MAY send a Stateless Reset (<a href="#stateless-reset" class="xref">Section 10.3</a>) in
-response to further packets that it receives.<a href="#section-12.3-10" class="pilcrow">¶</a></p>
+space in one connection.  If the packet number for sending reaches
+2<sup>62</sup>-1, the sender MUST close the connection without sending a
+CONNECTION_CLOSE frame or any further packets; an endpoint MAY send a Stateless
+Reset (<a href="#stateless-reset" class="xref">Section 10.3</a>) in response to further packets that it receives.<a href="#section-12.3-10" class="pilcrow">¶</a></p>
 <p id="section-12.3-11">A receiver MUST discard a newly unprotected packet unless it is certain that it
 has not processed another packet with the same packet number from the same
 packet number space. Duplicate suppression MUST happen after removing packet
-protection for the reasons described in Section 9.5 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-12.3-11" class="pilcrow">¶</a></p>
+protection for the reasons described in <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-9.5" class="relref">Section 9.5</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-12.3-11" class="pilcrow">¶</a></p>
 <p id="section-12.3-12">Endpoints that track all individual packets for the purposes of detecting
 duplicates are at risk of accumulating excessive state.  The data required for
 detecting duplicates can be limited by maintaining a minimum packet number below
@@ -5739,8 +5754,7 @@ contract: an endpoint promises to never intentionally delay acknowledgments of
 an ack-eliciting packet by more than the indicated value. If it does, any excess
 accrues to the RTT estimate and could result in spurious or delayed
 retransmissions from the peer. A sender uses the receiver's max_ack_delay value
-in determining timeouts for timer-based retransmission, as detailed in Section
-6.2 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.<a href="#section-13.2.1-1" class="pilcrow">¶</a></p>
+in determining timeouts for timer-based retransmission, as detailed in <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.2" class="relref">Section 6.2</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.<a href="#section-13.2.1-1" class="pilcrow">¶</a></p>
 <p id="section-13.2.1-2">An endpoint MUST acknowledge all ack-eliciting Initial and Handshake packets
 immediately and all ack-eliciting 0-RTT and 1-RTT packets within its advertised
 max_ack_delay, with the following exception. Prior to handshake confirmation, an
@@ -5795,16 +5809,15 @@ acknowledgments.<a href="#section-13.2.1-10" class="pilcrow">¶</a></p>
           </h4>
 <p id="section-13.2.2-1">A receiver determines how frequently to send acknowledgments in response to
 ack-eliciting packets. This determination involves a trade-off.<a href="#section-13.2.2-1" class="pilcrow">¶</a></p>
-<p id="section-13.2.2-2">Endpoints rely on timely acknowledgment to detect loss; see Section 6 of
-<span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>. Window-based congestion controllers, such as the one in
-Section 7 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>, rely on acknowledgments to manage their
+<p id="section-13.2.2-2">Endpoints rely on timely acknowledgment to detect loss; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6" class="relref">Section 6</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>. Window-based congestion controllers, such as the one in
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-7" class="relref">Section 7</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>, rely on acknowledgments to manage their
 congestion window. In both cases, delaying acknowledgments can adversely affect
 performance.<a href="#section-13.2.2-2" class="pilcrow">¶</a></p>
 <p id="section-13.2.2-3">On the other hand, reducing the frequency of packets that carry only
 acknowledgments reduces packet transmission and processing cost at both
 endpoints. It can improve connection throughput on severely asymmetric links
 and reduce the volume of acknowledgment traffic using return path capacity;
-see Section 3 of <span>[<a href="#RFC3449" class="xref">RFC3449</a>]</span>.<a href="#section-13.2.2-3" class="pilcrow">¶</a></p>
+see <span><a href="https://rfc-editor.org/rfc/rfc3449#section-3" class="relref">Section 3</a> of [<a href="#RFC3449" class="xref">RFC3449</a>]</span>.<a href="#section-13.2.2-3" class="pilcrow">¶</a></p>
 <p id="section-13.2.2-4">A receiver SHOULD send an ACK frame after receiving at least two ack-eliciting
 packets. This recommendation is general in nature and consistent with
 recommendations for TCP endpoint behavior <span>[<a href="#RFC5681" class="xref">RFC5681</a>]</span>. Knowledge of network
@@ -6048,8 +6061,7 @@ acknowledged. This includes packets that are acknowledged after being declared
 lost, which can happen in the presence of network reordering. Doing so requires
 senders to retain information about packets after they are declared lost. A
 sender can discard this information after a period of time elapses that
-adequately allows for reordering, such as a PTO (Section 6.2 of
-<span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>), or on other events, such as reaching a memory limit.<a href="#section-13.3-6" class="pilcrow">¶</a></p>
+adequately allows for reordering, such as a PTO (<span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.2" class="relref">Section 6.2</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>), or on other events, such as reaching a memory limit.<a href="#section-13.3-6" class="pilcrow">¶</a></p>
 <p id="section-13.3-7">Upon detecting losses, a sender MUST take appropriate congestion control action.
 The details of loss detection and congestion control are described in
 <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.<a href="#section-13.3-7" class="pilcrow">¶</a></p>
@@ -6114,14 +6126,14 @@ path and disables use of ECN on that path if errors are detected.<a href="#secti
 packets sent on a new path to the peer (<span>[<a href="#RFC8311" class="xref">RFC8311</a>]</span>).<a href="#section-13.4.2-3.1" class="pilcrow">¶</a>
 </li>
             <li class="normal" id="section-13.4.2-3.2">The endpoint monitors whether all packets sent with an ECT codepoint are
-eventually deemed lost (Section 6 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>), indicating
+eventually deemed lost (<span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6" class="relref">Section 6</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>), indicating
 that ECN validation has failed.<a href="#section-13.4.2-3.2" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-13.4.2-4">If an endpoint has cause to expect that IP packets with an ECT codepoint might
 be dropped by a faulty network element, the endpoint could set an ECT codepoint
 for only the first ten outgoing packets on a path, or for a period of three
-PTOs (see Section 6.2 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>). If all packets marked with non-zero
+PTOs (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.2" class="relref">Section 6.2</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>). If all packets marked with non-zero
 ECN codepoints are subsequently lost, it can disable marking on the assumption
 that the marking caused the loss.<a href="#section-13.4.2-4" class="pilcrow">¶</a></p>
 <p id="section-13.4.2-5">An endpoint thus attempts to use ECN and validates this for each new connection,
@@ -6313,16 +6325,16 @@ but might successfully guess the addresses used on the path. These attacks
 could reduce the PMTU to a bandwidth-inefficient value.<a href="#section-14.2.1-1" class="pilcrow">¶</a></p>
 <p id="section-14.2.1-2">An endpoint MUST ignore an ICMP message that claims the PMTU has decreased below
 QUIC's smallest allowed maximum datagram size.<a href="#section-14.2.1-2" class="pilcrow">¶</a></p>
-<p id="section-14.2.1-3">The requirements for generating ICMP (<span>[<a href="#RFC1812" class="xref">RFC1812</a>]</span>, <span>[<a href="#RFC4443" class="xref">RFC4443</a>]</span>) state that the
-quoted packet should contain as much of the original packet as possible without
-exceeding the minimum MTU for the IP version.  The size of the quoted packet can
-actually be smaller, or the information unintelligible, as described in Section
-1.1 of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#section-14.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-14.2.1-3">The requirements for generating ICMP (<span>[<a href="#RFC1812" class="xref">RFC1812</a>]</span>, <span>[<a href="#RFC4443" class="xref">RFC4443</a>]</span>) state that
+the quoted packet should contain as much of the original packet as possible
+without exceeding the minimum MTU for the IP version. The size of the quoted
+packet can actually be smaller, or the information unintelligible, as described
+in <span><a href="https://rfc-editor.org/rfc/rfc8899#section-1.1" class="relref">Section 1.1</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#section-14.2.1-3" class="pilcrow">¶</a></p>
 <p id="section-14.2.1-4">QUIC endpoints using PMTUD SHOULD validate ICMP messages to protect from
-packet injection as specified in <span>[<a href="#RFC8201" class="xref">RFC8201</a>]</span> and Section 5.2 of <span>[<a href="#RFC8085" class="xref">RFC8085</a>]</span>.
+packet injection as specified in <span>[<a href="#RFC8201" class="xref">RFC8201</a>]</span> and <span><a href="https://rfc-editor.org/rfc/rfc8085#section-5.2" class="relref">Section 5.2</a> of [<a href="#RFC8085" class="xref">RFC8085</a>]</span>.
 This validation SHOULD use the quoted packet supplied in the payload of an ICMP
 message to associate the message with a corresponding transport connection (see
-Section 4.6.1 of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>).  ICMP message validation MUST include matching
+<span><a href="https://rfc-editor.org/rfc/rfc8899#section-4.6.1" class="relref">Section 4.6.1</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>).  ICMP message validation MUST include matching
 IP addresses and UDP ports (<span>[<a href="#RFC8085" class="xref">RFC8085</a>]</span>) and, when possible, connection IDs to
 an active QUIC session.  The endpoint SHOULD ignore all ICMP messages that fail
 validation.<a href="#section-14.2.1-4" class="pilcrow">¶</a></p>
@@ -6342,12 +6354,11 @@ determines that the quoted packet has actually been lost.<a href="#section-14.2.
 <p id="section-14.3-1">Datagram Packetization Layer PMTU Discovery (DPLPMTUD; <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>)
 relies on tracking loss or acknowledgment of QUIC packets that are carried in
 PMTU probes.  PMTU probes for DPLPMTUD that use the PADDING frame implement
-"Probing using padding data", as defined in Section 4.1 of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
-<p id="section-14.3-2">Endpoints SHOULD set the initial value of BASE_PLPMTU (Section 5.1 of
-<span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>) to be consistent with QUIC's smallest allowed maximum datagram
+"Probing using padding data", as defined in <span><a href="https://rfc-editor.org/rfc/rfc8899#section-4.1" class="relref">Section 4.1</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
+<p id="section-14.3-2">Endpoints SHOULD set the initial value of BASE_PLPMTU (<span><a href="https://rfc-editor.org/rfc/rfc8899#section-5.1" class="relref">Section 5.1</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>) to be consistent with QUIC's smallest allowed maximum datagram
 size. The MIN_PLPMTU is the same as the BASE_PLPMTU.<a href="#section-14.3-2" class="pilcrow">¶</a></p>
 <p id="section-14.3-3">QUIC endpoints implementing DPLPMTUD maintain a DPLPMTUD Maximum Packet Size
-(MPS, Section 4.4 of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>) for each combination of local and remote IP
+(MPS, <span><a href="https://rfc-editor.org/rfc/rfc8899#section-4.4" class="relref">Section 4.4</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>) for each combination of local and remote IP
 addresses.  This corresponds to the maximum datagram size.<a href="#section-14.3-3" class="pilcrow">¶</a></p>
 <div id="dplpmtud-and-initial-connectivity">
 <section id="section-14.3.1">
@@ -6355,8 +6366,7 @@ addresses.  This corresponds to the maximum datagram size.<a href="#section-14.3
 <a href="#section-14.3.1" class="section-number selfRef">14.3.1. </a><a href="#name-dplpmtud-and-initial-connec" class="section-name selfRef">DPLPMTUD and Initial Connectivity</a>
           </h4>
 <p id="section-14.3.1-1">From the perspective of DPLPMTUD, QUIC is an acknowledged Packetization Layer
-(PL). A QUIC sender can therefore enter the DPLPMTUD BASE state (Section 5.2 of
-<span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>) when the QUIC connection handshake has been completed.<a href="#section-14.3.1-1" class="pilcrow">¶</a></p>
+(PL). A QUIC sender can therefore enter the DPLPMTUD BASE state (<span><a href="https://rfc-editor.org/rfc/rfc8899#section-5.2" class="relref">Section 5.2</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>) when the QUIC connection handshake has been completed.<a href="#section-14.3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="validating-the-network-path-with-dplpmtud">
@@ -6365,8 +6375,7 @@ addresses.  This corresponds to the maximum datagram size.<a href="#section-14.3
 <a href="#section-14.3.2" class="section-number selfRef">14.3.2. </a><a href="#name-validating-the-network-path" class="section-name selfRef">Validating the Network Path with DPLPMTUD</a>
           </h4>
 <p id="section-14.3.2-1">QUIC is an acknowledged PL, therefore a QUIC sender does not implement a
-DPLPMTUD CONFIRMATION_TIMER while in the SEARCH_COMPLETE state; see Section 5.2
-of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#section-14.3.2-1" class="pilcrow">¶</a></p>
+DPLPMTUD CONFIRMATION_TIMER while in the SEARCH_COMPLETE state; see <span><a href="https://rfc-editor.org/rfc/rfc8899#section-5.2" class="relref">Section 5.2</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#section-14.3.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="handling-of-icmp-messages-by-dplpmtud">
@@ -6375,8 +6384,7 @@ of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.<a href="#sectio
 <a href="#section-14.3.3" class="section-number selfRef">14.3.3. </a><a href="#name-handling-of-icmp-messages-by" class="section-name selfRef">Handling of ICMP Messages by DPLPMTUD</a>
           </h4>
 <p id="section-14.3.3-1">An endpoint using DPLPMTUD requires the validation of any received ICMP Packet
-Too Big (PTB) message before using the PTB information, as defined in Section
-4.6 of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.  In addition to UDP port validation, QUIC validates an
+Too Big (PTB) message before using the PTB information, as defined in <span><a href="https://rfc-editor.org/rfc/rfc8899#section-4.6" class="relref">Section 4.6</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.  In addition to UDP port validation, QUIC validates an
 ICMP message by using other PL information (e.g., validation of connection IDs
 in the quoted packet of any received ICMP message).<a href="#section-14.3.3-1" class="pilcrow">¶</a></p>
 <p id="section-14.3.3-2">The considerations for processing ICMP messages described in <a href="#pmtud" class="xref">Section 14.2.1</a> also
@@ -6395,9 +6403,8 @@ apply if these messages are used by DPLPMTUD.<a href="#section-14.3.3-2" class="
 since packets that are larger than the current maximum datagram size are more
 likely to be dropped by the network.  Loss of a QUIC packet that is carried in a
 PMTU probe is therefore not a reliable indication of congestion and SHOULD NOT
-trigger a congestion control reaction; see Section 3, Bullet 7 of <span>[<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.
-However, PMTU probes consume congestion window, which could delay subsequent
-transmission by an application.<a href="#section-14.4-2" class="pilcrow">¶</a></p>
+trigger a congestion control reaction; see Bullet 7 in <span><a href="https://rfc-editor.org/rfc/rfc8899#section-3" class="relref">Section 3</a> of [<a href="#DPLPMTUD" class="xref">DPLPMTUD</a>]</span>.  However, PMTU probes consume congestion window, which could delay
+subsequent transmission by an application.<a href="#section-14.4-2" class="pilcrow">¶</a></p>
 <div id="pmtu-probes-src-cid">
 <section id="section-14.4.1">
           <h4 id="name-pmtu-probes-containing-sour">
@@ -6537,12 +6544,13 @@ value of fields.<a href="#section-17-1" class="pilcrow">¶</a></p>
         <h3 id="name-packet-number-encoding-and-">
 <a href="#section-17.1" class="section-number selfRef">17.1. </a><a href="#name-packet-number-encoding-and-" class="section-name selfRef">Packet Number Encoding and Decoding</a>
         </h3>
-<p id="section-17.1-1">Packet numbers are integers in the range 0 to 2^62-1 (<a href="#packet-numbers" class="xref">Section 12.3</a>).  When
-present in long or short packet headers, they are encoded in 1 to 4 bytes.  The
-number of bits required to represent the packet number is reduced by including
-only the least significant bits of the packet number.<a href="#section-17.1-1" class="pilcrow">¶</a></p>
-<p id="section-17.1-2">The encoded packet number is protected as described in Section 5.4 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.1-2" class="pilcrow">¶</a></p>
+<p id="section-17.1-1">Packet numbers are integers in the range 0 to 2<sup>62</sup>-1
+(<a href="#packet-numbers" class="xref">Section 12.3</a>).  When present in long or short packet headers, they are
+encoded in 1 to 4 bytes.  The number of bits required to represent the packet
+number is reduced by including only the least significant bits of the packet
+number.<a href="#section-17.1-1" class="pilcrow">¶</a></p>
+<p id="section-17.1-2">The encoded packet number is protected as described in
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.1-2" class="pilcrow">¶</a></p>
 <p id="section-17.1-3">Prior to receiving an acknowledgment for a packet number space, the full packet
 number MUST be included; it is not to be truncated as described below.<a href="#section-17.1-3" class="pilcrow">¶</a></p>
 <p id="section-17.1-4">After an acknowledgment is received for a packet number space, the sender MUST
@@ -6748,13 +6756,12 @@ contain these additional fields:<a href="#section-17.2-7" class="pilcrow">¶</a>
 Reserved Bits:  </dt>
           <dd style="margin-left: 1.5em" id="section-17.2-8.2">
             <p id="section-17.2-8.2.1">Two bits (those with a mask of 0x0c) of byte 0 are reserved across multiple
-packet types.  These bits are protected using header protection; see Section
-5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>. The value included prior to protection MUST be set to 0.
+packet types.  These bits are protected using header protection; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>. The value included prior to protection MUST be set to 0.
 An endpoint MUST treat receipt of a packet that has a non-zero value for these
 bits after removing both packet and header protection as a connection error
 of type PROTOCOL_VIOLATION. Discarding such a packet after only removing
-header protection can expose the endpoint to attacks; see Section 9.5 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.2-8.2.1" class="pilcrow">¶</a></p>
+header protection can expose the endpoint to attacks; see
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-9.5" class="relref">Section 9.5</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.2-8.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-17.2-8.3">
@@ -6765,7 +6772,7 @@ bits (those with a mask of 0x03) of byte 0 contain the length of the packet
 number, encoded as an unsigned, two-bit integer that is one less than the
 length of the packet number field in bytes.  That is, the length of the packet
 number field is the value of this field, plus one.  These bits are protected
-using header protection; see Section 5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.2-8.4.1" class="pilcrow">¶</a></p>
+using header protection; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.2-8.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-17.2-8.5">
@@ -6780,7 +6787,7 @@ Payload fields) in bytes, encoded as a variable-length integer
 Packet Number:  </dt>
           <dd style="margin-left: 1.5em" id="section-17.2-8.8">
             <p id="section-17.2-8.8.1">The packet number field is 1 to 4 bytes long. The packet number is protected
-using header protection; see Section 5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.  The length of the
+using header protection; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.  The length of the
 packet number field is encoded in the Packet Number Length bits of byte 0; see
 above.<a href="#section-17.2-8.8.1" class="pilcrow">¶</a></p>
 </dd>
@@ -6934,8 +6941,7 @@ packet as spurious or treat it as a connection error.<a href="#section-17.2.2-8"
 <p id="section-17.2.2-9">The first packet sent by a client always includes a CRYPTO frame that contains
 the start or all of the first cryptographic handshake message.  The first
 CRYPTO frame sent always begins at an offset of 0; see <a href="#handshake" class="xref">Section 7</a>.<a href="#section-17.2.2-9" class="pilcrow">¶</a></p>
-<p id="section-17.2.2-10">Note that if the server sends a TLS HelloRetryRequest (see Section 4.7 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>), the client will send another series of Initial packets.  These
+<p id="section-17.2.2-10">Note that if the server sends a TLS HelloRetryRequest (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.7" class="relref">Section 4.7</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>), the client will send another series of Initial packets. These
 Initial packets will continue the cryptographic handshake and will contain
 CRYPTO frames starting at an offset matching the size of the CRYPTO frames sent
 in the first flight of Initial packets.<a href="#section-17.2.2-10" class="pilcrow">¶</a></p>
@@ -6949,8 +6955,8 @@ first Handshake packet.  A server stops sending and processing Initial packets
 when it receives its first Handshake packet.  Though packets might still be in
 flight or awaiting acknowledgment, no further Initial packets need to be
 exchanged beyond this point.  Initial packet protection keys are discarded (see
-Section 4.9.1 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>) along with any loss recovery and congestion
-control state; see Section 6.4 of <span>[<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.<a href="#section-17.2.2.1-1" class="pilcrow">¶</a></p>
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.9.1" class="relref">Section 4.9.1</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>) along with any loss recovery and congestion
+control state; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-recovery#section-6.4" class="relref">Section 6.4</a> of [<a href="#QUIC-RECOVERY" class="xref">QUIC-RECOVERY</a>]</span>.<a href="#section-17.2.2.1-1" class="pilcrow">¶</a></p>
 <p id="section-17.2.2.1-2">Any data in CRYPTO frames is discarded - and no longer retransmitted - when
 Initial keys are discarded.<a href="#section-17.2.2.1-2" class="pilcrow">¶</a></p>
 </section>
@@ -6968,7 +6974,7 @@ the Reserved and Packet Number Length bits; see <a href="#long-header" class="xr
 is used to carry "early" data from the client to the server as part of the
 first flight, prior to handshake completion.  As part of the TLS handshake, the
 server can accept or reject this early data.<a href="#section-17.2.3-1" class="pilcrow">¶</a></p>
-<p id="section-17.2.3-2">See Section 2.3 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span> for a discussion of 0-RTT data and its
+<p id="section-17.2.3-2">See <span><a href="https://rfc-editor.org/rfc/rfc8446#section-2.3" class="relref">Section 2.3</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span> for a discussion of 0-RTT data and its
 limitations.<a href="#section-17.2.3-2" class="pilcrow">¶</a></p>
 <span id="name-0-rtt-packet"></span><figure id="figure-16">
             <div class="artwork art-text alignLeft" id="section-17.2.3-3.1">
@@ -7001,7 +7007,7 @@ lost or discarded by the server.  A client SHOULD attempt to resend data in
 used for any new packets that are sent; as described in <a href="#retry-continue" class="xref">Section 17.2.5.3</a>,
 reusing packet numbers could compromise packet protection.<a href="#section-17.2.3-5" class="pilcrow">¶</a></p>
 <p id="section-17.2.3-6">A client only receives acknowledgments for its 0-RTT packets once the handshake
-is complete, as defined in Section 4.1.1 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.2.3-6" class="pilcrow">¶</a></p>
+is complete, as defined in <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.1.1" class="relref">Section 4.1.1</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.2.3-6" class="pilcrow">¶</a></p>
 <p id="section-17.2.3-7">A client MUST NOT send 0-RTT packets once it starts processing 1-RTT packets
 from the server.  This means that 0-RTT packets cannot contain any response to
 frames from 1-RTT packets.  For instance, a client cannot send an ACK frame in a
@@ -7261,14 +7267,13 @@ as described in <a href="#spin-bit" class="xref">Section 17.4</a>.<a href="#sect
 <dt id="section-17.3.1-4.7">
 Reserved Bits:  </dt>
             <dd style="margin-left: 1.5em" id="section-17.3.1-4.8">
-              <p id="section-17.3.1-4.8.1">The next two bits (those with a mask of 0x18) of byte 0 are reserved.  These
-bits are protected using header protection; see Section 5.4 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.  The value included prior to protection MUST be set to 0.  An
-endpoint MUST treat receipt of a packet that has a non-zero value for these
-bits, after removing both packet and header protection, as a connection error
-of type PROTOCOL_VIOLATION. Discarding such a packet after only removing
-header protection can expose the endpoint to attacks; see Section 9.5 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.3.1-4.8.1" class="pilcrow">¶</a></p>
+              <p id="section-17.3.1-4.8.1">The next two bits (those with a mask of 0x18) of byte 0 are reserved. These
+bits are protected using header protection; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.
+The value included prior to protection MUST be set to 0. An endpoint MUST treat
+receipt of a packet that has a non-zero value for these bits, after removing
+both packet and header protection, as a connection error of type
+PROTOCOL_VIOLATION. Discarding such a packet after only removing header
+protection can expose the endpoint to attacks; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-9.5" class="relref">Section 9.5</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.3.1-4.8.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-17.3.1-4.9">
@@ -7277,7 +7282,7 @@ Key Phase:  </dt>
               <p id="section-17.3.1-4.10.1">The next bit (0x04) of byte 0 indicates the key phase, which allows a
 recipient of a packet to identify the packet protection keys that are used to
 protect the packet.  See <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span> for details.  This bit is protected
-using header protection; see Section 5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.3.1-4.10.1" class="pilcrow">¶</a></p>
+using header protection; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.3.1-4.10.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-17.3.1-4.11">
@@ -7287,7 +7292,7 @@ Packet Number Length:  </dt>
 the length of the packet number, encoded as an unsigned, two-bit integer that
 is one less than the length of the packet number field in bytes.  That is, the
 length of the packet number field is the value of this field, plus one.  These
-bits are protected using header protection; see Section 5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.3.1-4.12.1" class="pilcrow">¶</a></p>
+bits are protected using header protection; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-17.3.1-4.12.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
 <dt id="section-17.3.1-4.13">
@@ -7302,7 +7307,7 @@ Packet Number:  </dt>
             <dd style="margin-left: 1.5em" id="section-17.3.1-4.16">
               <p id="section-17.3.1-4.16.1">The packet number field is 1 to 4 bytes long. The packet number is protected
 using header protection; see
-Section 5.4 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>. The length of the packet number field is encoded
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.4" class="relref">Section 5.4</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>. The length of the packet number field is encoded
 in Packet Number Length field. See <a href="#packet-encoding" class="xref">Section 17.1</a> for details.<a href="#section-17.3.1-4.16.1" class="pilcrow">¶</a></p>
 </dd>
             <dd class="break"></dd>
@@ -7570,8 +7575,8 @@ amount of time in milliseconds by which the endpoint will delay sending
 acknowledgments.  This value SHOULD include the receiver's expected delays in
 alarms firing.  For example, if a receiver sets a timer for 5ms and alarms
 commonly fire up to 1ms late, then it should send a max_ack_delay of 6ms.  If
-this value is absent, a default of 25 milliseconds is assumed. Values of 2^14
-or greater are invalid.<a href="#section-18.2-4.28.1" class="pilcrow">¶</a></p>
+this value is absent, a default of 25 milliseconds is assumed. Values of
+2<sup>14</sup> or greater are invalid.<a href="#section-18.2-4.28.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-18.2-4.29">
@@ -8147,9 +8152,9 @@ Crypto Data:  </dt>
 <p id="section-19.6-6">There is a separate flow of cryptographic handshake data in each encryption
 level, each of which starts at an offset of 0. This implies that each encryption
 level is treated as a separate CRYPTO stream of data.<a href="#section-19.6-6" class="pilcrow">¶</a></p>
-<p id="section-19.6-7">The largest offset delivered on a stream - the sum of the offset and data
-length - cannot exceed 2^62-1.  Receipt of a frame that exceeds this limit MUST
-be treated as a connection error of type FRAME_ENCODING_ERROR or
+<p id="section-19.6-7">The largest offset delivered on a stream - the sum of the offset and data length
+- cannot exceed 2<sup>62</sup>-1.  Receipt of a frame that exceeds this limit
+MUST be treated as a connection error of type FRAME_ENCODING_ERROR or
 CRYPTO_BUFFER_EXCEEDED.<a href="#section-19.6-7" class="pilcrow">¶</a></p>
 <p id="section-19.6-8">Unlike STREAM frames, which include a Stream ID indicating to which stream the
 data belongs, the CRYPTO frame carries data for a single stream per encryption
@@ -8288,10 +8293,10 @@ Stream Data:  </dt>
 <p id="section-19.8-8">When a Stream Data field has a length of 0, the offset in the STREAM frame is
 the offset of the next byte that would be sent.<a href="#section-19.8-8" class="pilcrow">¶</a></p>
 <p id="section-19.8-9">The first byte in the stream has an offset of 0.  The largest offset delivered
-on a stream - the sum of the offset and data length - cannot exceed 2^62-1, as
-it is not possible to provide flow control credit for that data.  Receipt of a
-frame that exceeds this limit MUST be treated as a connection error of type
-FRAME_ENCODING_ERROR or FLOW_CONTROL_ERROR.<a href="#section-19.8-9" class="pilcrow">¶</a></p>
+on a stream - the sum of the offset and data length - cannot exceed
+2<sup>62</sup>-1, as it is not possible to provide flow control credit for that
+data.  Receipt of a frame that exceeds this limit MUST be treated as a
+connection error of type FRAME_ENCODING_ERROR or FLOW_CONTROL_ERROR.<a href="#section-19.8-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="frame-max-data">
@@ -8421,11 +8426,11 @@ MAX_STREAMS Frame {
           <dt id="section-19.11-5.1">
 Maximum Streams:  </dt>
           <dd style="margin-left: 1.5em" id="section-19.11-5.2">
-            <p id="section-19.11-5.2.1">A count of the cumulative number of streams of the corresponding type that
-can be opened over the lifetime of the connection.  This value cannot exceed
-2^60, as it is not possible to encode stream IDs larger than 2^62-1.
-Receipt of a frame that permits opening of a stream larger than this limit
-MUST be treated as a FRAME_ENCODING_ERROR.<a href="#section-19.11-5.2.1" class="pilcrow">¶</a></p>
+            <p id="section-19.11-5.2.1">A count of the cumulative number of streams of the corresponding type that can
+be opened over the lifetime of the connection.  This value cannot exceed
+2<sup>60</sup>, as it is not possible to encode stream IDs larger than
+2<sup>62</sup>-1.  Receipt of a frame that permits opening of a stream larger
+than this limit MUST be treated as a FRAME_ENCODING_ERROR.<a href="#section-19.11-5.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -8557,11 +8562,11 @@ STREAMS_BLOCKED Frame {
           <dt id="section-19.14-6.1">
 Maximum Streams:  </dt>
           <dd style="margin-left: 1.5em" id="section-19.14-6.2">
-            <p id="section-19.14-6.2.1">A variable-length integer indicating the maximum number of streams allowed
-at the time the frame was sent.  This value cannot exceed 2^60, as it is
-not possible to encode stream IDs larger than 2^62-1.  Receipt of a frame
-that encodes a larger stream ID MUST be treated as a STREAM_LIMIT_ERROR or a
-FRAME_ENCODING_ERROR.<a href="#section-19.14-6.2.1" class="pilcrow">¶</a></p>
+            <p id="section-19.14-6.2.1">A variable-length integer indicating the maximum number of streams allowed at
+the time the frame was sent.  This value cannot exceed 2<sup>60</sup>, as it
+is not possible to encode stream IDs larger than 2<sup>62</sup>-1.  Receipt of
+a frame that encodes a larger stream ID MUST be treated as a
+STREAM_LIMIT_ERROR or a FRAME_ENCODING_ERROR.<a href="#section-19.14-6.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -9031,8 +9036,8 @@ CRYPTO_BUFFER_EXCEEDED (0xd):  </dt>
 <dt id="section-20.1-2.29">
 KEY_UPDATE_ERROR (0xe):  </dt>
           <dd style="margin-left: 1.5em" id="section-20.1-2.30">
-            <p id="section-20.1-2.30.1">An endpoint detected errors in performing key updates; see Section 6 of
-<span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-20.1-2.30.1" class="pilcrow">¶</a></p>
+            <p id="section-20.1-2.30.1">An endpoint detected errors in performing key updates; see
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-6" class="relref">Section 6</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-20.1-2.30.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-20.1-2.31">
@@ -9056,7 +9061,7 @@ CRYPTO_ERROR (0x1XX):  </dt>
             <p id="section-20.1-2.36.1">The cryptographic handshake failed.  A range of 256 values is reserved for
 carrying error codes specific to the cryptographic handshake that is used.
 Codes for errors occurring when TLS is used for the crypto handshake are
-described in Section 4.8 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-20.1-2.36.1" class="pilcrow">¶</a></p>
+described in <span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-4.8" class="relref">Section 4.8</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>.<a href="#section-20.1-2.36.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -9114,7 +9119,7 @@ modify, or remove any packet it observes such that it no longer reaches its
 destination, while an off-path attacker observes the packets, but cannot prevent
 the original packet from reaching its intended destination.  Both types of
 attackers can also transmit arbitrary packets.  This definition differs from
-that of Section 3.5 of <span>[<a href="#SEC-CONS" class="xref">SEC-CONS</a>]</span> in that an off-path attacker is able to
+that of <span><a href="https://rfc-editor.org/rfc/rfc3552#section-3.5" class="relref">Section 3.5</a> of [<a href="#SEC-CONS" class="xref">SEC-CONS</a>]</span> in that an off-path attacker is able to
 observe packets.<a href="#section-21.1-4" class="pilcrow">¶</a></p>
 <p id="section-21.1-5">Properties of the handshake, protected packets, and connection migration are
 considered separately.<a href="#section-21.1-5" class="pilcrow">¶</a></p>
@@ -9124,7 +9129,7 @@ considered separately.<a href="#section-21.1-5" class="pilcrow">¶</a></p>
 <a href="#section-21.1.1" class="section-number selfRef">21.1.1. </a><a href="#name-handshake" class="section-name selfRef">Handshake</a>
           </h4>
 <p id="section-21.1.1-1">The QUIC handshake incorporates the TLS 1.3 handshake and inherits the
-cryptographic properties described in Appendix E.1 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>. Many
+cryptographic properties described in <span><a href="https://rfc-editor.org/rfc/rfc8446#appendix-E.1" class="relref">Appendix E.1</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>. Many
 of the security properties of QUIC depend on the TLS handshake providing these
 properties. Any attack on the TLS handshake could affect QUIC.<a href="#section-21.1.1-1" class="pilcrow">¶</a></p>
 <p id="section-21.1.1-2">Any attack on the TLS handshake that compromises the secrecy or uniqueness
@@ -9626,7 +9631,7 @@ available for use in this sort of attack. The address validation implicit in
 the handshake ensures that - for a new connection - a client will not send
 other types of packet to a destination that does not understand QUIC or is not
 willing to accept a QUIC connection.<a href="#section-21.5.2-1" class="pilcrow">¶</a></p>
-<p id="section-21.5.2-2">Initial packet protection (Section 5.2 of <span>[<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>) makes it difficult for
+<p id="section-21.5.2-2">Initial packet protection (<span><a href="https://tools.ietf.org/html/draft-ietf-quic-tls#section-5.2" class="relref">Section 5.2</a> of [<a href="#QUIC-TLS" class="xref">QUIC-TLS</a>]</span>) makes it difficult for
 servers to control the content of Initial packets sent by clients. A client
 choosing an unpredictable Destination Connection ID ensures that servers are
 unable to control any of the encrypted portion of Initial packets from clients.<a href="#section-21.5.2-2" class="pilcrow">¶</a></p>
@@ -9962,8 +9967,7 @@ registries.<a href="#section-22.1-1" class="pilcrow">¶</a></p>
 experimentation with extensions to QUIC.  Provisional registrations only require
 the inclusion of the codepoint value and contact information.  However,
 provisional registrations could be reclaimed and reassigned for another purpose.<a href="#section-22.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-22.1.1-2">Provisional registrations require Expert Review, as defined in Section 4.5 of
-<span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>.  Designated expert(s) are advised that only registrations for an
+<p id="section-22.1.1-2">Provisional registrations require Expert Review, as defined in <span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.5" class="relref">Section 4.5</a> of [<a href="#RFC8126" class="xref">RFC8126</a>]</span>. Designated expert(s) are advised that only registrations for an
 excessive proportion of remaining codepoint space or the very first unassigned
 value (see <a href="#iana-random" class="xref">Section 22.1.2</a>) can be rejected.<a href="#section-22.1.1-2" class="pilcrow">¶</a></p>
 <p id="section-22.1.1-3">Provisional registrations will include a date field that indicates when the
@@ -10032,12 +10036,12 @@ codepoint in the selected space.  Requests for multiple codepoints MAY use a
 contiguous range.  This minimizes the risk that differing semantics are
 attributed to the same codepoint by different implementations.<a href="#section-22.1.2-1" class="pilcrow">¶</a></p>
 <p id="section-22.1.2-2">Use of the first unassigned codepoint is reserved for allocation using the
-Standards Action policy; see Section 4.9 of <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>.  The early codepoint
+Standards Action policy; see <span><a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">Section 4.9</a> of [<a href="#RFC8126" class="xref">RFC8126</a>]</span>.  The early codepoint
 assignment process <span>[<a href="#EARLY-ASSIGN" class="xref">EARLY-ASSIGN</a>]</span> can be used for these values.<a href="#section-22.1.2-2" class="pilcrow">¶</a></p>
 <p id="section-22.1.2-3">For codepoints that are encoded in variable-length integers
 (<a href="#integer-encoding" class="xref">Section 16</a>), such as frame types, codepoints that encode to four or
-eight bytes (that is, values 2^14 and above) SHOULD be used unless the usage is
-especially sensitive to having a longer encoding.<a href="#section-22.1.2-3" class="pilcrow">¶</a></p>
+eight bytes (that is, values 2<sup>14</sup> and above) SHOULD be used unless the
+usage is especially sensitive to having a longer encoding.<a href="#section-22.1.2-3" class="pilcrow">¶</a></p>
 <p id="section-22.1.2-4">Applications to register codepoints in QUIC registries MAY include a
 requested codepoint
 as part of the registration.  IANA MUST allocate the selected codepoint if the
@@ -10301,12 +10305,11 @@ appear in the listing of assigned values.<a href="#section-22.3-7" class="pilcro
         </h3>
 <p id="section-22.4-1">IANA [SHALL add/has added] a registry for "QUIC Frame Types" under a
 "QUIC" heading.<a href="#section-22.4-1" class="pilcrow">¶</a></p>
-<p id="section-22.4-2">The "QUIC Frame Types" registry governs a 62-bit space.  This registry follows
-the registration policy from <a href="#iana-policy" class="xref">Section 22.1</a>.  Permanent registrations in this
+<p id="section-22.4-2">The "QUIC Frame Types" registry governs a 62-bit space. This registry follows
+the registration policy from <a href="#iana-policy" class="xref">Section 22.1</a>. Permanent registrations in this
 registry are assigned using the Specification Required policy (<span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>),
 except for values between 0x00 and 0x3f (in hexadecimal; inclusive), which are
-assigned using Standards Action or IESG Approval as defined in Section 4.9 and
-4.10 of <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>.<a href="#section-22.4-2" class="pilcrow">¶</a></p>
+assigned using Standards Action or IESG Approval as defined in Sections <a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">4.9</a> and <a href="https://rfc-editor.org/rfc/rfc8126#section-4.10" class="relref">4.10</a> of <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>.<a href="#section-22.4-2" class="pilcrow">¶</a></p>
 <p id="section-22.4-3">In addition to the fields in <a href="#iana-provisional" class="xref">Section 22.1.1</a>, permanent registrations in
 this registry MUST include the following field:<a href="#section-22.4-3" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-22.4-4">
@@ -10340,7 +10343,7 @@ split into three regions that are governed by different policies.  Permanent
 registrations in this registry are assigned using the Specification Required
 policy (<span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>), except for values between 0x00 and 0x3f (in hexadecimal;
 inclusive), which are assigned using Standards Action or IESG Approval as
-defined in Section 4.9 and 4.10 of <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>.<a href="#section-22.5-2" class="pilcrow">¶</a></p>
+defined in Sections <a href="https://rfc-editor.org/rfc/rfc8126#section-4.9" class="relref">4.9</a> and <a href="https://rfc-editor.org/rfc/rfc8126#section-4.10" class="relref">4.10</a> of <span>[<a href="#RFC8126" class="xref">RFC8126</a>]</span>.<a href="#section-22.5-2" class="pilcrow">¶</a></p>
 <p id="section-22.5-3">In addition to the fields in <a href="#iana-provisional" class="xref">Section 22.1.1</a>, permanent registrations in
 this registry MUST include the following fields:<a href="#section-22.5-3" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-22.5-4">
@@ -10528,79 +10531,79 @@ specification reference is provided.<a href="#section-22.5-4.4.1" class="pilcrow
 <dl class="references">
 <dt id="BCP38">[BCP38]</dt>
         <dd>
-<span class="refAuthor">Ferguson, P.</span><span class="refAuthor"> and D. Senie</span>, <span class="refTitle">"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing"</span>, <span class="seriesInfo">BCP 38</span>, <span class="seriesInfo">RFC 2827</span>, <span class="seriesInfo">DOI 10.17487/RFC2827</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2827">https://www.rfc-editor.org/info/rfc2827</a>&gt;</span>. </dd>
+<span class="refAuthor">Ferguson, P.</span><span class="refAuthor"> and D. Senie</span>, <span class="refTitle">"Network Ingress Filtering: Defeating Denial of Service Attacks which employ IP Source Address Spoofing"</span>, <span class="seriesInfo">BCP 38</span>, <span class="seriesInfo">RFC 2827</span>, <span class="seriesInfo">DOI 10.17487/RFC2827</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc2827">https://datatracker.ietf.org/doc/html/rfc2827</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="DPLPMTUD">[DPLPMTUD]</dt>
         <dd>
-<span class="refAuthor">Fairhurst, G.</span><span class="refAuthor">, Jones, T.</span><span class="refAuthor">, Tüxen, M.</span><span class="refAuthor">, Rüngeler, I.</span><span class="refAuthor">, and T. Völker</span>, <span class="refTitle">"Packetization Layer Path MTU Discovery for Datagram Transports"</span>, <span class="seriesInfo">RFC 8899</span>, <span class="seriesInfo">DOI 10.17487/RFC8899</span>, <time datetime="2020-09" class="refDate">September 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8899">https://www.rfc-editor.org/info/rfc8899</a>&gt;</span>. </dd>
+<span class="refAuthor">Fairhurst, G.</span><span class="refAuthor">, Jones, T.</span><span class="refAuthor">, Tüxen, M.</span><span class="refAuthor">, Rüngeler, I.</span><span class="refAuthor">, and T. Völker</span>, <span class="refTitle">"Packetization Layer Path MTU Discovery for Datagram Transports"</span>, <span class="seriesInfo">RFC 8899</span>, <span class="seriesInfo">DOI 10.17487/RFC8899</span>, <time datetime="2020-09" class="refDate">September 2020</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8899">https://datatracker.ietf.org/doc/html/rfc8899</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="EARLY-ASSIGN">[EARLY-ASSIGN]</dt>
         <dd>
-<span class="refAuthor">Cotton, M.</span>, <span class="refTitle">"Early IANA Allocation of Standards Track Code Points"</span>, <span class="seriesInfo">BCP 100</span>, <span class="seriesInfo">RFC 7120</span>, <span class="seriesInfo">DOI 10.17487/RFC7120</span>, <time datetime="2014-01" class="refDate">January 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7120">https://www.rfc-editor.org/info/rfc7120</a>&gt;</span>. </dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refTitle">"Early IANA Allocation of Standards Track Code Points"</span>, <span class="seriesInfo">BCP 100</span>, <span class="seriesInfo">RFC 7120</span>, <span class="seriesInfo">DOI 10.17487/RFC7120</span>, <time datetime="2014-01" class="refDate">January 2014</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc7120">https://datatracker.ietf.org/doc/html/rfc7120</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="IPv4">[IPv4]</dt>
         <dd>
-<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Internet Protocol"</span>, <span class="seriesInfo">STD 5</span>, <span class="seriesInfo">RFC 791</span>, <span class="seriesInfo">DOI 10.17487/RFC0791</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc791">https://www.rfc-editor.org/info/rfc791</a>&gt;</span>. </dd>
+<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"Internet Protocol"</span>, <span class="seriesInfo">STD 5</span>, <span class="seriesInfo">RFC 791</span>, <span class="seriesInfo">DOI 10.17487/RFC0791</span>, <time datetime="1981-09" class="refDate">September 1981</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc791">https://datatracker.ietf.org/doc/html/rfc791</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-INVARIANTS">[QUIC-INVARIANTS]</dt>
         <dd>
-<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-invariants</span>, <time datetime="2021-01-20" class="refDate">20 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-invariants">https://tools.ietf.org/html/draft-ietf-quic-invariants</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M.</span>, <span class="refTitle">"Version-Independent Properties of QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-invariants</span>, <time datetime="2021-02-23" class="refDate">23 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-invariants.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-invariants.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-RECOVERY">[QUIC-RECOVERY]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-01-20" class="refDate">20 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-recovery">https://tools.ietf.org/html/draft-ietf-quic-recovery</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-02-23" class="refDate">23 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-recovery.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-recovery.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-TLS">[QUIC-TLS]</dt>
         <dd>
-<span class="refAuthor">Thomson, M., Ed.</span><span class="refAuthor"> and S. Turner, Ed.</span>, <span class="refTitle">"Using Transport Layer Security (TLS) to Secure QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-tls</span>, <time datetime="2021-01-20" class="refDate">20 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-tls">https://tools.ietf.org/html/draft-ietf-quic-tls</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M., Ed.</span><span class="refAuthor"> and S. Turner, Ed.</span>, <span class="refTitle">"Using Transport Layer Security (TLS) to Secure QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-tls</span>, <time datetime="2021-02-23" class="refDate">23 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-tls.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-tls.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC1191">[RFC1191]</dt>
         <dd>
-<span class="refAuthor">Mogul, J.</span><span class="refAuthor"> and S. Deering</span>, <span class="refTitle">"Path MTU discovery"</span>, <span class="seriesInfo">RFC 1191</span>, <span class="seriesInfo">DOI 10.17487/RFC1191</span>, <time datetime="1990-11" class="refDate">November 1990</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc1191">https://www.rfc-editor.org/info/rfc1191</a>&gt;</span>. </dd>
+<span class="refAuthor">Mogul, J.</span><span class="refAuthor"> and S. Deering</span>, <span class="refTitle">"Path MTU discovery"</span>, <span class="seriesInfo">RFC 1191</span>, <span class="seriesInfo">DOI 10.17487/RFC1191</span>, <time datetime="1990-11" class="refDate">November 1990</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc1191">https://datatracker.ietf.org/doc/html/rfc1191</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
-<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC3168">[RFC3168]</dt>
         <dd>
-<span class="refAuthor">Ramakrishnan, K.</span><span class="refAuthor">, Floyd, S.</span><span class="refAuthor">, and D. Black</span>, <span class="refTitle">"The Addition of Explicit Congestion Notification (ECN) to IP"</span>, <span class="seriesInfo">RFC 3168</span>, <span class="seriesInfo">DOI 10.17487/RFC3168</span>, <time datetime="2001-09" class="refDate">September 2001</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3168">https://www.rfc-editor.org/info/rfc3168</a>&gt;</span>. </dd>
+<span class="refAuthor">Ramakrishnan, K.</span><span class="refAuthor">, Floyd, S.</span><span class="refAuthor">, and D. Black</span>, <span class="refTitle">"The Addition of Explicit Congestion Notification (ECN) to IP"</span>, <span class="seriesInfo">RFC 3168</span>, <span class="seriesInfo">DOI 10.17487/RFC3168</span>, <time datetime="2001-09" class="refDate">September 2001</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc3168">https://datatracker.ietf.org/doc/html/rfc3168</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC3629">[RFC3629]</dt>
         <dd>
-<span class="refAuthor">Yergeau, F.</span>, <span class="refTitle">"UTF-8, a transformation format of ISO 10646"</span>, <span class="seriesInfo">STD 63</span>, <span class="seriesInfo">RFC 3629</span>, <span class="seriesInfo">DOI 10.17487/RFC3629</span>, <time datetime="2003-11" class="refDate">November 2003</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3629">https://www.rfc-editor.org/info/rfc3629</a>&gt;</span>. </dd>
+<span class="refAuthor">Yergeau, F.</span>, <span class="refTitle">"UTF-8, a transformation format of ISO 10646"</span>, <span class="seriesInfo">STD 63</span>, <span class="seriesInfo">RFC 3629</span>, <span class="seriesInfo">DOI 10.17487/RFC3629</span>, <time datetime="2003-11" class="refDate">November 2003</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc3629">https://datatracker.ietf.org/doc/html/rfc3629</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC6437">[RFC6437]</dt>
         <dd>
-<span class="refAuthor">Amante, S.</span><span class="refAuthor">, Carpenter, B.</span><span class="refAuthor">, Jiang, S.</span><span class="refAuthor">, and J. Rajahalme</span>, <span class="refTitle">"IPv6 Flow Label Specification"</span>, <span class="seriesInfo">RFC 6437</span>, <span class="seriesInfo">DOI 10.17487/RFC6437</span>, <time datetime="2011-11" class="refDate">November 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6437">https://www.rfc-editor.org/info/rfc6437</a>&gt;</span>. </dd>
+<span class="refAuthor">Amante, S.</span><span class="refAuthor">, Carpenter, B.</span><span class="refAuthor">, Jiang, S.</span><span class="refAuthor">, and J. Rajahalme</span>, <span class="refTitle">"IPv6 Flow Label Specification"</span>, <span class="seriesInfo">RFC 6437</span>, <span class="seriesInfo">DOI 10.17487/RFC6437</span>, <time datetime="2011-11" class="refDate">November 2011</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc6437">https://datatracker.ietf.org/doc/html/rfc6437</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8085">[RFC8085]</dt>
         <dd>
-<span class="refAuthor">Eggert, L.</span><span class="refAuthor">, Fairhurst, G.</span><span class="refAuthor">, and G. Shepherd</span>, <span class="refTitle">"UDP Usage Guidelines"</span>, <span class="seriesInfo">BCP 145</span>, <span class="seriesInfo">RFC 8085</span>, <span class="seriesInfo">DOI 10.17487/RFC8085</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8085">https://www.rfc-editor.org/info/rfc8085</a>&gt;</span>. </dd>
+<span class="refAuthor">Eggert, L.</span><span class="refAuthor">, Fairhurst, G.</span><span class="refAuthor">, and G. Shepherd</span>, <span class="refTitle">"UDP Usage Guidelines"</span>, <span class="seriesInfo">BCP 145</span>, <span class="seriesInfo">RFC 8085</span>, <span class="seriesInfo">DOI 10.17487/RFC8085</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8085">https://datatracker.ietf.org/doc/html/rfc8085</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8126">[RFC8126]</dt>
         <dd>
-<span class="refAuthor">Cotton, M.</span><span class="refAuthor">, Leiba, B.</span><span class="refAuthor">, and T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8126">https://www.rfc-editor.org/info/rfc8126</a>&gt;</span>. </dd>
+<span class="refAuthor">Cotton, M.</span><span class="refAuthor">, Leiba, B.</span><span class="refAuthor">, and T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8126">https://datatracker.ietf.org/doc/html/rfc8126</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
-<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8174">https://datatracker.ietf.org/doc/html/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8201">[RFC8201]</dt>
         <dd>
-<span class="refAuthor">McCann, J.</span><span class="refAuthor">, Deering, S.</span><span class="refAuthor">, Mogul, J.</span><span class="refAuthor">, and R. Hinden, Ed.</span>, <span class="refTitle">"Path MTU Discovery for IP version 6"</span>, <span class="seriesInfo">STD 87</span>, <span class="seriesInfo">RFC 8201</span>, <span class="seriesInfo">DOI 10.17487/RFC8201</span>, <time datetime="2017-07" class="refDate">July 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8201">https://www.rfc-editor.org/info/rfc8201</a>&gt;</span>. </dd>
+<span class="refAuthor">McCann, J.</span><span class="refAuthor">, Deering, S.</span><span class="refAuthor">, Mogul, J.</span><span class="refAuthor">, and R. Hinden, Ed.</span>, <span class="refTitle">"Path MTU Discovery for IP version 6"</span>, <span class="seriesInfo">STD 87</span>, <span class="seriesInfo">RFC 8201</span>, <span class="seriesInfo">DOI 10.17487/RFC8201</span>, <time datetime="2017-07" class="refDate">July 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8201">https://datatracker.ietf.org/doc/html/rfc8201</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8311">[RFC8311]</dt>
         <dd>
-<span class="refAuthor">Black, D.</span>, <span class="refTitle">"Relaxing Restrictions on Explicit Congestion Notification (ECN) Experimentation"</span>, <span class="seriesInfo">RFC 8311</span>, <span class="seriesInfo">DOI 10.17487/RFC8311</span>, <time datetime="2018-01" class="refDate">January 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8311">https://www.rfc-editor.org/info/rfc8311</a>&gt;</span>. </dd>
+<span class="refAuthor">Black, D.</span>, <span class="refTitle">"Relaxing Restrictions on Explicit Congestion Notification (ECN) Experimentation"</span>, <span class="seriesInfo">RFC 8311</span>, <span class="seriesInfo">DOI 10.17487/RFC8311</span>, <time datetime="2018-01" class="refDate">January 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8311">https://datatracker.ietf.org/doc/html/rfc8311</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS13">[TLS13]</dt>
         <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8446">https://datatracker.ietf.org/doc/html/rfc8446</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="UDP">[UDP]</dt>
       <dd>
-<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"User Datagram Protocol"</span>, <span class="seriesInfo">STD 6</span>, <span class="seriesInfo">RFC 768</span>, <span class="seriesInfo">DOI 10.17487/RFC0768</span>, <time datetime="1980-08" class="refDate">August 1980</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc768">https://www.rfc-editor.org/info/rfc768</a>&gt;</span>. </dd>
+<span class="refAuthor">Postel, J.</span>, <span class="refTitle">"User Datagram Protocol"</span>, <span class="seriesInfo">STD 6</span>, <span class="seriesInfo">RFC 768</span>, <span class="seriesInfo">DOI 10.17487/RFC0768</span>, <time datetime="1980-08" class="refDate">August 1980</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc768">https://datatracker.ietf.org/doc/html/rfc768</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -10611,19 +10614,19 @@ specification reference is provided.<a href="#section-22.5-4.4.1" class="pilcrow
 <dl class="references">
 <dt id="AEAD">[AEAD]</dt>
         <dd>
-<span class="refAuthor">McGrew, D.</span>, <span class="refTitle">"An Interface and Algorithms for Authenticated Encryption"</span>, <span class="seriesInfo">RFC 5116</span>, <span class="seriesInfo">DOI 10.17487/RFC5116</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5116">https://www.rfc-editor.org/info/rfc5116</a>&gt;</span>. </dd>
+<span class="refAuthor">McGrew, D.</span>, <span class="refTitle">"An Interface and Algorithms for Authenticated Encryption"</span>, <span class="seriesInfo">RFC 5116</span>, <span class="seriesInfo">DOI 10.17487/RFC5116</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc5116">https://datatracker.ietf.org/doc/html/rfc5116</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="ALPN">[ALPN]</dt>
         <dd>
-<span class="refAuthor">Friedl, S.</span><span class="refAuthor">, Popov, A.</span><span class="refAuthor">, Langley, A.</span><span class="refAuthor">, and E. Stephan</span>, <span class="refTitle">"Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension"</span>, <span class="seriesInfo">RFC 7301</span>, <span class="seriesInfo">DOI 10.17487/RFC7301</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7301">https://www.rfc-editor.org/info/rfc7301</a>&gt;</span>. </dd>
+<span class="refAuthor">Friedl, S.</span><span class="refAuthor">, Popov, A.</span><span class="refAuthor">, Langley, A.</span><span class="refAuthor">, and E. Stephan</span>, <span class="refTitle">"Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension"</span>, <span class="seriesInfo">RFC 7301</span>, <span class="seriesInfo">DOI 10.17487/RFC7301</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc7301">https://datatracker.ietf.org/doc/html/rfc7301</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="ALTSVC">[ALTSVC]</dt>
         <dd>
-<span class="refAuthor">Nottingham, M.</span><span class="refAuthor">, McManus, P.</span><span class="refAuthor">, and J. Reschke</span>, <span class="refTitle">"HTTP Alternative Services"</span>, <span class="seriesInfo">RFC 7838</span>, <span class="seriesInfo">DOI 10.17487/RFC7838</span>, <time datetime="2016-04" class="refDate">April 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7838">https://www.rfc-editor.org/info/rfc7838</a>&gt;</span>. </dd>
+<span class="refAuthor">Nottingham, M.</span><span class="refAuthor">, McManus, P.</span><span class="refAuthor">, and J. Reschke</span>, <span class="refTitle">"HTTP Alternative Services"</span>, <span class="seriesInfo">RFC 7838</span>, <span class="seriesInfo">DOI 10.17487/RFC7838</span>, <time datetime="2016-04" class="refDate">April 2016</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc7838">https://datatracker.ietf.org/doc/html/rfc7838</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="COOKIE">[COOKIE]</dt>
         <dd>
-<span class="refAuthor">Barth, A.</span>, <span class="refTitle">"HTTP State Management Mechanism"</span>, <span class="seriesInfo">RFC 6265</span>, <span class="seriesInfo">DOI 10.17487/RFC6265</span>, <time datetime="2011-04" class="refDate">April 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6265">https://www.rfc-editor.org/info/rfc6265</a>&gt;</span>. </dd>
+<span class="refAuthor">Barth, A.</span>, <span class="refTitle">"HTTP State Management Mechanism"</span>, <span class="seriesInfo">RFC 6265</span>, <span class="seriesInfo">DOI 10.17487/RFC6265</span>, <time datetime="2011-04" class="refDate">April 2011</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc6265">https://datatracker.ietf.org/doc/html/rfc6265</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="CSRF">[CSRF]</dt>
         <dd>
@@ -10639,79 +10642,79 @@ specification reference is provided.<a href="#section-22.5-4.4.1" class="pilcrow
 <dd class="break"></dd>
 <dt id="HTTP2">[HTTP2]</dt>
         <dd>
-<span class="refAuthor">Belshe, M.</span><span class="refAuthor">, Peon, R.</span><span class="refAuthor">, and M. Thomson, Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol Version 2 (HTTP/2)"</span>, <span class="seriesInfo">RFC 7540</span>, <span class="seriesInfo">DOI 10.17487/RFC7540</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7540">https://www.rfc-editor.org/info/rfc7540</a>&gt;</span>. </dd>
+<span class="refAuthor">Belshe, M.</span><span class="refAuthor">, Peon, R.</span><span class="refAuthor">, and M. Thomson, Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol Version 2 (HTTP/2)"</span>, <span class="seriesInfo">RFC 7540</span>, <span class="seriesInfo">DOI 10.17487/RFC7540</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc7540">https://datatracker.ietf.org/doc/html/rfc7540</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="IPv6">[IPv6]</dt>
         <dd>
-<span class="refAuthor">Deering, S.</span><span class="refAuthor"> and R. Hinden</span>, <span class="refTitle">"Internet Protocol, Version 6 (IPv6) Specification"</span>, <span class="seriesInfo">STD 86</span>, <span class="seriesInfo">RFC 8200</span>, <span class="seriesInfo">DOI 10.17487/RFC8200</span>, <time datetime="2017-07" class="refDate">July 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8200">https://www.rfc-editor.org/info/rfc8200</a>&gt;</span>. </dd>
+<span class="refAuthor">Deering, S.</span><span class="refAuthor"> and R. Hinden</span>, <span class="refTitle">"Internet Protocol, Version 6 (IPv6) Specification"</span>, <span class="seriesInfo">STD 86</span>, <span class="seriesInfo">RFC 8200</span>, <span class="seriesInfo">DOI 10.17487/RFC8200</span>, <time datetime="2017-07" class="refDate">July 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8200">https://datatracker.ietf.org/doc/html/rfc8200</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-MANAGEABILITY">[QUIC-MANAGEABILITY]</dt>
         <dd>
-<span class="refAuthor">Kuehlewind, M.</span><span class="refAuthor"> and B. Trammell</span>, <span class="refTitle">"Manageability of the QUIC Transport Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-manageability-08</span>, <time datetime="2020-11-02" class="refDate">2 November 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-ietf-quic-manageability-08.txt">http://www.ietf.org/internet-drafts/draft-ietf-quic-manageability-08.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Kuehlewind, M.</span><span class="refAuthor"> and B. Trammell</span>, <span class="refTitle">"Manageability of the QUIC Transport Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-manageability-10</span>, <time datetime="2021-02-22" class="refDate">22 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-manageability-10.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-manageability-10.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RANDOM">[RANDOM]</dt>
         <dd>
-<span class="refAuthor">Eastlake 3rd, D.</span><span class="refAuthor">, Schiller, J.</span><span class="refAuthor">, and S. Crocker</span>, <span class="refTitle">"Randomness Requirements for Security"</span>, <span class="seriesInfo">BCP 106</span>, <span class="seriesInfo">RFC 4086</span>, <span class="seriesInfo">DOI 10.17487/RFC4086</span>, <time datetime="2005-06" class="refDate">June 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4086">https://www.rfc-editor.org/info/rfc4086</a>&gt;</span>. </dd>
+<span class="refAuthor">Eastlake 3rd, D.</span><span class="refAuthor">, Schiller, J.</span><span class="refAuthor">, and S. Crocker</span>, <span class="refTitle">"Randomness Requirements for Security"</span>, <span class="seriesInfo">BCP 106</span>, <span class="seriesInfo">RFC 4086</span>, <span class="seriesInfo">DOI 10.17487/RFC4086</span>, <time datetime="2005-06" class="refDate">June 2005</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4086">https://datatracker.ietf.org/doc/html/rfc4086</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC1812">[RFC1812]</dt>
         <dd>
-<span class="refAuthor">Baker, F., Ed.</span>, <span class="refTitle">"Requirements for IP Version 4 Routers"</span>, <span class="seriesInfo">RFC 1812</span>, <span class="seriesInfo">DOI 10.17487/RFC1812</span>, <time datetime="1995-06" class="refDate">June 1995</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc1812">https://www.rfc-editor.org/info/rfc1812</a>&gt;</span>. </dd>
+<span class="refAuthor">Baker, F., Ed.</span>, <span class="refTitle">"Requirements for IP Version 4 Routers"</span>, <span class="seriesInfo">RFC 1812</span>, <span class="seriesInfo">DOI 10.17487/RFC1812</span>, <time datetime="1995-06" class="refDate">June 1995</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc1812">https://datatracker.ietf.org/doc/html/rfc1812</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC1918">[RFC1918]</dt>
         <dd>
-<span class="refAuthor">Rekhter, Y.</span><span class="refAuthor">, Moskowitz, B.</span><span class="refAuthor">, Karrenberg, D.</span><span class="refAuthor">, de Groot, G. J.</span><span class="refAuthor">, and E. Lear</span>, <span class="refTitle">"Address Allocation for Private Internets"</span>, <span class="seriesInfo">BCP 5</span>, <span class="seriesInfo">RFC 1918</span>, <span class="seriesInfo">DOI 10.17487/RFC1918</span>, <time datetime="1996-02" class="refDate">February 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc1918">https://www.rfc-editor.org/info/rfc1918</a>&gt;</span>. </dd>
+<span class="refAuthor">Rekhter, Y.</span><span class="refAuthor">, Moskowitz, B.</span><span class="refAuthor">, Karrenberg, D.</span><span class="refAuthor">, de Groot, G. J.</span><span class="refAuthor">, and E. Lear</span>, <span class="refTitle">"Address Allocation for Private Internets"</span>, <span class="seriesInfo">BCP 5</span>, <span class="seriesInfo">RFC 1918</span>, <span class="seriesInfo">DOI 10.17487/RFC1918</span>, <time datetime="1996-02" class="refDate">February 1996</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc1918">https://datatracker.ietf.org/doc/html/rfc1918</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2018">[RFC2018]</dt>
         <dd>
-<span class="refAuthor">Mathis, M.</span><span class="refAuthor">, Mahdavi, J.</span><span class="refAuthor">, Floyd, S.</span><span class="refAuthor">, and A. Romanow</span>, <span class="refTitle">"TCP Selective Acknowledgment Options"</span>, <span class="seriesInfo">RFC 2018</span>, <span class="seriesInfo">DOI 10.17487/RFC2018</span>, <time datetime="1996-10" class="refDate">October 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2018">https://www.rfc-editor.org/info/rfc2018</a>&gt;</span>. </dd>
+<span class="refAuthor">Mathis, M.</span><span class="refAuthor">, Mahdavi, J.</span><span class="refAuthor">, Floyd, S.</span><span class="refAuthor">, and A. Romanow</span>, <span class="refTitle">"TCP Selective Acknowledgment Options"</span>, <span class="seriesInfo">RFC 2018</span>, <span class="seriesInfo">DOI 10.17487/RFC2018</span>, <time datetime="1996-10" class="refDate">October 1996</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc2018">https://datatracker.ietf.org/doc/html/rfc2018</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2104">[RFC2104]</dt>
         <dd>
-<span class="refAuthor">Krawczyk, H.</span><span class="refAuthor">, Bellare, M.</span><span class="refAuthor">, and R. Canetti</span>, <span class="refTitle">"HMAC: Keyed-Hashing for Message Authentication"</span>, <span class="seriesInfo">RFC 2104</span>, <span class="seriesInfo">DOI 10.17487/RFC2104</span>, <time datetime="1997-02" class="refDate">February 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2104">https://www.rfc-editor.org/info/rfc2104</a>&gt;</span>. </dd>
+<span class="refAuthor">Krawczyk, H.</span><span class="refAuthor">, Bellare, M.</span><span class="refAuthor">, and R. Canetti</span>, <span class="refTitle">"HMAC: Keyed-Hashing for Message Authentication"</span>, <span class="seriesInfo">RFC 2104</span>, <span class="seriesInfo">DOI 10.17487/RFC2104</span>, <time datetime="1997-02" class="refDate">February 1997</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc2104">https://datatracker.ietf.org/doc/html/rfc2104</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC3449">[RFC3449]</dt>
         <dd>
-<span class="refAuthor">Balakrishnan, H.</span><span class="refAuthor">, Padmanabhan, V.</span><span class="refAuthor">, Fairhurst, G.</span><span class="refAuthor">, and M. Sooriyabandara</span>, <span class="refTitle">"TCP Performance Implications of Network Path Asymmetry"</span>, <span class="seriesInfo">BCP 69</span>, <span class="seriesInfo">RFC 3449</span>, <span class="seriesInfo">DOI 10.17487/RFC3449</span>, <time datetime="2002-12" class="refDate">December 2002</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3449">https://www.rfc-editor.org/info/rfc3449</a>&gt;</span>. </dd>
+<span class="refAuthor">Balakrishnan, H.</span><span class="refAuthor">, Padmanabhan, V.</span><span class="refAuthor">, Fairhurst, G.</span><span class="refAuthor">, and M. Sooriyabandara</span>, <span class="refTitle">"TCP Performance Implications of Network Path Asymmetry"</span>, <span class="seriesInfo">BCP 69</span>, <span class="seriesInfo">RFC 3449</span>, <span class="seriesInfo">DOI 10.17487/RFC3449</span>, <time datetime="2002-12" class="refDate">December 2002</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc3449">https://datatracker.ietf.org/doc/html/rfc3449</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4193">[RFC4193]</dt>
         <dd>
-<span class="refAuthor">Hinden, R.</span><span class="refAuthor"> and B. Haberman</span>, <span class="refTitle">"Unique Local IPv6 Unicast Addresses"</span>, <span class="seriesInfo">RFC 4193</span>, <span class="seriesInfo">DOI 10.17487/RFC4193</span>, <time datetime="2005-10" class="refDate">October 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4193">https://www.rfc-editor.org/info/rfc4193</a>&gt;</span>. </dd>
+<span class="refAuthor">Hinden, R.</span><span class="refAuthor"> and B. Haberman</span>, <span class="refTitle">"Unique Local IPv6 Unicast Addresses"</span>, <span class="seriesInfo">RFC 4193</span>, <span class="seriesInfo">DOI 10.17487/RFC4193</span>, <time datetime="2005-10" class="refDate">October 2005</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4193">https://datatracker.ietf.org/doc/html/rfc4193</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4291">[RFC4291]</dt>
         <dd>
-<span class="refAuthor">Hinden, R.</span><span class="refAuthor"> and S. Deering</span>, <span class="refTitle">"IP Version 6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 4291</span>, <span class="seriesInfo">DOI 10.17487/RFC4291</span>, <time datetime="2006-02" class="refDate">February 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4291">https://www.rfc-editor.org/info/rfc4291</a>&gt;</span>. </dd>
+<span class="refAuthor">Hinden, R.</span><span class="refAuthor"> and S. Deering</span>, <span class="refTitle">"IP Version 6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 4291</span>, <span class="seriesInfo">DOI 10.17487/RFC4291</span>, <time datetime="2006-02" class="refDate">February 2006</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4291">https://datatracker.ietf.org/doc/html/rfc4291</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4443">[RFC4443]</dt>
         <dd>
-<span class="refAuthor">Conta, A.</span><span class="refAuthor">, Deering, S.</span><span class="refAuthor">, and M. Gupta, Ed.</span>, <span class="refTitle">"Internet Control Message Protocol (ICMPv6) for the Internet Protocol Version 6 (IPv6) Specification"</span>, <span class="seriesInfo">STD 89</span>, <span class="seriesInfo">RFC 4443</span>, <span class="seriesInfo">DOI 10.17487/RFC4443</span>, <time datetime="2006-03" class="refDate">March 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4443">https://www.rfc-editor.org/info/rfc4443</a>&gt;</span>. </dd>
+<span class="refAuthor">Conta, A.</span><span class="refAuthor">, Deering, S.</span><span class="refAuthor">, and M. Gupta, Ed.</span>, <span class="refTitle">"Internet Control Message Protocol (ICMPv6) for the Internet Protocol Version 6 (IPv6) Specification"</span>, <span class="seriesInfo">STD 89</span>, <span class="seriesInfo">RFC 4443</span>, <span class="seriesInfo">DOI 10.17487/RFC4443</span>, <time datetime="2006-03" class="refDate">March 2006</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4443">https://datatracker.ietf.org/doc/html/rfc4443</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4787">[RFC4787]</dt>
         <dd>
-<span class="refAuthor">Audet, F., Ed.</span><span class="refAuthor"> and C. Jennings</span>, <span class="refTitle">"Network Address Translation (NAT) Behavioral Requirements for Unicast UDP"</span>, <span class="seriesInfo">BCP 127</span>, <span class="seriesInfo">RFC 4787</span>, <span class="seriesInfo">DOI 10.17487/RFC4787</span>, <time datetime="2007-01" class="refDate">January 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4787">https://www.rfc-editor.org/info/rfc4787</a>&gt;</span>. </dd>
+<span class="refAuthor">Audet, F., Ed.</span><span class="refAuthor"> and C. Jennings</span>, <span class="refTitle">"Network Address Translation (NAT) Behavioral Requirements for Unicast UDP"</span>, <span class="seriesInfo">BCP 127</span>, <span class="seriesInfo">RFC 4787</span>, <span class="seriesInfo">DOI 10.17487/RFC4787</span>, <time datetime="2007-01" class="refDate">January 2007</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4787">https://datatracker.ietf.org/doc/html/rfc4787</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4941">[RFC4941]</dt>
         <dd>
-<span class="refAuthor">Narten, T.</span><span class="refAuthor">, Draves, R.</span><span class="refAuthor">, and S. Krishnan</span>, <span class="refTitle">"Privacy Extensions for Stateless Address Autoconfiguration in IPv6"</span>, <span class="seriesInfo">RFC 4941</span>, <span class="seriesInfo">DOI 10.17487/RFC4941</span>, <time datetime="2007-09" class="refDate">September 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4941">https://www.rfc-editor.org/info/rfc4941</a>&gt;</span>. </dd>
+<span class="refAuthor">Narten, T.</span><span class="refAuthor">, Draves, R.</span><span class="refAuthor">, and S. Krishnan</span>, <span class="refTitle">"Privacy Extensions for Stateless Address Autoconfiguration in IPv6"</span>, <span class="seriesInfo">RFC 4941</span>, <span class="seriesInfo">DOI 10.17487/RFC4941</span>, <time datetime="2007-09" class="refDate">September 2007</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4941">https://datatracker.ietf.org/doc/html/rfc4941</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5681">[RFC5681]</dt>
         <dd>
-<span class="refAuthor">Allman, M.</span><span class="refAuthor">, Paxson, V.</span><span class="refAuthor">, and E. Blanton</span>, <span class="refTitle">"TCP Congestion Control"</span>, <span class="seriesInfo">RFC 5681</span>, <span class="seriesInfo">DOI 10.17487/RFC5681</span>, <time datetime="2009-09" class="refDate">September 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5681">https://www.rfc-editor.org/info/rfc5681</a>&gt;</span>. </dd>
+<span class="refAuthor">Allman, M.</span><span class="refAuthor">, Paxson, V.</span><span class="refAuthor">, and E. Blanton</span>, <span class="refTitle">"TCP Congestion Control"</span>, <span class="seriesInfo">RFC 5681</span>, <span class="seriesInfo">DOI 10.17487/RFC5681</span>, <time datetime="2009-09" class="refDate">September 2009</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc5681">https://datatracker.ietf.org/doc/html/rfc5681</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5869">[RFC5869]</dt>
         <dd>
-<span class="refAuthor">Krawczyk, H.</span><span class="refAuthor"> and P. Eronen</span>, <span class="refTitle">"HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"</span>, <span class="seriesInfo">RFC 5869</span>, <span class="seriesInfo">DOI 10.17487/RFC5869</span>, <time datetime="2010-05" class="refDate">May 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5869">https://www.rfc-editor.org/info/rfc5869</a>&gt;</span>. </dd>
+<span class="refAuthor">Krawczyk, H.</span><span class="refAuthor"> and P. Eronen</span>, <span class="refTitle">"HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"</span>, <span class="seriesInfo">RFC 5869</span>, <span class="seriesInfo">DOI 10.17487/RFC5869</span>, <time datetime="2010-05" class="refDate">May 2010</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc5869">https://datatracker.ietf.org/doc/html/rfc5869</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7983">[RFC7983]</dt>
         <dd>
-<span class="refAuthor">Petit-Huguenin, M.</span><span class="refAuthor"> and G. Salgueiro</span>, <span class="refTitle">"Multiplexing Scheme Updates for Secure Real-time Transport Protocol (SRTP) Extension for Datagram Transport Layer Security (DTLS)"</span>, <span class="seriesInfo">RFC 7983</span>, <span class="seriesInfo">DOI 10.17487/RFC7983</span>, <time datetime="2016-09" class="refDate">September 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7983">https://www.rfc-editor.org/info/rfc7983</a>&gt;</span>. </dd>
+<span class="refAuthor">Petit-Huguenin, M.</span><span class="refAuthor"> and G. Salgueiro</span>, <span class="refTitle">"Multiplexing Scheme Updates for Secure Real-time Transport Protocol (SRTP) Extension for Datagram Transport Layer Security (DTLS)"</span>, <span class="seriesInfo">RFC 7983</span>, <span class="seriesInfo">DOI 10.17487/RFC7983</span>, <time datetime="2016-09" class="refDate">September 2016</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc7983">https://datatracker.ietf.org/doc/html/rfc7983</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8087">[RFC8087]</dt>
         <dd>
-<span class="refAuthor">Fairhurst, G.</span><span class="refAuthor"> and M. Welzl</span>, <span class="refTitle">"The Benefits of Using Explicit Congestion Notification (ECN)"</span>, <span class="seriesInfo">RFC 8087</span>, <span class="seriesInfo">DOI 10.17487/RFC8087</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8087">https://www.rfc-editor.org/info/rfc8087</a>&gt;</span>. </dd>
+<span class="refAuthor">Fairhurst, G.</span><span class="refAuthor"> and M. Welzl</span>, <span class="refTitle">"The Benefits of Using Explicit Congestion Notification (ECN)"</span>, <span class="seriesInfo">RFC 8087</span>, <span class="seriesInfo">DOI 10.17487/RFC8087</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8087">https://datatracker.ietf.org/doc/html/rfc8087</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SEC-CONS">[SEC-CONS]</dt>
         <dd>
-<span class="refAuthor">Rescorla, E.</span><span class="refAuthor"> and B. Korver</span>, <span class="refTitle">"Guidelines for Writing RFC Text on Security Considerations"</span>, <span class="seriesInfo">BCP 72</span>, <span class="seriesInfo">RFC 3552</span>, <span class="seriesInfo">DOI 10.17487/RFC3552</span>, <time datetime="2003-07" class="refDate">July 2003</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3552">https://www.rfc-editor.org/info/rfc3552</a>&gt;</span>. </dd>
+<span class="refAuthor">Rescorla, E.</span><span class="refAuthor"> and B. Korver</span>, <span class="refTitle">"Guidelines for Writing RFC Text on Security Considerations"</span>, <span class="seriesInfo">BCP 72</span>, <span class="seriesInfo">RFC 3552</span>, <span class="seriesInfo">DOI 10.17487/RFC3552</span>, <time datetime="2003-07" class="refDate">July 2003</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc3552">https://datatracker.ietf.org/doc/html/rfc3552</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SLOWLORIS">[SLOWLORIS]</dt>
       <dd>
@@ -11358,8 +11361,8 @@ encryption keys should be discarded (#2214, #2267, #2673)<a href="#section-b.13-
 </li>
           <li class="normal" id="section-b.14-1.3">Spin bit text incorporated (#2564)<a href="#section-b.14-1.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-b.14-1.4">Close the connection when maximum stream ID in MAX_STREAMS exceeds 2^62 - 1
-(#2499, #2487)<a href="#section-b.14-1.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-b.14-1.4">Close the connection when maximum stream ID in MAX_STREAMS exceeds
+2<sup>62</sup>-1 (#2499, #2487)<a href="#section-b.14-1.4" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-b.14-1.5">New connection ID required for intentional migration (#2414, #2413)<a href="#section-b.14-1.5" class="pilcrow">¶</a>
 </li>

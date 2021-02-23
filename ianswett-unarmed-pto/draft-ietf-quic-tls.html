@@ -15,21 +15,21 @@ QUIC.
 <meta content="draft-ietf-quic-tls" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.5.0
-    Python 3.8.5
+    Python 3.8.7
     appdirs 1.4.4
     ConfigArgParse 1.2.3
     google-i18n-address 2.4.0
     html5lib 1.1
-    intervaltree 3.0.2
+    intervaltree 3.1.0
     Jinja2 2.11.2
     kitchen 1.2.6
-    lxml 4.5.0
-    pycountry 19.8.18
-    pyflakes 2.1.1
-    PyYAML 5.3.1
-    requests 2.22.0
-    setuptools 45.2.0
-    six 1.14.0
+    lxml 4.6.2
+    pycountry 20.7.3
+    pyflakes 2.2.0
+    PyYAML 5.4.1
+    requests 2.25.1
+    setuptools 51.3.3
+    six 1.15.0
 -->
 <link href="draft-ietf-quic-tls.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -42,7 +42,23 @@ html {
   --link-color: #2a6496;
   --highlight-color: #f9f9f9;
   --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
   --small-font-size: 14.5px;
+  scrollbar-color: #bbb #eee;
+}
+@media (prefers-color-scheme: dark) {
+html {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
 }
 body {
   max-width: 600px;
@@ -333,14 +349,14 @@ a.pilcrow {
   opacity: 0.2;
   user-select: none;
 }
-a.pilcrow[href] { color: #ddd; }
+a.pilcrow[href] { color: var(--pilcrow-weak); }
 a.pilcrow[href]:hover { text-decoration: none; }
-@media screen {
+@media not print {
   :hover > a.pilcrow {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
-    color: #bbb;
+    color: var(--pilcrow-strong);
     background-color: transparent;
   }
 }
@@ -822,11 +838,11 @@ address div.right {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Using TLS to Secure QUIC</td>
-<td class="right">January 2021</td>
+<td class="right">February 2021</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomson &amp; Turner</td>
-<td class="center">Expires 24 July 2021</td>
+<td class="center">Expires 27 August 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -839,12 +855,12 @@ address div.right {
 <dd class="internet-draft">draft-ietf-quic-tls</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2021-01-20" class="published">20 January 2021</time>
+<time datetime="2021-02-23" class="published">23 February 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-07-24">24 July 2021</time></dd>
+<dd class="expires"><time datetime="2021-08-27">27 August 2021</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -896,7 +912,7 @@ code and issues list for this draft can be found at
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 July 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 August 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1523,10 +1539,9 @@ delivered to QUIC, it is QUIC's responsibility to deliver it reliably. Each
 chunk of data that is produced by TLS is associated with the set of keys that
 TLS is currently using.  If QUIC needs to retransmit that data, it MUST use the
 same keys even if TLS has already updated to newer keys.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Each encryption level corresponds to a packet number space.  The packet number
-space that is used determines the semantics of frames.  Some frames are
-prohibited in different packet number spaces; see Section 12.5 of
-<span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-2">Each encryption level corresponds to a packet number space. The packet number
+space that is used determines the semantics of frames. Some frames are
+prohibited in different packet number spaces; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-12.5" class="relref">Section 12.5</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <p id="section-4-3">Because packets could be reordered on the wire, QUIC uses the packet type to
 indicate which keys were used to protect a given packet, as shown in
 <a href="#packet-types-keys" class="xref">Table 1</a>. When packets of different types need to be sent,
@@ -1578,7 +1593,7 @@ endpoints SHOULD use coalesced packets to send them in the same UDP datagram.<a 
         </tbody>
       </table>
 </div>
-<p id="section-4-5">Section 17 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span> shows how packets at the various encryption
+<p id="section-4-5"><span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-17" class="relref">Section 17</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span> shows how packets at the various encryption
 levels fit into the handshake process.<a href="#section-4-5" class="pilcrow">¶</a></p>
 <div id="interface-to-tls">
 <section id="section-4.1">
@@ -1695,7 +1710,7 @@ buffered until complete messages or flights are available.  TLS is responsible
 for buffering handshake bytes that have arrived in order.  QUIC is responsible
 for buffering handshake bytes that arrive out of order or for encryption levels
 that are not yet ready.  QUIC does not provide any means of flow control for
-CRYPTO frames; see Section 7.5 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.1.3-12" class="pilcrow">¶</a></p>
+CRYPTO frames; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-7.5" class="relref">Section 7.5</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.1.3-12" class="pilcrow">¶</a></p>
 <p id="section-4.1.3-13">Once the TLS handshake is complete, this is indicated to QUIC along with any
 final handshake bytes that TLS needs to send.  At this stage, the transport
 parameters that the peer advertised during the handshake are authenticated;
@@ -1861,7 +1876,7 @@ Server Name Identification (SNI) or Application Layer Protocol Negotiation
 If the ClientHello spans multiple Initial packets, such servers would need to
 buffer the first received fragments, which could consume excessive resources if
 the client's address has not yet been validated.  To avoid this, servers MAY
-use the Retry feature (see Section 8.1 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>) to only buffer
+use the Retry feature (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>) to only buffer
 partial ClientHello messages from clients with a validated address.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
 <p id="section-4.3-2">QUIC packet and framing add at least 36 bytes of overhead to the ClientHello
 message.  That overhead increases if the client chooses a source connection ID
@@ -1880,9 +1895,9 @@ Minimizing the size of these values increases the probability that clients can
 use them and still fit their entire ClientHello message in their first Initial
 packet.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
 <p id="section-4.3-5">The TLS implementation does not need to ensure that the ClientHello is large
-enough to meet the requirements for QUIC packets. QUIC PADDING frames are added
-to increase the size of the packet as necessary; see Section 14.1 of
-<span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+enough to meet QUIC's requirements for datagrams that carry Initial packets; see
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-14.1" class="relref">Section 14.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>. QUIC implementations use PADDING frames or
+packet coalescing to ensure that datagrams are large enough.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="peer-authentication">
@@ -1905,7 +1920,7 @@ Note:  </dt>
 the certificate chain can consume a large number of bytes.  Controlling the
 size of certificate chains is critical to performance in QUIC as servers are
 limited to sending 3 bytes for every byte received prior to validating the
-client address; see Section 8.1 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.  The size of a
+client address; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.  The size of a
 certificate chain can be managed by limiting the number of names or
 extensions; using keys with small public key representations, like ECDSA; or
 by using certificate compression
@@ -1918,7 +1933,7 @@ MAY refuse a connection if the client is unable to authenticate when requested.
 The requirements for client authentication vary based on application protocol
 and deployment.<a href="#section-4.4-4" class="pilcrow">¶</a></p>
 <p id="section-4.4-5">A server MUST NOT use post-handshake client authentication (as defined in
-Section 4.6.2 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>), because the multiplexing offered by QUIC prevents
+<span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.6.2" class="relref">Section 4.6.2</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>), because the multiplexing offered by QUIC prevents
 clients from correlating the certificate request with the application-level
 event that triggered it (see <span>[<a href="#HTTP2-TLS13" class="xref">HTTP2-TLS13</a>]</span>).
 More specifically, servers MUST NOT send post-handshake TLS CertificateRequest
@@ -1937,9 +1952,9 @@ complete. Session resumption can be used to provide 0-RTT, and can also be
 used when 0-RTT is disabled.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
 <p id="section-4.5-2">Endpoints that use session resumption might need to remember some information
 about the current connection when creating a resumed connection. TLS requires
-that some information be retained; see Section 4.6.1 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>. QUIC itself
+that some information be retained; see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.6.1" class="relref">Section 4.6.1</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>. QUIC itself
 does not depend on any state being retained when resuming a connection, unless
-0-RTT is also used; see Section 7.4.1 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span> and
+0-RTT is also used; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-7.4.1" class="relref">Section 7.4.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span> and
 <a href="#enable-0rtt" class="xref">Section 4.6.1</a>. Application protocols could depend on state that is retained
 between resumed connections.<a href="#section-4.5-2" class="pilcrow">¶</a></p>
 <p id="section-4.5-3">Clients can store any state required for resumption along with the session
@@ -1948,7 +1963,7 @@ ticket. Servers can use the session ticket to help carry state.<a href="#section
 with the resumed connection, which might be a privacy issue for clients.
 Clients can choose not to enable resumption to avoid creating this correlation.
 Clients SHOULD NOT reuse tickets as that allows entities other than the server
-to correlate connections; see Section C.4 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>.<a href="#section-4.5-4" class="pilcrow">¶</a></p>
+to correlate connections; see <span><a href="https://rfc-editor.org/rfc/rfc8446#appendix-C.4" class="relref">Appendix C.4</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>.<a href="#section-4.5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="rtt">
@@ -1991,11 +2006,11 @@ controlled by the initial_max_data transport parameter supplied by the server.<a
 set to any value other than 0xffffffff.  A client MUST treat receipt of a
 NewSessionTicket that contains an early_data extension with any other value as
 a connection error of type PROTOCOL_VIOLATION.<a href="#section-4.6.1-2" class="pilcrow">¶</a></p>
-<p id="section-4.6.1-3">A client that wishes to send 0-RTT packets uses the early_data extension in
-the ClientHello message of a subsequent handshake; see Section 4.2.10 of
-<span>[<a href="#TLS13" class="xref">TLS13</a>]</span>. It then sends application data in 0-RTT packets.<a href="#section-4.6.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.6.1-3">A client that wishes to send 0-RTT packets uses the early_data extension in the
+ClientHello message of a subsequent handshake; see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.2.10" class="relref">Section 4.2.10</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>.
+It then sends application data in 0-RTT packets.<a href="#section-4.6.1-3" class="pilcrow">¶</a></p>
 <p id="section-4.6.1-4">A client that attempts 0-RTT might also provide an address validation token if
-the server has sent a NEW_TOKEN frame; see Section 8.1 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.6.1-4" class="pilcrow">¶</a></p>
+the server has sent a NEW_TOKEN frame; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.6.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="accepting-and-rejecting-0-rtt">
@@ -2004,7 +2019,7 @@ the server has sent a NEW_TOKEN frame; see Section 8.1 of <span>[<a href="#QUIC-
 <a href="#section-4.6.2" class="section-number selfRef">4.6.2. </a><a href="#name-accepting-and-rejecting-0-r" class="section-name selfRef">Accepting and Rejecting 0-RTT</a>
           </h4>
 <p id="section-4.6.2-1">A server accepts 0-RTT by sending an early_data extension in the
-EncryptedExtensions; see Section 4.2.10 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>.  The server then
+EncryptedExtensions; see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.2.10" class="relref">Section 4.2.10</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>.  The server then
 processes and acknowledges the 0-RTT packets that it receives.<a href="#section-4.6.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.6.2-2">A server rejects 0-RTT by sending the EncryptedExtensions without an early_data
 extension.  A server will always reject 0-RTT if it sends a TLS
@@ -2028,7 +2043,7 @@ packet.  These packets do not signify rejection of 0-RTT.<a href="#section-4.6.2
 <p id="section-4.6.3-1">When a server receives a ClientHello with the early_data extension, it has to
 decide whether to accept or reject early data from the client. Some of this
 decision is made by the TLS stack (e.g., checking that the cipher suite being
-resumed was included in the ClientHello; see Section 4.2.10 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>). Even
+resumed was included in the ClientHello; see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.2.10" class="relref">Section 4.2.10</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>). Even
 when the TLS stack has no reason to reject early data, the QUIC stack or the
 application protocol using QUIC might reject early data because the
 configuration of the transport or application associated with the resumed
@@ -2050,13 +2065,13 @@ requirements for determining whether to accept or reject early data.<a href="#se
         <h3 id="name-helloretryrequest">
 <a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-helloretryrequest" class="section-name selfRef">HelloRetryRequest</a>
         </h3>
-<p id="section-4.7-1">The HelloRetryRequest message (see Section 4.1.4 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>) can be used to
+<p id="section-4.7-1">The HelloRetryRequest message (see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.1.4" class="relref">Section 4.1.4</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>) can be used to
 request that a client provide new information, such as a key share, or to
 validate some characteristic of the client.  From the perspective of QUIC,
 HelloRetryRequest is not differentiated from other cryptographic handshake
 messages that are carried in Initial packets. Although it is in principle
 possible to use this feature for address verification, QUIC implementations
-SHOULD instead use the Retry feature; see Section 8.1 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+SHOULD instead use the Retry feature; see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="tls-errors">
@@ -2065,7 +2080,7 @@ SHOULD instead use the Retry feature; see Section 8.1 of <span>[<a href="#QUIC-T
 <a href="#section-4.8" class="section-number selfRef">4.8. </a><a href="#name-tls-errors" class="section-name selfRef">TLS Errors</a>
         </h3>
 <p id="section-4.8-1">If TLS experiences an error, it generates an appropriate alert as defined in
-Section 6 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>.<a href="#section-4.8-1" class="pilcrow">¶</a></p>
+<span><a href="https://rfc-editor.org/rfc/rfc8446#section-6" class="relref">Section 6</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>.<a href="#section-4.8-1" class="pilcrow">¶</a></p>
 <p id="section-4.8-2">A TLS alert is converted into a QUIC connection error. The AlertDescription
 value is
 added to 0x100 to produce a QUIC error code from the range reserved for
@@ -2073,12 +2088,12 @@ CRYPTO_ERROR. The resulting value is sent in a QUIC CONNECTION_CLOSE frame of
 type 0x1c.<a href="#section-4.8-2" class="pilcrow">¶</a></p>
 <p id="section-4.8-3">QUIC is only able to convey an alert level of "fatal". In TLS 1.3, the only
 existing uses for the "warning" level are to signal connection close; see
-Section 6.1 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>. As QUIC provides alternative mechanisms for
+<span><a href="https://rfc-editor.org/rfc/rfc8446#section-6.1" class="relref">Section 6.1</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>. As QUIC provides alternative mechanisms for
 connection termination and the TLS connection is only closed if an error is
 encountered, a QUIC endpoint MUST treat any alert from TLS as if it were at the
 "fatal" level.<a href="#section-4.8-3" class="pilcrow">¶</a></p>
 <p id="section-4.8-4">QUIC permits the use of a generic code in place of a specific error code; see
-Section 11 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>. For TLS alerts, this includes replacing any
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-11" class="relref">Section 11</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>. For TLS alerts, this includes replacing any
 alert with a generic alert, such as handshake_failure (0x128 in QUIC).
 Endpoints MAY use a generic error code to avoid possibly exposing confidential
 information.<a href="#section-4.8-4" class="pilcrow">¶</a></p>
@@ -2199,14 +2214,13 @@ confidentiality and integrity protection.<a href="#section-5-4" class="pilcrow">
 <p id="section-5.1-1">QUIC derives packet protection keys in the same way that TLS derives record
 protection keys.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">Each encryption level has separate secret values for protection of packets sent
-in each direction.  These traffic secrets are derived by TLS (see Section 7.1 of
-<span>[<a href="#TLS13" class="xref">TLS13</a>]</span>) and are used by QUIC for all encryption levels except the Initial
-encryption level.  The secrets for the Initial encryption level are computed
+in each direction. These traffic secrets are derived by TLS (see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-7.1" class="relref">Section 7.1</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>) and are used by QUIC for all encryption levels except the Initial
+encryption level. The secrets for the Initial encryption level are computed
 based on the client's initial Destination Connection ID, as described in
 <a href="#initial-secrets" class="xref">Section 5.2</a>.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.1-3">The keys used for packet protection are computed from the TLS secrets using the
 KDF provided by TLS.  In TLS 1.3, the HKDF-Expand-Label function described in
-Section 7.1 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span> is used, using the hash function from the negotiated
+<span><a href="https://rfc-editor.org/rfc/rfc8446#section-7.1" class="relref">Section 7.1</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span> is used, using the hash function from the negotiated
 cipher suite.  All uses of HKDF-Expand-Label in QUIC use a zero-length Context.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.1-4">Note that labels, which are described using strings, are encoded
 as bytes using ASCII <span>[<a href="#ASCII" class="xref">ASCII</a>]</span> without quotes or any trailing NUL
@@ -2235,11 +2249,10 @@ TLS 1.3; see <a href="#initial-secrets" class="xref">Section 5.2</a>.<a href="#s
 <p id="section-5.2-1">Initial packets apply the packet protection process, but use a secret derived
 from the Destination Connection ID field from the client's first Initial
 packet.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">This secret is determined by using HKDF-Extract (see Section 2.2 of
-<span>[<a href="#HKDF" class="xref">HKDF</a>]</span>) with a salt of 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a
-and a IKM of the Destination Connection ID field. This produces an intermediate
-pseudorandom key (PRK) that is used to derive two separate secrets for sending
-and receiving.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">This secret is determined by using HKDF-Extract (see <span><a href="https://rfc-editor.org/rfc/rfc5869#section-2.2" class="relref">Section 2.2</a> of [<a href="#HKDF" class="xref">HKDF</a>]</span>)
+with a salt of 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a and a IKM of the
+Destination Connection ID field. This produces an intermediate pseudorandom key
+(PRK) that is used to derive two separate secrets for sending and receiving.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">The secret used by clients to construct Initial packets uses the PRK and the
 label "client in" as input to the HKDF-Expand-Label function from TLS
 <span>[<a href="#TLS13" class="xref">TLS13</a>]</span> to produce a 32-byte secret.  Packets constructed by the server use
@@ -2284,7 +2297,7 @@ including zero length if the server sends a Retry packet with a zero-length
 Source Connection ID field. After a Retry, the Initial keys provide the client
 no assurance that the server received its packet, so the client has to rely on
 the exchange that included the Retry packet to validate the server address;
-see Section 8.1 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5.2-10.2.1" class="pilcrow">¶</a></p>
+see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5.2-10.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -2538,7 +2551,7 @@ header_protection(hp_key, sample):
 <a href="#section-5.4.4" class="section-number selfRef">5.4.4. </a><a href="#name-chacha20-based-header-prote" class="section-name selfRef">ChaCha20-Based Header Protection</a>
           </h4>
 <p id="section-5.4.4-1">When AEAD_CHACHA20_POLY1305 is in use, header protection uses the raw ChaCha20
-function as defined in Section 2.4 of <span>[<a href="#CHACHA" class="xref">CHACHA</a>]</span>.  This uses a 256-bit key and
+function as defined in <span><a href="https://rfc-editor.org/rfc/rfc8439#section-2.4" class="relref">Section 2.4</a> of [<a href="#CHACHA" class="xref">CHACHA</a>]</span>.  This uses a 256-bit key and
 16 bytes sampled from the packet protection output.<a href="#section-5.4.4-1" class="pilcrow">¶</a></p>
 <p id="section-5.4.4-2">The first 4 bytes of the sampled ciphertext are the block counter.  A ChaCha20
 implementation could take a 32-bit integer in place of a byte sequence, in
@@ -2597,8 +2610,8 @@ requested by the application that is in use.<a href="#section-5.6-2" class="pilc
 <p id="section-5.6-3">An application protocol that uses QUIC MUST include a profile that defines
 acceptable use of 0-RTT; otherwise, 0-RTT can only be used to carry QUIC frames
 that do not carry application data. For example, a profile for HTTP is
-described in <span>[<a href="#HTTP-REPLAY" class="xref">HTTP-REPLAY</a>]</span> and used for HTTP/3; see Section 10.9 of
-<span>[<a href="#QUIC-HTTP" class="xref">QUIC-HTTP</a>]</span>.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
+described in <span>[<a href="#HTTP-REPLAY" class="xref">HTTP-REPLAY</a>]</span> and used for HTTP/3; see
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-http#section-10.9" class="relref">Section 10.9</a> of [<a href="#QUIC-HTTP" class="xref">QUIC-HTTP</a>]</span>.<a href="#section-5.6-3" class="pilcrow">¶</a></p>
 <p id="section-5.6-4">Though replaying packets might result in additional connection attempts, the
 effect of processing replayed frames that do not carry application data is
 limited to changing the state of the affected connection. A TLS handshake
@@ -2606,8 +2619,8 @@ cannot be successfully completed using replayed packets.<a href="#section-5.6-4"
 <p id="section-5.6-5">A client MAY wish to apply additional restrictions on what data it sends prior
 to the completion of the TLS handshake.<a href="#section-5.6-5" class="pilcrow">¶</a></p>
 <p id="section-5.6-6">A client otherwise treats 0-RTT keys as equivalent to 1-RTT keys, except that
-it cannot send certain frames with 0-RTT keys; see Section 12.5 of
-<span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5.6-6" class="pilcrow">¶</a></p>
+it cannot send certain frames with 0-RTT keys; see
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-12.5" class="relref">Section 12.5</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5.6-6" class="pilcrow">¶</a></p>
 <p id="section-5.6-7">A client that receives an indication that its 0-RTT data has been accepted by a
 server can send 0-RTT data until it receives all of the server's handshake
 messages.  A client SHOULD stop sending 0-RTT data if it receives an indication
@@ -2645,12 +2658,11 @@ decrypt 1-RTT packets from their peer prior to completing the handshake.<a href=
 handshake messages from a client, it is missing assurances on the client state:<a href="#section-5.7-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5.7-3.1">The client is not authenticated, unless the server has chosen to use a
-pre-shared key and validated the client's pre-shared key binder; see Section
-4.2.11 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>.<a href="#section-5.7-3.1" class="pilcrow">¶</a>
+pre-shared key and validated the client's pre-shared key binder; see <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.2.11" class="relref">Section 4.2.11</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>.<a href="#section-5.7-3.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-5.7-3.2">The client has not demonstrated liveness, unless the server has validated the
-client's address with a Retry packet or other means; see Section 8.1 of
-<span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5.7-3.2" class="pilcrow">¶</a>
+client's address with a Retry packet or other means; see
+<span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5.7-3.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-5.7-3.3">Any received 0-RTT data that the server responds to might be due to a replay
 attack.<a href="#section-5.7-3.3" class="pilcrow">¶</a>
@@ -2824,7 +2836,7 @@ value of the Key Phase bit is indicated in brackets [].<a href="#section-6-6" cl
 <p id="section-6.1-1">Endpoints maintain separate read and write secrets for packet protection.  An
 endpoint initiates a key update by updating its packet protection write secret
 and using that to protect new packets.  The endpoint creates a new write secret
-from the existing write secret as performed in Section 7.2 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>.  This
+from the existing write secret as performed in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-7.2" class="relref">Section 7.2</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>.  This
 uses the KDF function provided by TLS with a label of "quic ku".  The
 corresponding key and IV are created from that secret as defined in
 <a href="#protection-keys" class="xref">Section 5.1</a>.  The header protection key is not updated.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
@@ -3018,12 +3030,13 @@ the connection and only send stateless resets in response to receiving packets.
 It is RECOMMENDED that endpoints immediately close the connection with a
 connection error of type AEAD_LIMIT_REACHED before reaching a state where key
 updates are not possible.<a href="#section-6.6-4" class="pilcrow">¶</a></p>
-<p id="section-6.6-5">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the confidentiality limit is 2^23
-encrypted packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For AEAD_CHACHA20_POLY1305, the
-confidentiality limit is greater than the number of possible packets (2^62) and
-so can be disregarded. For AEAD_AES_128_CCM, the confidentiality limit is 2^21.5
-encrypted packets; see <a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying a limit reduces the probability
-that an attacker can distinguish the AEAD in use from a random permutation; see
+<p id="section-6.6-5">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the confidentiality limit is
+2<sup>23</sup> encrypted packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For
+AEAD_CHACHA20_POLY1305, the confidentiality limit is greater than the number of
+possible packets (2<sup>62</sup>) and so can be disregarded. For
+AEAD_AES_128_CCM, the confidentiality limit is 2<sup>21.5</sup> encrypted
+packets; see <a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying a limit reduces the probability that an
+attacker can distinguish the AEAD in use from a random permutation; see
 <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>, <span>[<a href="#ROBUST" class="xref">ROBUST</a>]</span>, and <span>[<a href="#GCM-MU" class="xref">GCM-MU</a>]</span>.<a href="#section-6.6-5" class="pilcrow">¶</a></p>
 <p id="section-6.6-6">In addition to counting packets sent, endpoints MUST count the number of
 received packets that fail authentication during the lifetime of a connection.
@@ -3031,12 +3044,12 @@ If the total number of received packets that fail authentication within the
 connection, across all keys, exceeds the integrity limit for the selected AEAD,
 the endpoint MUST immediately close the connection with a connection error of
 type AEAD_LIMIT_REACHED and not process any more packets.<a href="#section-6.6-6" class="pilcrow">¶</a></p>
-<p id="section-6.6-7">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the integrity limit is 2^52 invalid
-packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For AEAD_CHACHA20_POLY1305, the integrity limit is
-2^36 invalid packets; see <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>. For AEAD_AES_128_CCM, the integrity
-limit is 2^21.5 invalid packets; see <a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying this limit reduces
-the probability that an attacker can successfully forge a packet; see
-<span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>, <span>[<a href="#ROBUST" class="xref">ROBUST</a>]</span>, and <span>[<a href="#GCM-MU" class="xref">GCM-MU</a>]</span>.<a href="#section-6.6-7" class="pilcrow">¶</a></p>
+<p id="section-6.6-7">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the integrity limit is 2<sup>52</sup>
+invalid packets; see <a href="#gcm-bounds" class="xref">Appendix B.1</a>. For AEAD_CHACHA20_POLY1305, the integrity
+limit is 2<sup>36</sup> invalid packets; see <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>. For AEAD_AES_128_CCM,
+the integrity limit is 2<sup>21.5</sup> invalid packets; see
+<a href="#ccm-bounds" class="xref">Appendix B.2</a>. Applying this limit reduces the probability that an attacker can
+successfully forge a packet; see <span>[<a href="#AEBounds" class="xref">AEBounds</a>]</span>, <span>[<a href="#ROBUST" class="xref">ROBUST</a>]</span>, and <span>[<a href="#GCM-MU" class="xref">GCM-MU</a>]</span>.<a href="#section-6.6-7" class="pilcrow">¶</a></p>
 <p id="section-6.6-8">Endpoints that limit the size of packets MAY use higher confidentiality and
 integrity limits; see <a href="#aead-analysis" class="xref">Appendix B</a> for details.<a href="#section-6.6-8" class="pilcrow">¶</a></p>
 <p id="section-6.6-9">Future analyses and specifications MAY relax confidentiality or integrity limits
@@ -3102,8 +3115,7 @@ negotiation.  TLS uses Application Layer Protocol Negotiation
 (<span>[<a href="#ALPN" class="xref">ALPN</a>]</span>) to select an application protocol.  Unless another mechanism
 is used for agreeing on an application protocol, endpoints MUST use ALPN for
 this purpose.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">When using ALPN, endpoints MUST immediately close a connection (see Section
-10.2 of <span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>) with a no_application_protocol TLS alert (QUIC error
+<p id="section-8.1-2">When using ALPN, endpoints MUST immediately close a connection (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-10.2" class="relref">Section 10.2</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>) with a no_application_protocol TLS alert (QUIC error
 code 0x178; see <a href="#tls-errors" class="xref">Section 4.8</a>) if an application protocol is not negotiated.
 While <span>[<a href="#ALPN" class="xref">ALPN</a>]</span> only specifies that servers use this alert, QUIC clients MUST
 use error 0x178 to terminate a connection when ALPN negotiation fails.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
@@ -3211,7 +3223,7 @@ correlate connections made by the same client; see <a href="#resumption" class="
         <h3 id="name-replay-attacks-with-0-rtt">
 <a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-replay-attacks-with-0-rtt" class="section-name selfRef">Replay Attacks with 0-RTT</a>
         </h3>
-<p id="section-9.2-1">As described in Section 8 of <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>, use of TLS early data comes with an
+<p id="section-9.2-1">As described in <span><a href="https://rfc-editor.org/rfc/rfc8446#section-8" class="relref">Section 8</a> of [<a href="#TLS13" class="xref">TLS13</a>]</span>, use of TLS early data comes with an
 exposure to replay attack.  The use of 0-RTT in QUIC is similarly vulnerable to
 replay attack.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <p id="section-9.2-2">Endpoints MUST implement and use the replay protections described in <span>[<a href="#TLS13" class="xref">TLS13</a>]</span>,
@@ -3262,12 +3274,11 @@ mitigation strategies.<a href="#section-9.2-8" class="pilcrow">¶</a></p>
 <p id="section-9.3-1">A small ClientHello that results in a large block of handshake messages from a
 server can be used in packet reflection attacks to amplify the traffic generated
 by an attacker.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
-<p id="section-9.3-2">QUIC includes three defenses against this attack. First, the packet containing a
-ClientHello MUST be padded to a minimum size. Second, if responding to an
-unverified source address, the server is forbidden to send more than three times
-as many bytes as the number of bytes it has received (see Section 8.1 of
-<span>[<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>). Finally, because acknowledgments of Handshake packets are
-authenticated, a blind attacker cannot forge them.  Put together, these defenses
+<p id="section-9.3-2">QUIC includes three defenses against this attack. First, the packet containing
+a ClientHello MUST be padded to a minimum size. Second, if responding to an
+unverified source address, the server is forbidden to send more than three
+times as many bytes as the number of bytes it has received (see <span><a href="https://tools.ietf.org/html/draft-ietf-quic-transport#section-8.1" class="relref">Section 8.1</a> of [<a href="#QUIC-TRANSPORT" class="xref">QUIC-TRANSPORT</a>]</span>). Finally, because acknowledgments of Handshake packets are
+authenticated, a blind attacker cannot forge them. Put together, these defenses
 limit the level of amplification.<a href="#section-9.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3299,8 +3310,9 @@ security guarantees.<a href="#section-9.4-4" class="pilcrow">¶</a></p>
 header protection. Protecting two different headers with the same key and
 ciphertext sample reveals the exclusive OR of the protected fields.  Assuming
 that the AEAD acts as a PRF, if L bits are sampled, the odds of two ciphertext
-samples being identical approach 2^(-L/2), that is, the birthday bound. For the
-algorithms described in this document, that probability is one in 2^64.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
+samples being identical approach 2<sup>-L/2</sup>, that is, the birthday bound.
+For the algorithms described in this document, that probability is one in
+2<sup>64</sup>.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
 <p id="section-9.4-6">To prevent an attacker from modifying packet headers, the header is transitively
 authenticated using packet protection; the entire packet header is part of the
 authenticated additional data.  Protected fields that are falsified or modified
@@ -3397,7 +3409,7 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dl class="references">
 <dt id="AEAD">[AEAD]</dt>
         <dd>
-<span class="refAuthor">McGrew, D.</span>, <span class="refTitle">"An Interface and Algorithms for Authenticated Encryption"</span>, <span class="seriesInfo">RFC 5116</span>, <span class="seriesInfo">DOI 10.17487/RFC5116</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5116">https://www.rfc-editor.org/info/rfc5116</a>&gt;</span>. </dd>
+<span class="refAuthor">McGrew, D.</span>, <span class="refTitle">"An Interface and Algorithms for Authenticated Encryption"</span>, <span class="seriesInfo">RFC 5116</span>, <span class="seriesInfo">DOI 10.17487/RFC5116</span>, <time datetime="2008-01" class="refDate">January 2008</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc5116">https://datatracker.ietf.org/doc/html/rfc5116</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="AES">[AES]</dt>
         <dd>
@@ -3405,35 +3417,35 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="ALPN">[ALPN]</dt>
         <dd>
-<span class="refAuthor">Friedl, S.</span><span class="refAuthor">, Popov, A.</span><span class="refAuthor">, Langley, A.</span><span class="refAuthor">, and E. Stephan</span>, <span class="refTitle">"Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension"</span>, <span class="seriesInfo">RFC 7301</span>, <span class="seriesInfo">DOI 10.17487/RFC7301</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7301">https://www.rfc-editor.org/info/rfc7301</a>&gt;</span>. </dd>
+<span class="refAuthor">Friedl, S.</span><span class="refAuthor">, Popov, A.</span><span class="refAuthor">, Langley, A.</span><span class="refAuthor">, and E. Stephan</span>, <span class="refTitle">"Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension"</span>, <span class="seriesInfo">RFC 7301</span>, <span class="seriesInfo">DOI 10.17487/RFC7301</span>, <time datetime="2014-07" class="refDate">July 2014</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc7301">https://datatracker.ietf.org/doc/html/rfc7301</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="CHACHA">[CHACHA]</dt>
         <dd>
-<span class="refAuthor">Nir, Y.</span><span class="refAuthor"> and A. Langley</span>, <span class="refTitle">"ChaCha20 and Poly1305 for IETF Protocols"</span>, <span class="seriesInfo">RFC 8439</span>, <span class="seriesInfo">DOI 10.17487/RFC8439</span>, <time datetime="2018-06" class="refDate">June 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8439">https://www.rfc-editor.org/info/rfc8439</a>&gt;</span>. </dd>
+<span class="refAuthor">Nir, Y.</span><span class="refAuthor"> and A. Langley</span>, <span class="refTitle">"ChaCha20 and Poly1305 for IETF Protocols"</span>, <span class="seriesInfo">RFC 8439</span>, <span class="seriesInfo">DOI 10.17487/RFC8439</span>, <time datetime="2018-06" class="refDate">June 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8439">https://datatracker.ietf.org/doc/html/rfc8439</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="HKDF">[HKDF]</dt>
         <dd>
-<span class="refAuthor">Krawczyk, H.</span><span class="refAuthor"> and P. Eronen</span>, <span class="refTitle">"HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"</span>, <span class="seriesInfo">RFC 5869</span>, <span class="seriesInfo">DOI 10.17487/RFC5869</span>, <time datetime="2010-05" class="refDate">May 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5869">https://www.rfc-editor.org/info/rfc5869</a>&gt;</span>. </dd>
+<span class="refAuthor">Krawczyk, H.</span><span class="refAuthor"> and P. Eronen</span>, <span class="refTitle">"HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"</span>, <span class="seriesInfo">RFC 5869</span>, <span class="seriesInfo">DOI 10.17487/RFC5869</span>, <time datetime="2010-05" class="refDate">May 2010</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc5869">https://datatracker.ietf.org/doc/html/rfc5869</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-RECOVERY">[QUIC-RECOVERY]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-01-20" class="refDate">20 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-recovery">https://tools.ietf.org/html/draft-ietf-quic-recovery</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and I. Swett, Ed.</span>, <span class="refTitle">"QUIC Loss Detection and Congestion Control"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-recovery</span>, <time datetime="2021-02-23" class="refDate">23 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-recovery.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-recovery.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="QUIC-TRANSPORT">[QUIC-TRANSPORT]</dt>
         <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-01-20" class="refDate">20 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-transport">https://tools.ietf.org/html/draft-ietf-quic-transport</a>&gt;</span>. </dd>
+<span class="refAuthor">Iyengar, J., Ed.</span><span class="refAuthor"> and M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-transport</span>, <time datetime="2021-02-23" class="refDate">23 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-transport.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
-<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4086">[RFC4086]</dt>
         <dd>
-<span class="refAuthor">Eastlake 3rd, D.</span><span class="refAuthor">, Schiller, J.</span><span class="refAuthor">, and S. Crocker</span>, <span class="refTitle">"Randomness Requirements for Security"</span>, <span class="seriesInfo">BCP 106</span>, <span class="seriesInfo">RFC 4086</span>, <span class="seriesInfo">DOI 10.17487/RFC4086</span>, <time datetime="2005-06" class="refDate">June 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4086">https://www.rfc-editor.org/info/rfc4086</a>&gt;</span>. </dd>
+<span class="refAuthor">Eastlake 3rd, D.</span><span class="refAuthor">, Schiller, J.</span><span class="refAuthor">, and S. Crocker</span>, <span class="refTitle">"Randomness Requirements for Security"</span>, <span class="seriesInfo">BCP 106</span>, <span class="seriesInfo">RFC 4086</span>, <span class="seriesInfo">DOI 10.17487/RFC4086</span>, <time datetime="2005-06" class="refDate">June 2005</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc4086">https://datatracker.ietf.org/doc/html/rfc4086</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
-<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8174">https://datatracker.ietf.org/doc/html/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SHA">[SHA]</dt>
         <dd>
@@ -3441,11 +3453,11 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="TLS-REGISTRIES">[TLS-REGISTRIES]</dt>
         <dd>
-<span class="refAuthor">Salowey, J.</span><span class="refAuthor"> and S. Turner</span>, <span class="refTitle">"IANA Registry Updates for TLS and DTLS"</span>, <span class="seriesInfo">RFC 8447</span>, <span class="seriesInfo">DOI 10.17487/RFC8447</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8447">https://www.rfc-editor.org/info/rfc8447</a>&gt;</span>. </dd>
+<span class="refAuthor">Salowey, J.</span><span class="refAuthor"> and S. Turner</span>, <span class="refTitle">"IANA Registry Updates for TLS and DTLS"</span>, <span class="seriesInfo">RFC 8447</span>, <span class="seriesInfo">DOI 10.17487/RFC8447</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8447">https://datatracker.ietf.org/doc/html/rfc8447</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS13">[TLS13]</dt>
       <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8446">https://www.rfc-editor.org/info/rfc8446</a>&gt;</span>. </dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8446">https://datatracker.ietf.org/doc/html/rfc8446</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -3460,7 +3472,7 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="ASCII">[ASCII]</dt>
         <dd>
-<span class="refAuthor">Cerf, V.</span>, <span class="refTitle">"ASCII format for network interchange"</span>, <span class="seriesInfo">STD 80</span>, <span class="seriesInfo">RFC 20</span>, <span class="seriesInfo">DOI 10.17487/RFC0020</span>, <time datetime="1969-10" class="refDate">October 1969</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc20">https://www.rfc-editor.org/info/rfc20</a>&gt;</span>. </dd>
+<span class="refAuthor">Cerf, V.</span>, <span class="refTitle">"ASCII format for network interchange"</span>, <span class="seriesInfo">STD 80</span>, <span class="seriesInfo">RFC 20</span>, <span class="seriesInfo">DOI 10.17487/RFC0020</span>, <time datetime="1969-10" class="refDate">October 1969</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc20">https://datatracker.ietf.org/doc/html/rfc20</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="CCM-ANALYSIS">[CCM-ANALYSIS]</dt>
         <dd>
@@ -3468,7 +3480,7 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="COMPRESS">[COMPRESS]</dt>
         <dd>
-<span class="refAuthor">Ghedini, A.</span><span class="refAuthor"> and V. Vasiliev</span>, <span class="refTitle">"TLS Certificate Compression"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-certificate-compression-10</span>, <time datetime="2020-01-06" class="refDate">6 January 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-ietf-tls-certificate-compression-10.txt">http://www.ietf.org/internet-drafts/draft-ietf-tls-certificate-compression-10.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Ghedini, A.</span><span class="refAuthor"> and V. Vasiliev</span>, <span class="refTitle">"TLS Certificate Compression"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tls-certificate-compression-10</span>, <time datetime="2020-01-06" class="refDate">6 January 2020</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tls-certificate-compression-10.txt">https://datatracker.ietf.org/doc/html/draft-ietf-tls-certificate-compression-10.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="GCM-MU">[GCM-MU]</dt>
         <dd>
@@ -3476,11 +3488,11 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="HTTP-REPLAY">[HTTP-REPLAY]</dt>
         <dd>
-<span class="refAuthor">Thomson, M.</span><span class="refAuthor">, Nottingham, M.</span><span class="refAuthor">, and W. Tarreau</span>, <span class="refTitle">"Using Early Data in HTTP"</span>, <span class="seriesInfo">RFC 8470</span>, <span class="seriesInfo">DOI 10.17487/RFC8470</span>, <time datetime="2018-09" class="refDate">September 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8470">https://www.rfc-editor.org/info/rfc8470</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M.</span><span class="refAuthor">, Nottingham, M.</span><span class="refAuthor">, and W. Tarreau</span>, <span class="refTitle">"Using Early Data in HTTP"</span>, <span class="seriesInfo">RFC 8470</span>, <span class="seriesInfo">DOI 10.17487/RFC8470</span>, <time datetime="2018-09" class="refDate">September 2018</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8470">https://datatracker.ietf.org/doc/html/rfc8470</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="HTTP2-TLS13">[HTTP2-TLS13]</dt>
         <dd>
-<span class="refAuthor">Benjamin, D.</span>, <span class="refTitle">"Using TLS 1.3 with HTTP/2"</span>, <span class="seriesInfo">RFC 8740</span>, <span class="seriesInfo">DOI 10.17487/RFC8740</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8740">https://www.rfc-editor.org/info/rfc8740</a>&gt;</span>. </dd>
+<span class="refAuthor">Benjamin, D.</span>, <span class="refTitle">"Using TLS 1.3 with HTTP/2"</span>, <span class="seriesInfo">RFC 8740</span>, <span class="seriesInfo">DOI 10.17487/RFC8740</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc8740">https://datatracker.ietf.org/doc/html/rfc8740</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="IMC">[IMC]</dt>
         <dd>
@@ -3492,15 +3504,15 @@ includes CH and EE.<a href="#section-10-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="QUIC-HTTP">[QUIC-HTTP]</dt>
         <dd>
-<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol Version 3 (HTTP/3)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-http</span>, <time datetime="2021-01-20" class="refDate">20 January 2021</time>, <span>&lt;<a href="https://tools.ietf.org/html/draft-ietf-quic-http">https://tools.ietf.org/html/draft-ietf-quic-http</a>&gt;</span>. </dd>
+<span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"Hypertext Transfer Protocol Version 3 (HTTP/3)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-http</span>, <time datetime="2021-02-23" class="refDate">23 February 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-http.txt">https://datatracker.ietf.org/doc/html/draft-ietf-quic-http.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2818">[RFC2818]</dt>
         <dd>
-<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"HTTP Over TLS"</span>, <span class="seriesInfo">RFC 2818</span>, <span class="seriesInfo">DOI 10.17487/RFC2818</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2818">https://www.rfc-editor.org/info/rfc2818</a>&gt;</span>. </dd>
+<span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"HTTP Over TLS"</span>, <span class="seriesInfo">RFC 2818</span>, <span class="seriesInfo">DOI 10.17487/RFC2818</span>, <time datetime="2000-05" class="refDate">May 2000</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc2818">https://datatracker.ietf.org/doc/html/rfc2818</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5280">[RFC5280]</dt>
         <dd>
-<span class="refAuthor">Cooper, D.</span><span class="refAuthor">, Santesson, S.</span><span class="refAuthor">, Farrell, S.</span><span class="refAuthor">, Boeyen, S.</span><span class="refAuthor">, Housley, R.</span><span class="refAuthor">, and W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5280">https://www.rfc-editor.org/info/rfc5280</a>&gt;</span>. </dd>
+<span class="refAuthor">Cooper, D.</span><span class="refAuthor">, Santesson, S.</span><span class="refAuthor">, Farrell, S.</span><span class="refAuthor">, Boeyen, S.</span><span class="refAuthor">, Housley, R.</span><span class="refAuthor">, and W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/rfc5280">https://datatracker.ietf.org/doc/html/rfc5280</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="ROBUST">[ROBUST]</dt>
       <dd>
@@ -3883,21 +3895,22 @@ o:  </dt>
 </dl>
 <p id="section-appendix.b-3">The analyses that follow rely on a count of the number of block operations
 involved in producing each message. This analysis is performed for packets of
-size up to 2^11 (l = 2^7) and 2^16 (l = 2^12). A size of 2^11 is expected to be
-a limit that matches common deployment patterns, whereas the 2^16 is the maximum
-possible size of a QUIC packet. Only endpoints that strictly limit packet size
-can use the larger confidentiality and integrity limits that are derived using
-the smaller packet size.<a href="#section-appendix.b-3" class="pilcrow">¶</a></p>
+size up to 2<sup>11</sup> (l = 2<sup>7</sup>) and 2<sup>16</sup> (l =
+2<sup>12</sup>). A size of 2<sup>11</sup> is expected to be a limit that matches
+common deployment patterns, whereas the 2<sup>16</sup> is the maximum possible
+size of a QUIC packet. Only endpoints that strictly limit packet size can use
+the larger confidentiality and integrity limits that are derived using the
+smaller packet size.<a href="#section-appendix.b-3" class="pilcrow">¶</a></p>
 <p id="section-appendix.b-4">For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the message length (l) is the length
 of the associated data in blocks plus the length of the plaintext in blocks.<a href="#section-appendix.b-4" class="pilcrow">¶</a></p>
-<p id="section-appendix.b-5">For AEAD_AES_128_CCM, the total number of block cipher operations is the sum
-of: the length of the associated data in blocks, the length of the ciphertext
-in blocks, the length of the plaintext in blocks, plus 1. In this analysis,
-this is simplified to a value of twice the length of the packet in blocks (that
-is, <code>2l = 2^8</code> for packets that are limited to 2^11 bytes, or <code>2l = 2^13</code>
-otherwise). This simplification is based on the packet containing all of the
-associated data and ciphertext. This results in a 1 to 3 block overestimation
-of the number of operations per packet.<a href="#section-appendix.b-5" class="pilcrow">¶</a></p>
+<p id="section-appendix.b-5">For AEAD_AES_128_CCM, the total number of block cipher operations is the sum of:
+the length of the associated data in blocks, the length of the ciphertext in
+blocks, the length of the plaintext in blocks, plus 1. In this analysis, this is
+simplified to a value of twice the length of the packet in blocks (that is,
+<code>2l = 2<sup>8</sup></code> for packets that are limited to 2<sup>11</sup>
+bytes, or <code>2l = 2<sup>13</sup></code> otherwise). This simplification is based
+on the packet containing all of the associated data and ciphertext. This results
+in a 1 to 3 block overestimation of the number of operations per packet.<a href="#section-appendix.b-5" class="pilcrow">¶</a></p>
 <div id="gcm-bounds">
 <section id="section-b.1">
         <h2 id="name-analysis-of-aead_aes_128_gc">
@@ -3932,16 +3945,17 @@ attacker is:<a href="#section-b.1.1-1" class="pilcrow">¶</a></p>
 2 * (q * l)^2 / 2^n
 </pre><a href="#section-b.1.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.1-3">For a target advantage of 2^-57, this results in the relation:<a href="#section-b.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-b.1.1-3">For a target advantage of 2<sup>-57</sup>, this results in the relation:<a href="#section-b.1.1-3" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.1.1-4">
 <pre>
 q &lt;= 2^35 / l
 </pre><a href="#section-b.1.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.1-5">Thus, endpoints that do not send packets larger than 2^11 bytes cannot protect
-more than 2^28 packets in a single connection without causing an attacker to
-gain an larger advantage than the target of 2^-57. The limit for endpoints that
-allow for the packet size to be as large as 2^16 is instead 2^23.<a href="#section-b.1.1-5" class="pilcrow">¶</a></p>
+<p id="section-b.1.1-5">Thus, endpoints that do not send packets larger than 2<sup>11</sup> bytes cannot
+protect more than 2<sup>28</sup> packets in a single connection without causing
+an attacker to gain an larger advantage than the target of 2<sup>-57</sup>. The
+limit for endpoints that allow for the packet size to be as large as
+2<sup>16</sup> is instead 2<sup>23</sup>.<a href="#section-b.1.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="integrity-limit">
@@ -3957,18 +3971,19 @@ an advantage in successfully forging a packet of no more than:<a href="#section-
         + ((2 * o * v) / 2^(k + n)) + (n * (v + (v * l)) / 2^k)
 </pre><a href="#section-b.1.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.2-3">The goal is to limit this advantage to 2^-57.  For AEAD_AES_128_GCM, the fourth
-term in this inequality dominates the rest, so the others can be removed without
-significant effect on the result. This produces the following approximation:<a href="#section-b.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-b.1.2-3">The goal is to limit this advantage to 2<sup>-57</sup>.  For AEAD_AES_128_GCM,
+the fourth term in this inequality dominates the rest, so the others can be
+removed without significant effect on the result. This produces the following
+approximation:<a href="#section-b.1.2-3" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.1.2-4">
 <pre>
 v &lt;= 2^64 / l
 </pre><a href="#section-b.1.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-b.1.2-5">Endpoints that do not attempt to remove protection from packets larger than 2^11
-bytes can attempt to remove protection from at most 2^57 packets. Endpoints that
-do not restrict the size of processed packets can attempt to remove protection
-from at most 2^52 packets.<a href="#section-b.1.2-5" class="pilcrow">¶</a></p>
+<p id="section-b.1.2-5">Endpoints that do not attempt to remove protection from packets larger than
+2<sup>11</sup> bytes can attempt to remove protection from at most
+2<sup>57</sup> packets. Endpoints that do not restrict the size of processed
+packets can attempt to remove protection from at most 2<sup>52</sup> packets.<a href="#section-b.1.2-5" class="pilcrow">¶</a></p>
 <p id="section-b.1.2-6">For AEAD_AES_256_GCM, the same term dominates, but the larger value of k
 produces the following approximation:<a href="#section-b.1.2-6" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.1.2-7">
@@ -4018,16 +4033,16 @@ v / 2^t + (2l * (v + q))^2 / 2^n
 second, so that term can be removed without a significant effect on the result.<a href="#section-b.2-8" class="pilcrow">¶</a></p>
 <p id="section-b.2-9">This produces a relation that combines both encryption and decryption attempts
 with the same limit as that produced by the theorem for confidentiality alone.
-For a target advantage of 2^-57, this results in:<a href="#section-b.2-9" class="pilcrow">¶</a></p>
+For a target advantage of 2<sup>-57</sup>, this results in:<a href="#section-b.2-9" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-b.2-10">
 <pre>
 v + q &lt;= 2^34.5 / l
 </pre><a href="#section-b.2-10" class="pilcrow">¶</a>
 </div>
 <p id="section-b.2-11">By setting <code>q = v</code>, values for both confidentiality and integrity limits can be
-produced. Endpoints that limit packets to 2^11 bytes therefore have both
-confidentiality and integrity limits of 2^26.5 packets. Endpoints that do not
-restrict packet size have a limit of 2^21.5.<a href="#section-b.2-11" class="pilcrow">¶</a></p>
+produced. Endpoints that limit packets to 2<sup>11</sup> bytes therefore have
+both confidentiality and integrity limits of 2<sup>26.5</sup> packets. Endpoints
+that do not restrict packet size have a limit of 2<sup>21.5</sup>.<a href="#section-b.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

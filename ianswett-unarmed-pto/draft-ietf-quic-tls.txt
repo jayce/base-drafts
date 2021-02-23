@@ -5,8 +5,8 @@
 QUIC                                                     M. Thomson, Ed.
 Internet-Draft                                                   Mozilla
 Intended status: Standards Track                          S. Turner, Ed.
-Expires: 24 July 2021                                              sn3rd
-                                                         20 January 2021
+Expires: 27 August 2021                                            sn3rd
+                                                        23 February 2021
 
 
                         Using TLS to Secure QUIC
@@ -42,7 +42,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 July 2021.
+   This Internet-Draft will expire on 27 August 2021.
 
 Copyright Notice
 
@@ -737,9 +737,10 @@ Table of Contents
    ClientHello message in their first Initial packet.
 
    The TLS implementation does not need to ensure that the ClientHello
-   is large enough to meet the requirements for QUIC packets.  QUIC
-   PADDING frames are added to increase the size of the packet as
-   necessary; see Section 14.1 of [QUIC-TRANSPORT].
+   is large enough to meet QUIC's requirements for datagrams that carry
+   Initial packets; see Section 14.1 of [QUIC-TRANSPORT].  QUIC
+   implementations use PADDING frames or packet coalescing to ensure
+   that datagrams are large enough.
 
 4.4.  Peer Authentication
 
@@ -801,7 +802,7 @@ Table of Contents
    issue for clients.  Clients can choose not to enable resumption to
    avoid creating this correlation.  Clients SHOULD NOT reuse tickets as
    that allows entities other than the server to correlate connections;
-   see Section C.4 of [TLS13].
+   see Appendix C.4 of [TLS13].
 
 4.6.  0-RTT
 
@@ -1849,10 +1850,10 @@ Table of Contents
    reaching a state where key updates are not possible.
 
    For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the confidentiality limit
-   is 2^23 encrypted packets; see Appendix B.1.  For
+   is 2^(23) encrypted packets; see Appendix B.1.  For
    AEAD_CHACHA20_POLY1305, the confidentiality limit is greater than the
-   number of possible packets (2^62) and so can be disregarded.  For
-   AEAD_AES_128_CCM, the confidentiality limit is 2^21.5 encrypted
+   number of possible packets (2^(62)) and so can be disregarded.  For
+   AEAD_AES_128_CCM, the confidentiality limit is 2^(21.5) encrypted
    packets; see Appendix B.2.  Applying a limit reduces the probability
    that an attacker can distinguish the AEAD in use from a random
    permutation; see [AEBounds], [ROBUST], and [GCM-MU].
@@ -1866,12 +1867,12 @@ Table of Contents
    AEAD_LIMIT_REACHED and not process any more packets.
 
    For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the integrity limit is
-   2^52 invalid packets; see Appendix B.1.  For AEAD_CHACHA20_POLY1305,
-   the integrity limit is 2^36 invalid packets; see [AEBounds].  For
-   AEAD_AES_128_CCM, the integrity limit is 2^21.5 invalid packets; see
-   Appendix B.2.  Applying this limit reduces the probability that an
-   attacker can successfully forge a packet; see [AEBounds], [ROBUST],
-   and [GCM-MU].
+   2^(52) invalid packets; see Appendix B.1.  For
+   AEAD_CHACHA20_POLY1305, the integrity limit is 2^(36) invalid
+   packets; see [AEBounds].  For AEAD_AES_128_CCM, the integrity limit
+   is 2^(21.5) invalid packets; see Appendix B.2.  Applying this limit
+   reduces the probability that an attacker can successfully forge a
+   packet; see [AEBounds], [ROBUST], and [GCM-MU].
 
    Endpoints that limit the size of packets MAY use higher
    confidentiality and integrity limits; see Appendix B for details.
@@ -2128,7 +2129,7 @@ Table of Contents
    the protected fields.  Assuming that the AEAD acts as a PRF, if L
    bits are sampled, the odds of two ciphertext samples being identical
    approach 2^(-L/2), that is, the birthday bound.  For the algorithms
-   described in this document, that probability is one in 2^64.
+   described in this document, that probability is one in 2^(64).
 
    To prevent an attacker from modifying packet headers, the header is
    transitively authenticated using packet protection; the entire packet
@@ -2216,7 +2217,7 @@ Table of Contents
 
    [AEAD]     McGrew, D., "An Interface and Algorithms for Authenticated
               Encryption", RFC 5116, DOI 10.17487/RFC5116, January 2008,
-              <https://www.rfc-editor.org/info/rfc5116>.
+              <https://datatracker.ietf.org/doc/html/rfc5116>.
 
    [AES]      "Advanced encryption standard (AES)", National Institute
               of Standards and Technology report,
@@ -2226,43 +2227,45 @@ Table of Contents
    [ALPN]     Friedl, S., Popov, A., Langley, A., and E. Stephan,
               "Transport Layer Security (TLS) Application-Layer Protocol
               Negotiation Extension", RFC 7301, DOI 10.17487/RFC7301,
-              July 2014, <https://www.rfc-editor.org/info/rfc7301>.
+              July 2014,
+              <https://datatracker.ietf.org/doc/html/rfc7301>.
 
    [CHACHA]   Nir, Y. and A. Langley, "ChaCha20 and Poly1305 for IETF
               Protocols", RFC 8439, DOI 10.17487/RFC8439, June 2018,
-              <https://www.rfc-editor.org/info/rfc8439>.
+              <https://datatracker.ietf.org/doc/html/rfc8439>.
 
    [HKDF]     Krawczyk, H. and P. Eronen, "HMAC-based Extract-and-Expand
               Key Derivation Function (HKDF)", RFC 5869,
               DOI 10.17487/RFC5869, May 2010,
-              <https://www.rfc-editor.org/info/rfc5869>.
+              <https://datatracker.ietf.org/doc/html/rfc5869>.
 
    [QUIC-RECOVERY]
               Iyengar, J., Ed. and I. Swett, Ed., "QUIC Loss Detection
               and Congestion Control", Work in Progress, Internet-Draft,
-              draft-ietf-quic-recovery, 20 January 2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-recovery>.
+              draft-ietf-quic-recovery, 23 February 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              recovery.txt>.
 
    [QUIC-TRANSPORT]
               Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
               Multiplexed and Secure Transport", Work in Progress,
-              Internet-Draft, draft-ietf-quic-transport, 20 January
-              2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-transport>.
+              Internet-Draft, draft-ietf-quic-transport, 23 February
+              2021, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              quic-transport.txt>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
+              <https://datatracker.ietf.org/doc/html/rfc2119>.
 
    [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,
               "Randomness Requirements for Security", BCP 106, RFC 4086,
               DOI 10.17487/RFC4086, June 2005,
-              <https://www.rfc-editor.org/info/rfc4086>.
+              <https://datatracker.ietf.org/doc/html/rfc4086>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+              May 2017, <https://datatracker.ietf.org/doc/html/rfc8174>.
 
    [SHA]      Dang, Q., "Secure Hash Standard", National Institute of
               Standards and Technology report,
@@ -2272,11 +2275,11 @@ Table of Contents
    [TLS-REGISTRIES]
               Salowey, J. and S. Turner, "IANA Registry Updates for TLS
               and DTLS", RFC 8447, DOI 10.17487/RFC8447, August 2018,
-              <https://www.rfc-editor.org/info/rfc8447>.
+              <https://datatracker.ietf.org/doc/html/rfc8447>.
 
    [TLS13]    Rescorla, E., "The Transport Layer Security (TLS) Protocol
               Version 1.3", RFC 8446, DOI 10.17487/RFC8446, August 2018,
-              <https://www.rfc-editor.org/info/rfc8446>.
+              <https://datatracker.ietf.org/doc/html/rfc8446>.
 
 11.2.  Informative References
 
@@ -2286,7 +2289,7 @@ Table of Contents
 
    [ASCII]    Cerf, V., "ASCII format for network interchange", STD 80,
               RFC 20, DOI 10.17487/RFC0020, October 1969,
-              <https://www.rfc-editor.org/info/rfc20>.
+              <https://datatracker.ietf.org/doc/html/rfc20>.
 
    [CCM-ANALYSIS]
               Jonsson, J., "On the Security of CTR + CBC-MAC", Selected
@@ -2297,7 +2300,7 @@ Table of Contents
    [COMPRESS] Ghedini, A. and V. Vasiliev, "TLS Certificate
               Compression", Work in Progress, Internet-Draft, draft-
               ietf-tls-certificate-compression-10, 6 January 2020,
-              <http://www.ietf.org/internet-drafts/draft-ietf-tls-
+              <https://datatracker.ietf.org/doc/html/draft-ietf-tls-
               certificate-compression-10.txt>.
 
    [GCM-MU]   Hoang, V., Tessaro, S., and A. Thiruvengadam, "The Multi-
@@ -2310,12 +2313,12 @@ Table of Contents
    [HTTP-REPLAY]
               Thomson, M., Nottingham, M., and W. Tarreau, "Using Early
               Data in HTTP", RFC 8470, DOI 10.17487/RFC8470, September
-              2018, <https://www.rfc-editor.org/info/rfc8470>.
+              2018, <https://datatracker.ietf.org/doc/html/rfc8470>.
 
    [HTTP2-TLS13]
               Benjamin, D., "Using TLS 1.3 with HTTP/2", RFC 8740,
               DOI 10.17487/RFC8740, February 2020,
-              <https://www.rfc-editor.org/info/rfc8740>.
+              <https://datatracker.ietf.org/doc/html/rfc8740>.
 
    [IMC]      Katz, J. and Y. Lindell, "Introduction to Modern
               Cryptography, Second Edition", ISBN 978-1466570269, 6
@@ -2329,18 +2332,19 @@ Table of Contents
    [QUIC-HTTP]
               Bishop, M., Ed., "Hypertext Transfer Protocol Version 3
               (HTTP/3)", Work in Progress, Internet-Draft, draft-ietf-
-              quic-http, 20 January 2021,
-              <https://tools.ietf.org/html/draft-ietf-quic-http>.
+              quic-http, 23 February 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              http.txt>.
 
    [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818,
               DOI 10.17487/RFC2818, May 2000,
-              <https://www.rfc-editor.org/info/rfc2818>.
+              <https://datatracker.ietf.org/doc/html/rfc2818>.
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
-              <https://www.rfc-editor.org/info/rfc5280>.
+              <https://datatracker.ietf.org/doc/html/rfc5280>.
 
    [ROBUST]   Fischlin, M., Günther, F., and C. Janson, "Robust
               Channels: Handling Unreliable Networks in the Record
@@ -2614,12 +2618,12 @@ Appendix B.  AEAD Algorithm Analysis
 
    The analyses that follow rely on a count of the number of block
    operations involved in producing each message.  This analysis is
-   performed for packets of size up to 2^11 (l = 2^7) and 2^16 (l =
-   2^12).  A size of 2^11 is expected to be a limit that matches common
-   deployment patterns, whereas the 2^16 is the maximum possible size of
-   a QUIC packet.  Only endpoints that strictly limit packet size can
-   use the larger confidentiality and integrity limits that are derived
-   using the smaller packet size.
+   performed for packets of size up to 2^(11) (l = 2^(7)) and 2^(16) (l
+   = 2^(12)).  A size of 2^(11) is expected to be a limit that matches
+   common deployment patterns, whereas the 2^(16) is the maximum
+   possible size of a QUIC packet.  Only endpoints that strictly limit
+   packet size can use the larger confidentiality and integrity limits
+   that are derived using the smaller packet size.
 
    For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the message length (l) is
    the length of the associated data in blocks plus the length of the
@@ -2629,8 +2633,8 @@ Appendix B.  AEAD Algorithm Analysis
    the sum of: the length of the associated data in blocks, the length
    of the ciphertext in blocks, the length of the plaintext in blocks,
    plus 1.  In this analysis, this is simplified to a value of twice the
-   length of the packet in blocks (that is, "2l = 2^8" for packets that
-   are limited to 2^11 bytes, or "2l = 2^13" otherwise).  This
+   length of the packet in blocks (that is, "2l = 2^(8)" for packets
+   that are limited to 2^(11) bytes, or "2l = 2^(13)" otherwise).  This
    simplification is based on the packet containing all of the
    associated data and ciphertext.  This results in a 1 to 3 block
    overestimation of the number of operations per packet.
@@ -2661,15 +2665,15 @@ B.1.1.  Confidentiality Limit
 
    2 * (q * l)^2 / 2^n
 
-   For a target advantage of 2^-57, this results in the relation:
+   For a target advantage of 2^(-57), this results in the relation:
 
    q <= 2^35 / l
 
-   Thus, endpoints that do not send packets larger than 2^11 bytes
-   cannot protect more than 2^28 packets in a single connection without
-   causing an attacker to gain an larger advantage than the target of
-   2^-57.  The limit for endpoints that allow for the packet size to be
-   as large as 2^16 is instead 2^23.
+   Thus, endpoints that do not send packets larger than 2^(11) bytes
+   cannot protect more than 2^(28) packets in a single connection
+   without causing an attacker to gain an larger advantage than the
+   target of 2^(-57).  The limit for endpoints that allow for the packet
+   size to be as large as 2^(16) is instead 2^(23).
 
 B.1.2.  Integrity Limit
 
@@ -2679,17 +2683,18 @@ B.1.2.  Integrity Limit
    (1 / 2^(8 * n)) + ((2 * v) / 2^(2 * n))
            + ((2 * o * v) / 2^(k + n)) + (n * (v + (v * l)) / 2^k)
 
-   The goal is to limit this advantage to 2^-57.  For AEAD_AES_128_GCM,
-   the fourth term in this inequality dominates the rest, so the others
-   can be removed without significant effect on the result.  This
-   produces the following approximation:
+   The goal is to limit this advantage to 2^(-57).  For
+   AEAD_AES_128_GCM, the fourth term in this inequality dominates the
+   rest, so the others can be removed without significant effect on the
+   result.  This produces the following approximation:
 
    v <= 2^64 / l
 
    Endpoints that do not attempt to remove protection from packets
-   larger than 2^11 bytes can attempt to remove protection from at most
-   2^57 packets.  Endpoints that do not restrict the size of processed
-   packets can attempt to remove protection from at most 2^52 packets.
+   larger than 2^(11) bytes can attempt to remove protection from at
+   most 2^(57) packets.  Endpoints that do not restrict the size of
+   processed packets can attempt to remove protection from at most
+   2^(52) packets.
 
    For AEAD_AES_256_GCM, the same term dominates, but the larger value
    of k produces the following approximation:
@@ -2733,16 +2738,16 @@ B.2.  Analysis of AEAD_AES_128_CCM Usage Limits
 
    This produces a relation that combines both encryption and decryption
    attempts with the same limit as that produced by the theorem for
-   confidentiality alone.  For a target advantage of 2^-57, this results
-   in:
+   confidentiality alone.  For a target advantage of 2^(-57), this
+   results in:
 
    v + q <= 2^34.5 / l
 
    By setting "q = v", values for both confidentiality and integrity
-   limits can be produced.  Endpoints that limit packets to 2^11 bytes
-   therefore have both confidentiality and integrity limits of 2^26.5
+   limits can be produced.  Endpoints that limit packets to 2^(11) bytes
+   therefore have both confidentiality and integrity limits of 2^(26.5)
    packets.  Endpoints that do not restrict packet size have a limit of
-   2^21.5.
+   2^(21.5).
 
 Appendix C.  Change Log
 
