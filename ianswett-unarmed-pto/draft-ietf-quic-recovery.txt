@@ -1622,6 +1622,10 @@ A.6.  On Receiving a Datagram
      // PTO timer to avoid deadlock.
      if (server was at anti-amplification limit):
        SetLossDetectionTimer()
+       if loss_detection_timer.timeout < now():
+         // PTO would have already expired, execute it
+         // immediately.
+         OnLossDetectionTimeout()
 
 A.7.  On Receiving an Acknowledgment
 
