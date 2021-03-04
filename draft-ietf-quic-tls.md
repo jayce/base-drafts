@@ -108,6 +108,8 @@ informative:
 This document describes how Transport Layer Security (TLS) is used to secure
 QUIC.
 
+本文档介绍了如何使用传输层安全性协议（TLS）来保护 QUIC。
+
 --- note_Note_to_Readers
 
 Discussion of this draft takes place on the QUIC working group mailing list
@@ -120,10 +122,12 @@ code and issues list for this draft can be found at
 
 --- middle
 
-# Introduction
+# Introduction - 介绍
 
 This document describes how QUIC {{QUIC-TRANSPORT}} is secured using TLS
 {{!TLS13=RFC8446}}.
+
+本文档介绍了如何使用 TLS {{!TLS13=RFC8446}} 保护 QUIC {{QUIC-TRANSPORT}}。
 
 TLS 1.3 provides critical latency improvements for connection establishment over
 previous versions.  Absent packet loss, most new connections can be established
@@ -131,28 +135,41 @@ and secured within a single round trip; on subsequent connections between the
 same client and server, the client can often send application data immediately,
 that is, using a zero round trip setup.
 
+TLS 1.3 为先前版本提供了连接建立的关键延迟改进。在没有数据包丢失的情况下，
+大多数新连接可以在一次往返中建立和保护; 在同一客户端和服务器之间的后续连接上，
+客户端通常可以立即发送应用程序数据，即使用零往返机制。
+
 This document describes how TLS acts as a security component of QUIC.
 
+本文档描述 TLS 如何作为 QUIC 的安全组件。
 
-# Notational Conventions
+# Notational Conventions - 符号约定
 
 {::boilerplate bcp14}
 
 This document uses the terminology established in {{QUIC-TRANSPORT}}.
 
+文档使用 {{QUIC-TRANSPORT}} 中建立的术语。
+
 For brevity, the acronym TLS is used to refer to TLS 1.3, though a newer version
 could be used; see {{tls-version}}.
 
+为简单起见，缩写 TLS 用来表示 TLS 1.3，不过可以使用更新的版本（见 {{tls-version}}）。
 
-## TLS Overview
+## TLS Overview - TLS 概述
 
 TLS provides two endpoints with a way to establish a means of communication over
 an untrusted medium (for example, the Internet). TLS enables authentication of
 peers and provides confidentiality and integrity protection for messages that
 endpoints exchange.
 
+TLS 为两个端点提供了一种在不受信任的媒体（例如，Internet）上建立通信的方法。
+TLS 启用两端的身份验证，并为两端交换的消息提供机密性和完整性保护。
+
 Internally, TLS is a layered protocol, with the structure shown in
 {{tls-layers}}.
+
+TLS 内部是一种分层协议，其结构如 {{tls-layers}}。
 
 ~~~~
           +-------------+------------+--------------+---------+
@@ -172,6 +189,10 @@ carried as a series of typed TLS records by the Record layer.  Records are
 individually cryptographically protected and then transmitted over a reliable
 transport (typically TCP), which provides sequencing and guaranteed delivery.
 
+记录层将每个内容层消息（例如，握手、警告、应用层数据）作为一系列类型的 TLS 记录
+进行传输。记录被单独地加密保护，然后通过可靠的传输方法（通常是 TCP ）传输，
+该传输提供排序和有保证的传输。
+
 The TLS authenticated key exchange occurs between two endpoints: client and
 server.  The client initiates the exchange and the server responds.  If the key
 exchange completes successfully, both client and server will agree on a secret.
@@ -181,6 +202,12 @@ Data (0-RTT); the latter provides forward secrecy (FS) when the (EC)DHE
 keys are destroyed.  The two modes can also be combined, to provide forward
 secrecy while using the PSK for authentication.
 
+TLS 认证密钥交换发生在两个端点之间：客户端和服务器。客户端启动交换，服务器响应。
+如果密钥交换成功完成，客户端和服务器都将同意一个秘密。TLS 支持有限域或椭圆曲线
+上的预共享密钥（PSK）和 Diffie-Hellman 密钥交换。PSK 是早期数据（0-RTT）的基础；
+后者在（EC）DHE 密钥被破坏时提供前向保密（FS）。这两种模式也可以结合使用，
+以便在使用 PSK 进行身份验证时提供前向保密性。
+
 After completing the TLS handshake, the client will have learned and
 authenticated an identity for the server and the server is optionally able to
 learn and authenticate an identity for the client.  TLS supports X.509
@@ -188,14 +215,25 @@ learn and authenticate an identity for the client.  TLS supports X.509
 When PSK key exchange is used (as in resumption), knowledge of the PSK
 serves to authenticate the peer.
 
+在完成 TLS 握手之后，客户机将学习并验证服务器的身份，并且服务器可选地能够学习并验
+证客户机的身份。TLS 支持 X.509 {{?RFC5280}} 服务器和客户端的基于证书的身份验证。
+当使用 PSK 密钥交换时（如在恢复中），PSK 的知识用于对对等方进行身份验证。
+
 The TLS key exchange is resistant to tampering by attackers and it produces
 shared secrets that cannot be controlled by either participating peer.
 
+TLS 密钥交换能够抵抗攻击者的篡改，并且它产生的共享秘密不能由任何参与的对等方控制。
+
 TLS provides two basic handshake modes of interest to QUIC:
+
+TLS 提供了两种 QUIC 感兴趣的握手模式：
 
  * A full 1-RTT handshake, in which the client is able to send Application Data
    after one round trip and the server immediately responds after receiving the
    first handshake message from the client.
+
+ * 完整的 1-RTT 握手，客户端能够在一次往返之后发送应用程序数据，服务器在接收到
+   客户端的第一个握手消息后立即作出响应。
 
  * A 0-RTT handshake, in which the client uses information it has previously
    learned about the server to send Application Data immediately.  This
@@ -203,7 +241,13 @@ TLS provides two basic handshake modes of interest to QUIC:
    carrying instructions that might initiate any action that could cause
    unwanted effects if replayed.
 
+ * 0-RTT 握手，客户端使用先前从服务端学到的信息立即发送应用程序数据。攻击者可以
+   重放此应用程序数据，因此 0-RTT 不适合携带可能启动任何操作的指令，这些操作在
+   重放时可能会造成不必要的影响。
+
 A simplified TLS handshake with 0-RTT application data is shown in {{tls-full}}.
+
+{{tls-full}} 显示了使用 0-RTT 应用程序数据的简化版 TLS 握手。
 
 ~~~
     Client                                             Server
@@ -222,6 +266,10 @@ A simplified TLS handshake with 0-RTT application data is shown in {{tls-full}}.
     {} Indicates messages protected using Handshake Keys
     [] Indicates messages protected using Application Data
        (1-RTT) Keys
+
+    () 表示使用 Early Data (0-RTT) 密钥保护的消息
+    {} 表示使用握手密钥保护的消息
+    [] 表示使用应用数据 (1-RTT) 密钥保护的消息
 ~~~
 {: #tls-full title="TLS Handshake with 0-RTT"}
 
@@ -230,23 +278,38 @@ A simplified TLS handshake with 0-RTT application data is shown in {{tls-full}}.
 used by QUIC. ChangeCipherSpec is redundant in TLS 1.3; see {{compat-mode}}.
 QUIC has its own key update mechanism; see {{key-update}}.
 
+{{tls-full}} 省略了 EndOfEarlyData 消息， QUIC 没有使用它（见 {{remove-eoed}}）。
+同样，QUIC 也不使用 ChangeCipherSpec 和 KeyUpdate 消息。 ChangeCipherSpec 在 TLS 1.3
+中是冗余的（见 {{compat-mode}}）。 QUIC 有自己的密钥更新机制（见 {{key-update}}）。
+
 Data is protected using a number of encryption levels:
+
+使用多种加密级别来保护数据：
 
 - Initial Keys
 - Early Data (0-RTT) Keys
 - Handshake Keys
 - Application Data (1-RTT) Keys
 
+- 初始密钥
+- Early Data (0-RTT) 密钥
+- 握手密钥
+- 应用数据 (1-RTT) 密钥
+
 Application Data may appear only in the Early Data and Application Data
 levels. Handshake and Alert messages may appear in any level.
+
+应用数据可能只出现在 Early Data 和应用数据级别。握手和警告消息可以出现在任意级别。
 
 The 0-RTT handshake can be used if the client and server have previously
 communicated.  In the 1-RTT handshake, the client is unable to send protected
 Application Data until it has received all of the Handshake messages sent by the
 server.
 
+如果客户端和服务器之前进行过通信，则可以使用 0-RTT 握手。在 1-RTT 握手过程中，
+客户端在接收到服务器发送的所有握手消息之前，不能发送受保护的应用数据。
 
-# Protocol Overview
+# Protocol Overview - 协议概述
 
 QUIC {{QUIC-TRANSPORT}} assumes responsibility for the confidentiality and
 integrity protection of packets.  For this it uses keys derived from a TLS
@@ -254,6 +317,11 @@ handshake {{!TLS13}}, but instead of carrying TLS records over QUIC (as with
 TCP), TLS Handshake and Alert messages are carried directly over the QUIC
 transport, which takes over the responsibilities of the TLS record layer, as
 shown in {{quic-layers}}.
+
+QUIC {{QUIC-TRANSPORT}} 负责数据包的机密性和完整性保护。为此，QUIC 只使用
+从 TLS 握手过程中 {{!TLS13}} 派生的密钥，且不通过 QUIC 本身传输 TLS 记录
+（同 TCP 一样），而是直接通过 QUIC 传输 TLS 握手和警告消息，等于 QUIC 接管
+了 TLS 记录层的职责，如下 {{quic-layers}}。
 
 ~~~~
 +--------------+--------------+ +-------------+
@@ -276,22 +344,36 @@ shown in {{quic-layers}}.
 QUIC also relies on TLS for authentication and negotiation of parameters that
 are critical to security and performance.
 
+QUIC 还依赖 TLS 来验证和协商对安全和性能至关重要的参数。
+
 Rather than a strict layering, these two protocols cooperate: QUIC uses the TLS
 handshake; TLS uses the reliability, ordered delivery, and record layer provided
 by QUIC.
 
+这两个协议不是严格分层的，而是相互协作：QUIC 使用 TLS 握手；TLS 使用 QUIC 提供的
+可靠性、有序交付和记录层。
+
 At a high level, there are two main interactions between the TLS and QUIC
 components:
 
+在高层次上，TLS 和 QUIC 组件之间有两种主要的相互作用：
+
 * The TLS component sends and receives messages via the QUIC component, with
   QUIC providing a reliable stream abstraction to TLS.
+
+* TLS 通过 QUIC 发送和接受消息，QUIC 为 TLS 提供了可靠的流抽象。
 
 * The TLS component provides a series of updates to the QUIC component,
   including (a) new packet protection keys to install (b) state changes such as
   handshake completion, the server certificate, etc.
 
+* TLS 为 QUIC 提供了一系列更新，包括 (a) 设置新的数据包保护密钥 (b) 状态变更，例如
+  握手完成、服务端证书等。
+
 {{schematic}} shows these interactions in more detail, with the QUIC packet
 protection being called out specially.
+
+{{schematic}} 更详细地展示了这些交互，特意展示了 QUIC 数据包保护。
 
 ~~~
 +------------+                               +------------+
@@ -317,7 +399,10 @@ Unlike TLS over TCP, QUIC applications that want to send data do not send it
 through TLS "application_data" records. Rather, they send it as QUIC STREAM
 frames or other frame types, which are then carried in QUIC packets.
 
-# Carrying TLS Messages {#carrying-tls}
+与 TLS over TCP 不同，想要发送数据的 QUIC 应用程序不通过 TLS "application_data" 记录。
+相反，它们将其作为 QUIC 的 STREAM 帧或其他帧类型发送，然后封装在 QUIC 数据包中。
+
+# Carrying TLS Messages - 传输 TLS 消息 {#carrying-tls}
 
 QUIC carries TLS handshake data in CRYPTO frames, each of which consists of a
 contiguous block of handshake data identified by an offset and length. Those
@@ -328,15 +413,28 @@ chunk of data that is produced by TLS is associated with the set of keys that
 TLS is currently using.  If QUIC needs to retransmit that data, it MUST use the
 same keys even if TLS has already updated to newer keys.
 
+QUIC 在 CRYPTO 帧中携带 TLS 握手数据，每个帧由一个偏移量和长度标识的连续握手数据块
+组成。这些帧被打包成 QUIC 数据包，并在当前加密级别下进行加密。与 TCP over TLS 一样，
+一旦 TLS 握手数据被传递到 QUIC，QUIC 就有责任可靠地传递它。TLS 生成的每个数据块都
+与 TLS 当前使用的密钥集相关联。如果 QUIC 需要重新传输该数据，则必须使用相同的密钥，
+即使 TLS 已经更新为较新的密钥。
+
 Each encryption level corresponds to a packet number space. The packet number
 space that is used determines the semantics of frames. Some frames are
 prohibited in different packet number spaces; see {{Section 12.5 of
 QUIC-TRANSPORT}}.
 
+每个加密级别对应一个数据包编号空间。所使用的包编号空间决定帧的语义。
+某些帧在不同的包编号空间中被禁止（见 {{Section 12.5 of QUIC-TRANSPORT}}）。
+
 Because packets could be reordered on the wire, QUIC uses the packet type to
 indicate which keys were used to protect a given packet, as shown in
 {{packet-types-keys}}. When packets of different types need to be sent,
 endpoints SHOULD use coalesced packets to send them in the same UDP datagram.
+
+因为数据包在链路上可能被重新排序，所以 QUIC 使用数据包类型来区分哪种密钥保护哪种数据，
+如 {{packet-types-keys}} 。当需要发送不同类型的数据包时，端点应使用聚合的数据包
+在同一个 UDP 数据报中发送它们。
 
 | Packet Type         | Encryption Keys | PN Space         |
 | :------------------ | :-------------- | :--------------- |
@@ -351,11 +449,14 @@ endpoints SHOULD use coalesced packets to send them in the same UDP datagram.
 {{Section 17 of QUIC-TRANSPORT}} shows how packets at the various encryption
 levels fit into the handshake process.
 
+{{Section 17 of QUIC-TRANSPORT}} 展示各种加密级别的数据包如何适配握手过程。
 
-## Interface to TLS
+## Interface to TLS - TLS 接口
 
 As shown in {{schematic}}, the interface from QUIC to TLS consists of four
 primary functions:
+
+如 {{schematic}} ，QUIC 到 TLS 的接口由四个主要的函数组成：
 
 - Sending and receiving handshake messages
 - Processing stored transport and application state from a resumed session
@@ -363,10 +464,17 @@ primary functions:
 - Rekeying (both transmit and receive)
 - Handshake state updates
 
+- 发送和接受握手消息
+- 处理从恢复会话中保存的传输和应用状态，并确定生成或接受早期数据是否有效
+- 更新密钥（包括发送和接受）
+- 握手状态更新
+
 Additional functions might be needed to configure TLS.  In particular, QUIC and
 TLS need to agree on which is responsible for validation of peer credentials,
 such as certificate validation ({{?RFC5280}}).
 
+配置 TLS 可能需要额外的函数。特别是，QUIC 和 TLS 需要就谁负责对等凭据的验证达成一致，
+比如证书验证 ({{?RFC5280}}) 。
 
 ### Handshake Complete {#handshake-complete}
 
@@ -1478,7 +1586,7 @@ Original Destination Connection ID:
   observes the Initial packet.
 
 
-# Key Update
+# Key Update - 密钥更新 {#key-update}
 
 Once the handshake is confirmed (see {{handshake-confirmed}}), an endpoint MAY
 initiate a key update.
