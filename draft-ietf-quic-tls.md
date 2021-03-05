@@ -476,7 +476,7 @@ such as certificate validation ({{?RFC5280}}).
 配置 TLS 可能需要额外的函数。特别是，QUIC 和 TLS 需要就谁负责对等凭据的验证达成一致，
 比如证书验证 ({{?RFC5280}}) 。
 
-### Handshake Complete {#handshake-complete}
+### Handshake Complete - 握手完成 {#handshake-complete}
 
 In this document, the TLS handshake is considered complete when the TLS stack
 has reported that the handshake is complete.  This happens when the TLS stack
@@ -487,13 +487,20 @@ does not complete at both endpoints simultaneously.  Consequently, any
 requirement that is based on the completion of the handshake depends on the
 perspective of the endpoint in question.
 
+在本文中，当 TLS 堆栈报告握手已完成时，TLS 握手被认为已完成。当 TLS 堆栈既发送了
+已完成的消息，又验证了对等方的已完成消息时，就会发生这种情况。验证对等方的完成为
+端点提供了一个保证，即先前的握手消息没有被修改。请注意，握手不会在两个端点同时完成。
+因此，基于握手完成的任何需求都取决于所讨论的端点的视角。
 
-### Handshake Confirmed {#handshake-confirmed}
+### Handshake Confirmed - 握手确认 {#handshake-confirmed}
 
 In this document, the TLS handshake is considered confirmed at the server when
 the handshake completes.  The server MUST send a HANDSHAKE_DONE frame as soon as
 the handshake is complete.  At the client, the handshake is considered confirmed
 when a HANDSHAKE_DONE frame is received.
+
+在本文中，TLS 握手被认为是在握手完成时在服务器上确认的。一旦握手完成，服务器必须
+发送 HANDSHAKE_DONE 帧。在客户端，当收到 HANDSHAKE_DONE帧 时，认为握手已确认。
 
 Additionally, a client MAY consider the handshake to be confirmed when it
 receives an acknowledgment for a 1-RTT packet.  This can be implemented by
@@ -501,20 +508,31 @@ recording the lowest packet number sent with 1-RTT keys, and comparing it to the
 Largest Acknowledged field in any received 1-RTT ACK frame: once the latter is
 greater than or equal to the former, the handshake is confirmed.
 
+另外，客户端可以认为握手已经被确认，当客户端收到 1-RTT 数据包的确认时。这可以通过
+记录用 1-RTT 密钥发送的最小数据包号来实现，并将其与任何接收到的 1-RTT ACK 帧中的
+最大确认字段进行比较：一旦后者大于或等于前者，则确认握手。
 
-### Sending and Receiving Handshake Messages
+### Sending and Receiving Handshake Messages - 发送和接收握手消息
 
 In order to drive the handshake, TLS depends on being able to send and receive
 handshake messages. There are two basic functions on this interface: one where
 QUIC requests handshake messages and one where QUIC provides bytes that comprise
 handshake messages.
 
+TLS 依赖发送和接收握手消息来驱动握手。该接口上有两个基本功能：一个在 QUIC 请求
+握手消息，另一个在 QUIC 提供构成握手消息的字节。
+
 Before starting the handshake QUIC provides TLS with the transport parameters
 (see {{quic_parameters}}) that it wishes to carry.
+
+在握手开始之前，QUIC 向 TLS 提供它希望携带的传输参数。
 
 A QUIC client starts TLS by requesting TLS handshake bytes from TLS.  The client
 acquires handshake bytes before sending its first packet.  A QUIC server starts
 the process by providing TLS with the client's handshake bytes.
+
+QUIC 客户端通过 TLS 请求 TLS 握手字节来启动 TLS。客户端在发送第一个数据包之前
+获取握手字节。QUIC 服务器通过向 TLS 提供客户端的握手字节来启动这个过程。
 
 At any time, the TLS stack at an endpoint will have a current sending
 encryption level and receiving encryption level. TLS encryption levels determine
