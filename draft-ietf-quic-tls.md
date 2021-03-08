@@ -525,7 +525,7 @@ TLS 依赖发送和接收握手消息来驱动握手。该接口上有两个基�
 Before starting the handshake QUIC provides TLS with the transport parameters
 (see {{quic_parameters}}) that it wishes to carry.
 
-在握手开始之前，QUIC 向 TLS 提供它希望携带的传输参数。
+在握手开始之前，QUIC 向 TLS 提供它希望携带的传输参数（见 {{quic_parameters}}）。
 
 A QUIC client starts TLS by requesting TLS handshake bytes from TLS.  The client
 acquires handshake bytes before sending its first packet.  A QUIC server starts
@@ -538,11 +538,18 @@ At any time, the TLS stack at an endpoint will have a current sending
 encryption level and receiving encryption level. TLS encryption levels determine
 the QUIC packet type and keys that are used for protecting data.
 
+在任何时候，任意端点的 TLS 堆栈都将具有当前的发送加密级别和接收加密级别。 TLS 加密级
+别确定 QUIC 数据包类型和用于保护数据的密钥。
+
 Each encryption level is associated with a different sequence of bytes, which is
 reliably transmitted to the peer in CRYPTO frames. When TLS provides handshake
 bytes to be sent, they are appended to the handshake bytes for the current
 encryption level. The encryption level then determines the type of packet that
 the resulting CRYPTO frame is carried in; see {{packet-types-keys}}.
+
+每个加密级别与不同的字节序列关联，并在 CRYPTO 帧中可靠的传输到对端。当 TLS 提供要发送的
+握手字节时，会将它们附加到当前加密级别的握手字节中。然后，加密级别决定携带 CRYPTO 帧的
+数据包类型（见 {{packet-types-keys}}）。
 
 Four encryption levels are used, producing keys for Initial, 0-RTT, Handshake,
 and 1-RTT packets. CRYPTO frames are carried in just three of these levels,
@@ -550,28 +557,48 @@ omitting the 0-RTT level. These four levels correspond to three packet number
 spaces: Initial and Handshake encrypted packets use their own separate spaces;
 0-RTT and 1-RTT packets use the application data packet number space.
 
+使用四种加密级别，为 Initial、0-RTT、Handshake、1-RTT 数据包生成密钥。 CRYPTO 帧只出现
+在三个级别，省略了 0-RTT 级别。这四个级别对应于三个数据包编号空间：Initial 和 Handshake 加
+密的数据包使用各自独立的空间；0-RTT 和 1-RTT 数据包使用应用程序数据包编号空间。
+
 QUIC takes the unprotected content of TLS handshake records as the content of
 CRYPTO frames. TLS record protection is not used by QUIC. QUIC assembles
 CRYPTO frames into QUIC packets, which are protected using QUIC packet
 protection.
+
+QUIC 把 TLS 握手记录中不受保护的内容作为 CRYPTO 帧的内容。QUIC 没有使用 TLS 记录保护。
+QUIC 将 CRYPTO 帧封装到 QUIC 数据包中，使用 QUIC 包保护来保护。
 
 QUIC CRYPTO frames only carry TLS handshake messages.  TLS
 alerts are turned into QUIC CONNECTION_CLOSE error codes; see {{tls-errors}}.
 TLS application data and other content types cannot be carried by QUIC at any
 encryption level; it is an error if they are received from the TLS stack.
 
+QUIC CRYPTO 帧只用于传输 TLS 握手消息。TLS 警告被转换成了 QUIC CONNECTION_CLOSE 帧的
+错误代码（见 {{tls-errors}}）。TLS 应用数据以及其他内容不能传输，在 QUIC 任意加密级别；
+如果它们是从 TLS 堆栈接收到的，则是错误的。
+
 When an endpoint receives a QUIC packet containing a CRYPTO frame from the
 network, it proceeds as follows:
+
+当端点从网络上接收到一个包含 CRYPTO 帧的 QUIC 数据包时，处理过程如下：
 
 - If the packet uses the current TLS receiving encryption level, sequence the
   data into the input flow as usual. As with STREAM frames, the offset is used
   to find the proper location in the data sequence.  If the result of this
   process is that new data is available, then it is delivered to TLS in order.
 
+- 如果数据包使用当前的 TLS 接收加密级别，请照常将数据排序到输入流中。与 STREAM 帧
+  一样，偏移量用于在数据序列中找到合适的位置。如果此过程的结果是有新数据可用，则
+  将按顺序传送到 TLS。
+
 - If the packet is from a previously installed encryption level, it MUST NOT
   contain data that extends past the end of previously received data in that
   flow. Implementations MUST treat any violations of this requirement as a
   connection error of type PROTOCOL_VIOLATION.
+
+- 如果数据包来自先前安装的加密级别，则它不得包含超出该流中先前接收数据结尾的数据。
+  实现必须将任何违反此要求的行为视为违反协议类型的连接错误。
 
 - If the packet is from a new encryption level, it is saved for later processing
   by TLS.  Once TLS moves to receiving from this encryption level, saved data
@@ -579,9 +606,17 @@ network, it proceeds as follows:
   if there is data from a previous encryption level that TLS has not consumed,
   this MUST be treated as a connection error of type PROTOCOL_VIOLATION.
 
+- 如果数据包来自新的加密级别，它会被保存起由 TLS 延迟处理。一旦 TLS 从加密级别
+  转移到接收状态，便可以将保存的数据提供给 TLS。当 TLS 为更高的加密级别提供密钥时，
+  如果有来自 TLS 尚未使用的先前加密级别的数据，则必须将其视为 PROTOCOL_VIOLATION 类型
+  的连接错误。
+
 Each time that TLS is provided with new data, new handshake bytes are requested
 from TLS.  TLS might not provide any bytes if the handshake messages it has
 received are incomplete or it has no data to send.
+
+每次为 TLS 提供新数据时，都会从 TLS 请求新的握手字节。如果已收到的握手消息不完整
+或没有要发送的数据，则 TLS 可能不会提供任何字节。
 
 The content of CRYPTO frames might either be processed incrementally by TLS or
 buffered until complete messages or flights are available.  TLS is responsible
@@ -590,10 +625,17 @@ for buffering handshake bytes that arrive out of order or for encryption levels
 that are not yet ready.  QUIC does not provide any means of flow control for
 CRYPTO frames; see {{Section 7.5 of QUIC-TRANSPORT}}.
 
+CRYPTO 帧的内容可以通过 TLS 进行增量处理，也可以进行缓冲，直到获得完整的消息或
+传输为止。TLS 负责缓冲按顺序到达的握手字节。 QUIC 负责缓冲乱序到达的握手字节或尚未准备好的加密级别。
+QUIC 不提供任何用于 CRYPTO 帧的流控制的方法（{{Section 7.5 of QUIC-TRANSPORT}}）。
+
 Once the TLS handshake is complete, this is indicated to QUIC along with any
 final handshake bytes that TLS needs to send.  At this stage, the transport
 parameters that the peer advertised during the handshake are authenticated;
 see {{quic_parameters}}.
+
+一旦 TLS 握手完成，会将其与 TLS 需要发送的所有最终握手字节一起指示给 QUIC。
+在此阶段，对端在握手期间通告的传输参数得到认证。
 
 Once the handshake is complete, TLS becomes passive.  TLS can still receive data
 from its peer and respond in kind, but it will not need to send more data unless
@@ -601,10 +643,16 @@ specifically requested - either by an application or QUIC.  One reason to send
 data is that the server might wish to provide additional or updated session
 tickets to a client.
 
+只要握手完成，TLS 就会变成被动状态。TLS 依然可以从对端接收数据并响应，除非应用程序
+或 QUIC 明确要求，否则它无需发送更多数据。发送数据的一个原因是服务器可能希望向客户端
+提供其他或更新 session tickets 。
+
 When the handshake is complete, QUIC only needs to provide TLS with any data
 that arrives in CRYPTO streams.  In the same manner that is used during the
 handshake, new data is requested from TLS after providing received data.
 
+当握手完成的时候，QUIC 只需要向 TLS 提供 CYPTO 流中的任意数据。与握手期间相同的方式，
+在提供接收到的数据之后，从 TLS 请求新的数据。
 
 ### Encryption Level Changes
 
