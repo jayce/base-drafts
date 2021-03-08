@@ -654,14 +654,19 @@ handshake, new data is requested from TLS after providing received data.
 当握手完成的时候，QUIC 只需要向 TLS 提供 CYPTO 流中的任意数据。与握手期间相同的方式，
 在提供接收到的数据之后，从 TLS 请求新的数据。
 
-### Encryption Level Changes
+### Encryption Level Changes - 加密级别改变
 
 As keys at a given encryption level become available to TLS, TLS indicates to
 QUIC that reading or writing keys at that encryption level are available.
 
+当给定加密级别的密钥可供 TLS 使用时，TLS 向 QUIC 指示可在该加密级别读取或写入密钥。
+
 The availability of new keys is always a result of providing inputs to TLS.  TLS
 only provides new keys after being initialized (by a client) or when provided
 with new handshake data.
+
+新密钥的可用性始终是向 TLS 提供输入的结果。TLS 仅在初始化（由客户端）或提供新的握手
+数据后提供新密钥。
 
 However, a TLS implementation could perform some of its processing
 asynchronously. In particular, the process of validating a certificate can take
@@ -671,10 +676,19 @@ available. These packets can be processed once keys are provided by TLS. An
 endpoint SHOULD continue to respond to packets that can be processed during this
 time.
 
+但是，TLS 实现可以异步执行其某些处理。特别是，验证证书的过程可能需要一些时间。
+在等待 TLS 处理完成时，如果可能使用尚不可用的密钥来处理它们，则端点应该缓冲接收
+到的数据包。 TLS 提供密钥后即可处理这些数据包。端点应该继续响应在这段时间内可以
+处理的数据包。
+
 After processing inputs, TLS might produce handshake bytes, keys for new
 encryption levels, or both.
 
+在处理输入之后， TLS 可能会生成握手字节，或是用于新加密级别的密钥，或者两者都生成。
+
 TLS provides QUIC with three items as a new encryption level becomes available:
+
+随着新的加密级别变得可用，TLS 向 QUIC 提供了三项：
 
 * A secret
 
@@ -682,15 +696,29 @@ TLS provides QUIC with three items as a new encryption level becomes available:
 
 * A Key Derivation Function (KDF)
 
+* 一个秘密
+
+* 一个具有关联数据的身份验证加密 (AEAD) 函数
+
+* 一个密钥派生函数
+
 These values are based on the values that TLS negotiates and are used by QUIC to
 generate packet and header protection keys; see {{packet-protection}} and
 {{header-protect}}.
+
+这些值是基于 TLS 协商出来的值，被 QUIC 用来生成数据包和包头保护密钥
+（见 {{packet-protection}} 和 {{header-protect}}）。
 
 If 0-RTT is possible, it is ready after the client sends a TLS ClientHello
 message or the server receives that message.  After providing a QUIC client with
 the first handshake bytes, the TLS stack might signal the change to 0-RTT
 keys. On the server, after receiving handshake bytes that contain a ClientHello
 message, a TLS server might signal that 0-RTT keys are available.
+
+如果可以使用 0-RTT ，在客户端发送 TLS ClientHello 消息或者服务端收到该消息之后，
+客户端就准备好了。在向 QUIC 客户端提供第一个握手字节后，TLS 堆栈可能会向 0-RTT 密钥
+发出更改信号。在服务器上，在接收到包含 ClientHello 消息的握手字节后，TLS 服务器可能
+会发出 0-RTT 密钥可用的信号。
 
 Although TLS only uses one encryption level at a time, QUIC may use more than
 one level. For instance, after sending its Finished message (using a CRYPTO
@@ -701,11 +729,21 @@ of packets can mean that QUIC will need to handle packets at multiple encryption
 levels.  During the handshake, this means potentially handling packets at higher
 and lower encryption levels than the current encryption level used by TLS.
 
+虽然， TLS 一次只使用一个加密级别， 但 QUIC 可以使用多个加密级别。例如，在发送完成
+消息（使用握手加密级别的 CRYPTO 帧）之后，端点可以发送 STREAM 数据（1-RTT 加密）。
+如果完成消息丢失了，端点可以使用握手加密级别重传丢失的消息。数据包的重新排序或丢失
+意味着 QUIC 需要在多个加密级别上处理数据包。在握手期间，意味着要在比当前 TLS 使用的
+加密级别更高和更低的加密级别来处理数据包。
+
 In particular, server implementations need to be able to read packets at the
 Handshake encryption level at the same time as the 0-RTT encryption level.  A
 client could interleave ACK frames that are protected with Handshake keys with
 0-RTT data and the server needs to process those acknowledgments in order to
 detect lost Handshake packets.
+
+特别地，服务端实现需要能够在 0-RTT、Handshake 加密级别同时读取数据包。客户端可以
+将受握手密钥保护的 ACK 帧与 0-RTT 数据交织在一起，服务端需要处理这些确认以检测丢失的
+握手数据包。
 
 QUIC also needs access to keys that might not ordinarily be available to a TLS
 implementation.  For instance, a client might need to acknowledge Handshake
@@ -713,6 +751,9 @@ packets before it is ready to send CRYPTO frames at that encryption level.  TLS
 therefore needs to provide keys to QUIC before it might produce them for its own
 use.
 
+QUIC 还需要访问 TLS 实现通常不可用的密钥。例如，客户端可能需要确认握手数据包，然后才能
+准备在该加密级别发送 CRYPTO 帧。因此，TLS 需要在 QUIC 生成密钥供自己使用之前向 QUIC 提
+供密钥。
 
 ### TLS Interface Summary
 
