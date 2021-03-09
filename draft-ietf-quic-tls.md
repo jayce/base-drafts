@@ -961,7 +961,7 @@ of type PROTOCOL_VIOLATION.
 更具体地说，服务器不得发送握手后的 TLS 证书请求消息，客户端必须将此类消息的接收视为
 PROTOCOL_VIOLATION 类型的连接错误。
 
-## Session Resumption {#resumption}
+## Session Resumption - 会话恢复 {#resumption}
 
 QUIC can use the session resumption feature of TLS 1.3. It does this by
 carrying NewSessionTicket messages in CRYPTO frames after the handshake is
@@ -1196,11 +1196,14 @@ QUIC 允许使用通用代码代替特定的错误代码（{{Section 11 of QUIC-
 对于 TLS 警报，这包括用通用警报替换所有警报，例如 handshake_failure（ QUIC 中为 0x128）。
 端点可以使用通用错误代码，以避免可能暴露机密信息。
 
-## Discarding Unused Keys
+## Discarding Unused Keys - 丢弃未使用的密钥
 
 After QUIC has completed a move to a new encryption level, packet protection
 keys for previous encryption levels can be discarded.  This occurs several times
 during the handshake, as well as when keys are updated; see {{key-update}}.
+
+在 QUIC 完成转移到新的加密级别后，可以丢弃先前加密级别的数据包保护密钥。在握手期间
+以及在更新密钥时，这种情况会发生多次，见 {{key-update}}。
 
 Packet protection keys are not discarded immediately when new keys are
 available.  If packets from a lower encryption level contain CRYPTO frames,
@@ -1210,6 +1213,11 @@ encryption level as the packet being acknowledged.  Thus, it is possible that
 keys for a lower encryption level are needed for a short time after keys for a
 newer encryption level are available.
 
+当新密钥可用时，不会立即丢弃数据包保护密钥。如果来自较低加密级别的数据包包含 CRYPTO 帧，
+则必须以相同的加密级别发送重传该数据的帧。同样，端点会以与要确认的数据包相同的加密级别
+为数据包生成确认。因此，可能在较新的加密级别的密钥可用之后的短时间内需要较低加密级别的
+密钥。
+
 An endpoint cannot discard keys for a given encryption level unless it has
 received all the cryptographic handshake messages from its peer at that
 encryption level and its peer has done the same.  Different methods for
@@ -1218,18 +1226,28 @@ Handshake keys ({{discard-handshake}}).  These methods do not prevent packets
 from being received or sent at that encryption level because a peer might not
 have received all the acknowledgments necessary.
 
+端点无法丢弃给定加密级别的密钥，除非它已从该加密级别的对等方接收到所有加密握手消息，
+并且对等方也已这样做。确定 Initial 密钥（{{discard-initial}}）和 Handshake 密钥
+（{{discard-handshake}}）的方法不同。这些方法不会阻止在该加密级别接收或发送数据包，
+因为对等端可能未收到所有必需的确认。
+
 Though an endpoint might retain older keys, new data MUST be sent at the highest
 currently-available encryption level.  Only ACK frames and retransmissions of
 data in CRYPTO frames are sent at a previous encryption level.  These packets
 MAY also include PADDING frames.
 
+尽管端点可能保留了旧密钥，但必须以当前可用的最高加密级别发送新数据。在先前的加密级别
+仅发送 ACK 帧和 CRYPTO 帧中的数据重传。这些数据包还可以包括 PADDING 帧。
 
-### Discarding Initial Keys {#discard-initial}
+### Discarding Initial Keys - 丢弃 Initial 密钥 {#discard-initial}
 
 Packets protected with Initial secrets ({{initial-secrets}}) are not
 authenticated, meaning that an attacker could spoof packets with the intent to
 disrupt a connection.  To limit these attacks, Initial packet protection keys
 are discarded more aggressively than other keys.
+
+未验证使用 Initial 密码（{{initial-secrets}}）保护的数据包，这意味着攻击者可能会欺骗
+意图中断连接的数据包。为了限制这些攻击，初始包保护密钥比其他密钥更为积极地丢弃。
 
 The successful use of Handshake packets indicates that no more Initial packets
 need to be exchanged, as these keys can only be produced after receiving all
@@ -1238,23 +1256,35 @@ when it first sends a Handshake packet and a server MUST discard Initial keys
 when it first successfully processes a Handshake packet.  Endpoints MUST NOT
 send Initial packets after this point.
 
+握手数据包的成功使用表明不再需要交换 Initial 数据包，因为只有在从初始数据包接收到
+所有 CRYPTO 帧之后才能生成这些密钥。因此，客户端在第一次发送握手包时必须丢弃初始密钥，
+而服务器在第一次成功处理握手包时必须丢弃初始密钥。端点在此之后不得发送初始数据包。
+
 This results in abandoning loss recovery state for the Initial encryption level
 and ignoring any outstanding Initial packets.
 
+这导致放弃 Initial 加密级别的丢失恢复状态，并忽略任何未完成的初始数据包。
 
-### Discarding Handshake Keys {#discard-handshake}
+### Discarding Handshake Keys - 丢弃 Handshake 密钥 {#discard-handshake}
 
 An endpoint MUST discard its handshake keys when the TLS handshake is confirmed
 ({{handshake-confirmed}}).
 
+端点必须在握手被确认时丢弃 Handshake 密钥（见 {{handshake-confirmed}}）。
 
-### Discarding 0-RTT Keys
+### Discarding 0-RTT Keys - 丢弃 0-RTT 密钥
 
 0-RTT and 1-RTT packets share the same packet number space, and clients do not
 send 0-RTT packets after sending a 1-RTT packet ({{using-early-data}}).
 
+0-RTT 和 1-RTT 数据包共享相同的数据包编号空间，客户端不能在发送 1-RTT 数据包之后
+发送 0-RTT 数据包（{{using-early-data}}）。
+
 Therefore, a client SHOULD discard 0-RTT keys as soon as it installs 1-RTT
 keys, since they have no use after that moment.
+
+因此，客户端应该在应用 1-RTT 密钥后立即丢弃 0-RTT 密钥，因为在那一刻之后它们
+将不再使用。
 
 Additionally, a server MAY discard 0-RTT keys as soon as it receives a 1-RTT
 packet.  However, due to packet reordering, a 0-RTT packet could arrive after
@@ -1266,8 +1296,14 @@ Timeout (PTO, see {{QUIC-RECOVERY}}).  A server MAY discard 0-RTT keys earlier
 if it determines that it has received all 0-RTT packets, which can be done by
 keeping track of missing packet numbers.
 
+另外，服务器一旦接收到 1-RTT 包，就可以丢弃 0-RTT 密钥。但是，由于数据包重新排序，
+0-RTT 数据包可能会在 1-RTT 数据包之后到达。服务器可以临时保留 0-RTT 密钥，以允许
+解密重新排序的数据包，而无需使用 1-RTT 密钥重新发送其内容。收到 1-RTT 数据包后，
+服务器务必在短时间内丢弃 0-RTT 密钥。推荐时间是探测超时的三倍（PTO 见 {{QUIC-RECOVERY}}）。
+如果服务器确定已收到所有 0-RTT 数据包，则服务器可以更早地丢弃 0-RTT 密钥，这可以
+通过跟踪丢失的数据包编号来完成。
 
-# Packet Protection {#packet-protection}
+# Packet Protection - 数据包保护 {#packet-protection}
 
 As with TLS over TCP, QUIC protects packets with keys derived from the TLS
 handshake, using the AEAD algorithm {{!AEAD}} negotiated by TLS.
