@@ -1007,22 +1007,34 @@ from a previous connection.  To enable this, 0-RTT depends on the client
 remembering critical parameters and providing the server with a TLS session
 ticket that allows the server to recover the same information.
 
+QUIC 中的 0-RTT 特性允许客户端在握手完成之前发送应用层数据。这可以通过重用以前连接中协商的
+参数来实现。为了实现这一点，0-RTT 依赖于客户端记住关键参数并向服务器提供 TLS 会话票证，该票证
+允许服务器恢复相同的信息。
+
 This information includes parameters that determine TLS state, as governed by
 {{!TLS13}}, QUIC transport parameters, the chosen application protocol, and any
 information the application protocol might need; see {{app-0rtt}}.  This
 information determines how 0-RTT packets and their contents are formed.
+
+这个信息包括确定 TLS 状态的参数（见 {{!TLS13}}），QUIC 传输参数，所选的应用层协议
+以及应用层协议可能需要的信息（见 {{app-0rtt}}）。此信息决定如何产生 0-RTT 数据包及其内容。
 
 To ensure that the same information is available to both endpoints, all
 information used to establish 0-RTT comes from the same connection.  Endpoints
 cannot selectively disregard information that might alter the sending or
 processing of 0-RTT.
 
+为了确保两个端点都可以使用相同的信息，用于建立 0-RTT 的所有信息都来自同一个连接。端点
+不能选择性地忽略可能改变 0-RTT 的发送或处理的信息。
+
 {{!TLS13}} sets a limit of 7 days on the time between the original connection
 and any attempt to use 0-RTT.  There are other constraints on 0-RTT usage,
 notably those caused by the potential exposure to replay attack; see {{replay}}.
 
+{{!TLS13}} 将原始连接与任何尝试使用 0-RTT 之间的时间限制为 7 天。对 0-RTT 的使用还有
+其他限制，特别是那些可能暴露于重放攻击的限制（见 {{replay}}）。
 
-### Enabling 0-RTT {#enable-0rtt}
+### Enabling 0-RTT - 启用 0-RTT {#enable-0rtt}
 
 The TLS "early_data" extension in the NewSessionTicket message is defined
 to convey (in the "max_early_data_size" parameter) the amount of TLS 0-RTT
@@ -1035,24 +1047,43 @@ extension is omitted from the NewSessionTicket.
 The amount of data that the client can send in QUIC 0-RTT is
 controlled by the initial_max_data transport parameter supplied by the server.
 
+NewSessionTicket 消息中的 TLS "early_data" 扩展定义为（在 "max_early_data_size" 参数中）
+传递服务器愿意接受的 TLS 0-RTT 数据量。QUIC 不使用 TLS 0-RTT 数据。QUIC 使用 0-RTT 数据包
+来传送早期数据。因此，"max_early_data_size" 参数被重新调整用途，以保持哨兵值 0xffffffff ，
+以指示服务器愿意接受 QUIC 0-RTT 数据；为了指示服务器不接受 0-RTT 数据，NewSessionTicket 中
+的 "early_data" 扩展是被忽略的。客户端在 QUIC 0-RTT 中可以发送的数据量由服务器
+提供的 initial_max_data 传输参数控制。
+
 Servers MUST NOT send the early_data extension with a max_early_data_size field
 set to any value other than 0xffffffff.  A client MUST treat receipt of a
 NewSessionTicket that contains an early_data extension with any other value as
 a connection error of type PROTOCOL_VIOLATION.
 
+服务器不得发送将 max_early_data_size 字段设置为 0xffffffff 以外的任何值的 early_data 扩展。
+客户端必须将包含带有任何其他值的 early_data 扩展的 NewSessionTicket 的接收
+视为 PROTOCOL_VIOLATION 类型的连接错误。
+
 A client that wishes to send 0-RTT packets uses the early_data extension in the
 ClientHello message of a subsequent handshake; see {{Section 4.2.10 of TLS13}}.
 It then sends application data in 0-RTT packets.
 
+希望发送 0-RTT 数据包的客户端在后续握手的 ClientHello 消息中使用 early_data 扩展
+（见 {{Section 4.2.10 of TLS13}}）。然后，它以 0-RTT 数据包的形式发送应用程序数据。
+
 A client that attempts 0-RTT might also provide an address validation token if
 the server has sent a NEW_TOKEN frame; see {{Section 8.1 of QUIC-TRANSPORT}}.
 
+如果服务器发送了 NEW_TOKEN 帧，则尝试 0-RTT 的客户端也可能提供地址验证令牌
+（见 {{Section 8.1 of QUIC-TRANSPORT}}）。
 
-### Accepting and Rejecting 0-RTT
+### Accepting and Rejecting 0-RTT - 接受和拒绝 0-RTT
 
 A server accepts 0-RTT by sending an early_data extension in the
 EncryptedExtensions; see {{Section 4.2.10 of TLS13}}.  The server then
 processes and acknowledges the 0-RTT packets that it receives.
+
+服务器通过在 EncryptedExtensions 中发送 early_data 扩展来接受 0-RTT
+（见 {{Section 4.2.10 of TLS13}}）。然后，服务器处理并确认收到的 0-RTT 数据包。
 
 A server rejects 0-RTT by sending the EncryptedExtensions without an early_data
 extension.  A server will always reject 0-RTT if it sends a TLS
@@ -1061,16 +1092,26 @@ packets, even if it could.  When 0-RTT was rejected, a client SHOULD treat
 receipt of an acknowledgment for a 0-RTT packet as a connection error of type
 PROTOCOL_VIOLATION, if it is able to detect the condition.
 
+服务器通过发送不包含 early_data 扩展的 EncryptedExtensions 拒绝 0-RTT。如果服务器
+发送 TLS HelloRetryRequest，它将始终拒绝 0-RTT。拒绝 0-RTT 时，即使可以，服务器也
+不得处理任何 0-RTT 数据包。当 0-RTT 被拒绝时，如果客户端能够检测到条件，则应该将
+收到 0-RTT 包的确认消息视为 PROTOCOL_VIOLATION 类型的连接错误。
+
 When 0-RTT is rejected, all connection characteristics that the client assumed
 might be incorrect.  This includes the choice of application protocol, transport
 parameters, and any application configuration.  The client therefore MUST reset
 the state of all streams, including application state bound to those streams.
 
+拒绝 0-RTT 时，客户端假定的所有连接特征可能都不正确。这包括应用程序协议，传输参数
+和任何应用程序配置的选择。因此，客户端必须重置所有流的状态，包括绑定到这些流的应用
+程序状态。
+
 A client MAY reattempt 0-RTT if it receives a Retry or Version Negotiation
 packet.  These packets do not signify rejection of 0-RTT.
 
+如果客户端收到重试或版本协商包，则可以重新尝试 0-RTT。这些数据包不表示拒绝 0-RTT。
 
-### Validating 0-RTT Configuration {#app-0rtt}
+### Validating 0-RTT Configuration - 验证 0-RTT 配置 {#app-0rtt}
 
 When a server receives a ClientHello with the early_data extension, it has to
 decide whether to accept or reject early data from the client. Some of this
@@ -1081,6 +1122,12 @@ application protocol using QUIC might reject early data because the
 configuration of the transport or application associated with the resumed
 session is not compatible with the server's current configuration.
 
+服务器收到扩展为 early_data 的 ClientHello 时，必须决定是接受还是拒绝来自客户端的
+早期数据。某些决定是由 TLS 堆栈决定的（例如，检查 ClientHello 中是否包含要恢复的
+密码套件；见 {{Section 4.2.10 of TLS13}}）。即使 TLS 堆栈没有理由拒绝早期数据，
+QUIC 堆栈或使用 QUIC 的应用程序协议也可能拒绝早期数据，因为与恢复的会话关联的传输
+或应用程序的配置与服务器的当前配置不兼容。
+
 QUIC requires additional transport state to be associated with a 0-RTT session
 ticket. One common way to implement this is using stateless session tickets and
 storing this state in the session ticket. Application protocols that use QUIC
@@ -1090,6 +1137,11 @@ example, HTTP/3 ({{QUIC-HTTP}}) settings determine how early data from the
 client is interpreted. Other applications using QUIC could have different
 requirements for determining whether to accept or reject early data.
 
+QUIC 要求将其他传输状态与 0-RTT 会话票证相关联。 实现此目的的一种常用方法是使用无
+状态会话票证，并将此状态存储在会话票证中。使用 QUIC 的应用程序协议可能在关联或存储
+状态方面有相似的要求。此关联状态用于确定是否必须拒绝早期数据。例如，HTTP/3（{{QUIC-HTTP}}）的
+设置决定如何解释来自客户端的早期数据。使用 QUIC 的其他应用程序可能对确定是接受还是
+拒绝早期数据有不同的要求。
 
 ## HelloRetryRequest
 
@@ -1101,17 +1153,26 @@ messages that are carried in Initial packets. Although it is in principle
 possible to use this feature for address verification, QUIC implementations
 SHOULD instead use the Retry feature; see {{Section 8.1 of QUIC-TRANSPORT}}.
 
+HelloRetryRequest 消息（见 {{Section 4.1.4 of TLS13}}）可以用来要求客户端提供
+新的信息（例如密钥共享）或验证客户端的某些特性。从 QUIC 的角度来看，HelloRetryRequest
+与 Initial 数据包中携带的其他加密握手消息没有区别。尽管原则上可以使用此功能进行
+地址验证，但 QUIC 实现应改为使用重试功能（见 {{Section 8.1 of QUIC-TRANSPORT}}）。
 
-## TLS Errors {#tls-errors}
+## TLS Errors - TLS 错误 {#tls-errors}
 
 If TLS experiences an error, it generates an appropriate alert as defined in
 {{Section 6 of TLS13}}.
+
+如果 TLS 遇到错误，则会生成 {{Section 6 of TLS13}} 中定义的适当警报。
 
 A TLS alert is converted into a QUIC connection error. The AlertDescription
 value is
 added to 0x100 to produce a QUIC error code from the range reserved for
 CRYPTO_ERROR. The resulting value is sent in a QUIC CONNECTION_CLOSE frame of
 type 0x1c.
+
+TLS 警报将转换为 QUIC 连接错误。AlertDescription 值添加到 0x100，以从为 CRYPTO_ERROR
+保留的范围内产生 QUIC 错误代码。结果值在类型为 0x1c 的 QUIC CONNECTION_CLOSE 帧中发送。
 
 QUIC is only able to convey an alert level of "fatal". In TLS 1.3, the only
 existing uses for the "warning" level are to signal connection close; see
@@ -1120,12 +1181,20 @@ connection termination and the TLS connection is only closed if an error is
 encountered, a QUIC endpoint MUST treat any alert from TLS as if it were at the
 "fatal" level.
 
+QUIC 仅能传达 "fatal" 警报级别。 在 TLS 1.3 中，"fatal" 级别的唯一现有用法是发出
+信号以表明连接已关闭（{{Section 6.1 of TLS13}}）。由于 QUIC 提供了用于终止连接的
+替代机制，并且 TLS 连接仅在遇到错误时才关闭，因此 QUIC 端点务必将来自 TLS 的任何
+警报视为处于 "fatal" 级别。
+
 QUIC permits the use of a generic code in place of a specific error code; see
 {{Section 11 of QUIC-TRANSPORT}}. For TLS alerts, this includes replacing any
 alert with a generic alert, such as handshake_failure (0x128 in QUIC).
 Endpoints MAY use a generic error code to avoid possibly exposing confidential
 information.
 
+QUIC 允许使用通用代码代替特定的错误代码（{{Section 11 of QUIC-TRANSPORT}}）。
+对于 TLS 警报，这包括用通用警报替换所有警报，例如 handshake_failure（ QUIC 中为 0x128）。
+端点可以使用通用错误代码，以避免可能暴露机密信息。
 
 ## Discarding Unused Keys
 
