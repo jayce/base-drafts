@@ -755,12 +755,16 @@ QUIC 还需要访问 TLS 实现通常不可用的密钥。例如，客户端可�
 准备在该加密级别发送 CRYPTO 帧。因此，TLS 需要在 QUIC 生成密钥供自己使用之前向 QUIC 提
 供密钥。
 
-### TLS Interface Summary
+### TLS Interface Summary - TLS 接口概要
 
 {{exchange-summary}} summarizes the exchange between QUIC and TLS for both
 client and server. Solid arrows indicate packets that carry handshake data;
 dashed arrows show where application data can be sent.  Each arrow is tagged
 with the encryption level used for that transmission.
+
+{{exchange-summary}} 总结了客户端和服务器的 QUIC 和 TLS 之间的交换。实线箭头表示携带握手
+数据的数据包；虚线箭头表示可以将应用程序数据发送到的位置。每个箭头都标记有用于该传输的加
+密级别。
 
 ~~~
 Client                                                    Server
@@ -806,28 +810,41 @@ different actions. This shows multiple "Get Handshake" invocations to retrieve
 handshake messages at different encryption levels. New handshake messages are
 requested after incoming packets have been processed.
 
+{{exchange-summary}} 展示了形成单个"传输中"消息的多个数据包，这些消息被单独处理，
+以显示哪些传入消息触发了不同的操作；这显示了多个 "Get Handshake" 调用，以不同的
+加密级别检索了握手消息。在处理完收到的数据包之后请求新的握手消息。
+
 {{exchange-summary}} shows one possible structure for a simple handshake
 exchange. The exact process varies based on the structure of endpoint
 implementations and the order in which packets arrive. Implementations could
 use a different number of operations or execute them in other orders.
 
+{{exchange-summary}} 显示了一个简单握手交换的可行的结构。具体的过程根据端点实现的
+结构和数据包到达的顺序而有所不同。实现可以使用不同数量的操作或以其他顺序执行它们。
 
-## TLS Version {#tls-version}
+## TLS Version - TLS 版本 {#tls-version}
 
 This document describes how TLS 1.3 {{!TLS13}} is used with QUIC.
+
+文档介绍如何一起使用 TLS1.3 {{!TLS13}} 与 QUIC。
 
 In practice, the TLS handshake will negotiate a version of TLS to use.  This
 could result in a newer version of TLS than 1.3 being negotiated if both
 endpoints support that version.  This is acceptable provided that the features
 of TLS 1.3 that are used by QUIC are supported by the newer version.
 
+实际上，TLS 握手会协商要使用的 TLS 版本。如果两端都支持 TLS，则可能会协商出比 1.3 更
+高的 TLS 版本。如果新版本支持 QUIC 使用的 TLS 1.3 功能，则这是可以接受的。
+
 Clients MUST NOT offer TLS versions older than 1.3.  A badly configured TLS
 implementation could negotiate TLS 1.2 or another older version of TLS.  An
 endpoint MUST terminate the connection if a version of TLS older than 1.3 is
 negotiated.
 
+客户端不得提供比 1.3 更低的 TLS 版本。配置错误的 TLS 可能会协商 TLS1.2 或其他较旧
+的 TLS 版本。如果协商的 TLS 版本低于 1.3，则端点必须终止连接。
 
-## ClientHello Size {#clienthello-size}
+## ClientHello Size - ClientHello 大小 {#clienthello-size}
 
 The first Initial packet from a client contains the start or all of its first
 cryptographic handshake message, which for TLS is the ClientHello.  Servers
@@ -840,11 +857,22 @@ the client's address has not yet been validated.  To avoid this, servers MAY
 use the Retry feature (see {{Section 8.1 of QUIC-TRANSPORT}}) to only buffer
 partial ClientHello messages from clients with a validated address.
 
+从客户端收到的第一个 Initial 数据包，它包含第一个加密握手消息的开始部分或全部，
+对于 TLS 来说，它是 ClientHello。服务器可能需要解析整个 ClientHello（例如，访问诸如
+服务器名称标识 (SNI) 或应用层协议协商 (ALPN) 之类的扩展），以便决定是否接受新的 QUIC 连接。
+如果 ClientHello 跨越多个 Initial 数据包，那么服务器将需要缓冲第一个接收到的片段，如果
+客户端的地址还没有被验证，这可能会消耗过多的资源。为了避免这种情况，服务器可以使用重试特性
+（见 {{Section 8.1 of QUIC-TRANSPORT}}）只缓冲来自已验证地址的客户端的部分 ClientHello 消息。
+
 QUIC packet and framing add at least 36 bytes of overhead to the ClientHello
 message.  That overhead increases if the client chooses a source connection ID
 longer than zero bytes.  Overheads also do not include the token or a
 destination connection ID longer than 8 bytes, both of which might be required
 if a server sends a Retry packet.
+
+QUIC 数据包和帧至少给 Clientello 消息添加 36 字节的开销。如果客户端选择的源连接 ID 大于
+零字节，则开销还会增加。开销还不包括令牌或超过 8 字节的目标连接 ID，如果服务器发送重试
+数据包，这两个字节都可能需要。
 
 A typical TLS ClientHello can easily fit into a 1200-byte packet.  However, in
 addition to the overheads added by QUIC, there are several variables that could
@@ -853,28 +881,44 @@ shares, and long lists of supported ciphers, signature algorithms, versions,
 QUIC transport parameters, and other negotiable parameters and extensions could
 cause this message to grow.
 
+一个典型的 TLS ClientHello 可以很容易地放入一个 1200 字节的数据包中。然而，除了 QUIC 增加的
+管理开销外，还有几个变量可能导致超过这一限制。大的会话票、多个或大的密钥共享、支持的密码、
+签名算法、版本、QUIC 传输参数以及其他可协商参数和扩展的长列表都可能会导致此消息的开销增加。
+
 For servers, in addition to connection IDs and tokens, the size of TLS session
 tickets can have an effect on a client's ability to connect efficiently.
 Minimizing the size of these values increases the probability that clients can
 use them and still fit their entire ClientHello message in their first Initial
 packet.
 
+对于服务器，除了连接 ID 和令牌之外，TLS 会话票的大小还可能影响客户端高效连接的能力。
+最小化这些值的大小会增加客户机可以使用它们并且仍然将其整个 ClientHello 消息放在第一个
+初始数据包中的可能性。
+
 The TLS implementation does not need to ensure that the ClientHello is large
 enough to meet QUIC's requirements for datagrams that carry Initial packets; see
 {{Section 14.1 of QUIC-TRANSPORT}}. QUIC implementations use PADDING frames or
 packet coalescing to ensure that datagrams are large enough.
 
+TLS 实现不需要确保 ClientHello 足够大以满足 QUIC 对携带初始数据包的数据报的要求
+（{{Section 14.1 of QUIC-TRANSPORT}}）。QUIC 实现使用 PADDING 帧或包合并来确保数据报足够大。
 
-## Peer Authentication
+## Peer Authentication - 身份验证
 
 The requirements for authentication depend on the application protocol that is
 in use.  TLS provides server authentication and permits the server to request
 client authentication.
 
+身份验证的要求取决于正在使用的应用程序协议。TLS 提供服务器身份验证，并允许服务器
+请求客户端身份验证。
+
 A client MUST authenticate the identity of the server.  This typically involves
 verification that the identity of the server is included in a certificate and
 that the certificate is issued by a trusted entity (see for example
 {{?RFC2818}}).
+
+客户端必须验证服务器的身份。这通常涉及验证服务器的身份是否包含在证书中以及证书是否
+由受信任实体颁发（见 {{?RFC2818}}）。
 
 Note:
 
@@ -888,10 +932,21 @@ Note:
   by using certificate compression
   {{?COMPRESS=I-D.ietf-tls-certificate-compression}}.
 
+注意:
+
+: 当服务器提供用于身份验证的证书时，证书链的大小可能会消耗大量字节。控制证书链的大小
+  对 QUIC 的性能至关重要，因为在验证客户机地址之前，服务器只能为接收到的每个字节发送
+  3 个字节（{{Section 8.1 of QUIC-TRANSPORT}}）。证书链的大小可以通过以下方式进行管理：
+  限制名称或扩展名的数量；使用具有较小公钥表示形式的密钥（比如 ECDSA）；或者使用证书压缩
+  （{{?COMPRESS=I-D.ietf-tls-certificate-compression}}）。
+
 A server MAY request that the client authenticate during the handshake. A server
 MAY refuse a connection if the client is unable to authenticate when requested.
 The requirements for client authentication vary based on application protocol
 and deployment.
+
+服务器可以在握手期间请求客户端认证。如果客户端不能在请求时进行认证，则服务器可以拒绝连接。
+客户端身份验证的要求因应用程序协议和部署而异。
 
 A server MUST NOT use post-handshake client authentication (as defined in
 {{Section 4.6.2 of TLS13}}), because the multiplexing offered by QUIC prevents
@@ -901,6 +956,10 @@ More specifically, servers MUST NOT send post-handshake TLS CertificateRequest
 messages and clients MUST treat receipt of such messages as a connection error
 of type PROTOCOL_VIOLATION.
 
+服务器不得使用握手后客户端身份验证（如 {{Section 4.6.2 of TLS13}} 中所定义），因为 QUIC 提供的
+多路复用阻止客户端将证书请求与触发该请求的应用程序级事件相关联（见 {{?HTTP2-TLS13=RFC8740}}）。
+更具体地说，服务器不得发送握手后的 TLS 证书请求消息，客户端必须将此类消息的接收视为
+PROTOCOL_VIOLATION 类型的连接错误。
 
 ## Session Resumption {#resumption}
 
@@ -908,6 +967,9 @@ QUIC can use the session resumption feature of TLS 1.3. It does this by
 carrying NewSessionTicket messages in CRYPTO frames after the handshake is
 complete. Session resumption can be used to provide 0-RTT, and can also be
 used when 0-RTT is disabled.
+
+QUIC 可以使用 TLS 1.3 的会话恢复功能。它通过在握手完成后在 CRYPTO 帧中携带
+NewSessionTicket 消息来完成此操作。会话恢复可用于提供 0-RTT，也可以在禁用 0-RTT 时使用。
 
 Endpoints that use session resumption might need to remember some information
 about the current connection when creating a resumed connection. TLS requires
@@ -917,8 +979,15 @@ does not depend on any state being retained when resuming a connection, unless
 {{enable-0rtt}}. Application protocols could depend on state that is retained
 between resumed connections.
 
+使用会话恢复的端点在创建恢复的连接时可能需要记住一些有关当前连接的信息。TLS 要求保留一些
+信息（{{Section 4.6.1 of TLS13}}）。除非也使用 0-RTT，否则 QUIC 本身不依赖于恢复连接时
+保留的任何状态（见 {{Section 7.4.1 of QUIC-TRANSPORT}} 和 {{enable-0rtt}}）。应用程序协议
+可能取决于恢复的连接之间保留的状态。
+
 Clients can store any state required for resumption along with the session
 ticket. Servers can use the session ticket to help carry state.
+
+客户端可以将恢复状态所需的任何状态与会话票证一起存储。服务器可以使用会话票证来帮助保持状态。
 
 Session resumption allows servers to link activity on the original connection
 with the resumed connection, which might be a privacy issue for clients.
@@ -926,6 +995,9 @@ Clients can choose not to enable resumption to avoid creating this correlation.
 Clients SHOULD NOT reuse tickets as that allows entities other than the server
 to correlate connections; see {{Section C.4 of TLS13}}.
 
+会话恢复允许服务器将原始连接上的活动与恢复的连接链接起来，这可能是客户端的隐私问题。客户可以
+选择不启用恢复以避免创建此关联。客户端不应该重复使用票据，因为它允许服务器以外的实体关联连接
+（见 {{Section C.4 of TLS13}}）。
 
 ## 0-RTT
 
