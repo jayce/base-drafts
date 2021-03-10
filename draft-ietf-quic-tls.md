@@ -1308,20 +1308,35 @@ keeping track of missing packet numbers.
 As with TLS over TCP, QUIC protects packets with keys derived from the TLS
 handshake, using the AEAD algorithm {{!AEAD}} negotiated by TLS.
 
+与 TCP 上的 TLS 一样，QUIC 使用 TLS 协商的 AEAD 算法 {{!AEAD}} 来保护从 TLS 握手
+产生的密钥的数据包。
+
 QUIC packets have varying protections depending on their type:
 
+QUIC 数据包根据它们的类型采用不同的保护策略：
+
 * Version Negotiation packets have no cryptographic protection.
+
+* 版本协商数据包没有加密保护。
 
 * Retry packets use AEAD_AES_128_GCM to provide protection against accidental
   modification and to limit the entities that can produce a valid Retry;
   see {{retry-integrity}}.
 
+* 重试数据包使用 AEAD_AES_128_GCM 提供保护以防止意外修改并限制可以产生有效重试的实体
+  （见 {{retry-integrity}}）。
+
 * Initial packets use AEAD_AES_128_GCM with keys derived from the Destination
   Connection ID field of the first Initial packet sent by the client; see
   {{initial-secrets}}.
 
+* Initial 数据包使用 AEAD_AES_128_GCM，密钥来自客户端发送的第一个 Initial 数据包中的
+  Destination Connection ID 字段（见 {{initial-secrets}}）。
+
 * All other packets have strong cryptographic protections for confidentiality
   and integrity, using keys and algorithms negotiated by TLS.
+
+* 所有其他的数据包都使用 TLS 协商的密钥和算法，对机密性和完整性具有很强的加密保护。
 
 This section describes how packet protection is applied to Handshake packets,
 0-RTT packets, and 1-RTT packets. The same packet protection process is applied
@@ -1330,11 +1345,18 @@ Initial packets, these packets are not considered to have confidentiality or
 integrity protection. Retry packets use a fixed key and so similarly lack
 confidentiality and integrity protection.
 
+这章节描述如何将数据包保护应用到 Handshake、0-RTT、1-RTT 数据包。同样的数据包保护
+过程将应用到 Initial 数据包。然而，因为决定用于 Initial 数据包的密钥很简单，所以这
+些数据包不被认为具有机密性或完整性保护。重试数据包使用固定密钥，因此同样缺乏机密性
+和完整性保护。
 
-## Packet Protection Keys {#protection-keys}
+
+## Packet Protection Keys - 数据包保护密钥 {#protection-keys}
 
 QUIC derives packet protection keys in the same way that TLS derives record
 protection keys.
+
+QUIC 生成数据包保护密钥的方式与 TLS 生成记录保护密钥的方式相同。
 
 Each encryption level has separate secret values for protection of packets sent
 in each direction. These traffic secrets are derived by TLS (see {{Section 7.1
@@ -1343,17 +1365,29 @@ encryption level. The secrets for the Initial encryption level are computed
 based on the client's initial Destination Connection ID, as described in
 {{initial-secrets}}.
 
+每个加密级别都有单独的秘密值，用来保护在每个方向上发送的数据包。这些流量秘密是由 TLS 派生的
+（见 {{Section 7.1 of TLS13}}），QUIC 将其用在除 Initial 加密级别之外的所有加密级别。
+如 {{initial-secrets}} 中所述，将根据客户端的初始目标连接 ID 计算 Initial 加密级别的秘密。
+
 The keys used for packet protection are computed from the TLS secrets using the
 KDF provided by TLS.  In TLS 1.3, the HKDF-Expand-Label function described in
 {{Section 7.1 of TLS13}} is used, using the hash function from the negotiated
 cipher suite.  All uses of HKDF-Expand-Label in QUIC use a zero-length Context.
 
+用于数据包保护的密钥是由 TLS 提供的 KDF 从 TLS 秘密计算出来的。在 TLS1.3 中，使用了
+{{Section 7.1 of TLS13}} 中描述的 HKDF-Expand-Label 函数，它使用了协商密码套件中的哈希函数。
+所有在 QUIC 中使用的 HKDF-Expand-Label 函数都使用零长度上下文。
+
 Note that labels, which are described using strings, are encoded
 as bytes using ASCII {{?ASCII=RFC0020}} without quotes or any trailing NUL
 byte.
 
+请注意，那些使用字符串描述的标签使用不带引号的 ASCII 编码为字节，也没有任何尾部 NUL 字节。
+
 Other versions of TLS MUST provide a similar function in order to be
 used with QUIC.
+
+其他版本的 TLS 必须提供类似的函数才能与 QUIC 一起使用。
 
 The current encryption level secret and the label "quic key" are input to the
 KDF to produce the AEAD key; the label "quic iv" is used to derive the
@@ -1361,26 +1395,42 @@ Initialization Vector (IV); see {{aead}}.  The header protection key uses the
 "quic hp" label; see {{header-protect}}.  Using these labels provides key
 separation between QUIC and TLS; see {{key-diversity}}.
 
+当前加密级别 secret 和标签 "quic key" 被输入到 KDF 以生成 AEAD 密钥；标签 "quic iv" 用于
+导出初始化向量 (IV)（见 {{aead}}）。Header 保护密钥使用 "quic hp" 标签（{{header-protect}}）。
+使用这些标签可以在 QUIC 和 TLS 之间提供密钥分离（见 {{key-diversity}}）。
+
 Both "quic key" and "quic hp" are used to produce keys, so the Length provided
 to HKDF-Expand-Label along with these labels is determined by the size of keys
 in the AEAD or header protection algorithm. The Length provided with "quic iv"
 is the minimum length of the AEAD nonce, or 8 bytes if that is larger; see
 {{!AEAD}}.
 
+"quic key" 和 "quic hp" 都用于生成密钥，因此提供给 HKDF-Expand-Label 的长度以及
+这些标签由 AEAD 或 Header 保护算法中密钥的大小确定。 "quic iv" 提供的长度是 AEAD 随机
+数的最小长度，如果较大，则为 8 个字节（见 {{!AEAD}}）。
+
 The KDF used for initial secrets is always the HKDF-Expand-Label function from
 TLS 1.3; see {{initial-secrets}}.
 
+用于 Initial secrets 的 KDF 始终是 TLS 1.3 中的 HKDF-Expand-Label 函数（见 {{initial-secrets}}）。
 
-## Initial Secrets {#initial-secrets}
+## Initial Secrets - Initial 密码 {#initial-secrets}
 
 Initial packets apply the packet protection process, but use a secret derived
 from the Destination Connection ID field from the client's first Initial
 packet.
 
+Initial 数据包应用数据包保护过程，是使用从客户端的第一个 Initial 数据包的“目标连接ID”字段
+派生的密码。
+
 This secret is determined by using HKDF-Extract (see {{Section 2.2 of HKDF}})
 with a salt of 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a and a IKM of the
 Destination Connection ID field. This produces an intermediate pseudorandom key
 (PRK) that is used to derive two separate secrets for sending and receiving.
+
+这个密码是通过使用 HKDF-Extract （见 {{Section 2.2 of HKDF}})）和
+一个盐 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a 以及目标连接 ID 字段的 IKM 来确定的。
+这将产生一个中间伪随机密钥（PRK），用于导出用于发送和接收的两个独立密钥。
 
 The secret used by clients to construct Initial packets uses the PRK and the
 label "client in" as input to the HKDF-Expand-Label function from TLS
@@ -1389,7 +1439,14 @@ the same process with the label "server in".  The hash function for HKDF when
 deriving initial secrets and keys is SHA-256
 {{!SHA=DOI.10.6028/NIST.FIPS.180-4}}.
 
+客户端用来构造 Initial 数据包的 secret 使用 PRK 和 "client-in" 标签作为
+HKDF-Expand-Label 函数的输入，从 TLS {{!TLS13}} 产生一个 32 字节的 secret。
+服务器使用相同的过程加上 "server in" 标签构造数据包。HKDF 在派生初始 secret 和
+密钥时的哈希函数是 SHA-256 {{!SHA=DOI.10.6028/NIST.FIPS.180-4}}。
+
 This process in pseudocode is:
+
+伪代码处理过程：
 
 ~~~
 initial_salt = 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a
@@ -1409,18 +1466,32 @@ in the Initial packet sent by the client.  This will be a randomly-selected
 value unless the client creates the Initial packet after receiving a Retry
 packet, where the Destination Connection ID is selected by the server.
 
+与 HKDF-Expand-Label 一起使用的连接 ID 是客户端发送的初始数据包中的目标连接 ID。
+这将是随机选择的值，除非客户端在接收到重试数据包后创建初始数据包，其中目标
+连接 ID 由服务器选择。
+
 Future versions of QUIC SHOULD generate a new salt value, thus ensuring that
 the keys are different for each version of QUIC.  This prevents a middlebox that
 recognizes only one version of QUIC from seeing or modifying the contents of
 packets from future versions.
 
+未来版本的 QUIC 应该生成一个新的 salt 值，从而确保每个版本的 QUIC 的密钥是不同的。
+这可以防止只识别一个 QUIC 版本的中间盒子看到或修改来自未来版本的数据包的内容。
+
 The HKDF-Expand-Label function defined in TLS 1.3 MUST be used for Initial
 packets even where the TLS versions offered do not include TLS 1.3.
+
+在 TLS1.3 中定义的 HKDF-Expand-Label 函数必须用于初始数据包，即使提供的 TLS 实现
+不支持 TLS1.3 。
 
 The secrets used for constructing subsequent Initial packets change when a
 server sends a Retry packet, to use the connection ID value selected by the
 server.  The secrets do not change when a client changes the Destination
 Connection ID it uses in response to an Initial packet from the server.
+
+当服务器发送重试数据包时，用于构造后续初始数据包的 secrets 将会更改，以使用服务器
+选择的连接 ID。当客户端响应于来自服务器的初始数据包而更改其使用的目标连接 ID 时，
+secrets 不会更改。
 
 Note:
 
@@ -1431,7 +1502,15 @@ Note:
   the exchange that included the Retry packet to validate the server address;
   see {{Section 8.1 of QUIC-TRANSPORT}}.
 
+注意：
+
+: 如果服务器发送带有长度为零长度的源连接 ID 字段的重试数据包，则目标连接 ID 字段的长度
+  可以为 0-20 个字节。重试之后，Initial 密钥不能保证客户端已收到服务器的数据包，因此客户端
+  必须依靠包含重试数据包的交换来验证服务器地址（见 {{Section 8.1 of QUIC-TRANSPORT}}）。
+
 {{test-vectors}} contains sample Initial packets.
+
+{{test-vectors}} 包含初始数据包样本。
 
 
 ## AEAD Usage {#aead}
