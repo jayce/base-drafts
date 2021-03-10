@@ -1513,12 +1513,16 @@ Note:
 {{test-vectors}} 包含初始数据包样本。
 
 
-## AEAD Usage {#aead}
+## AEAD Usage - AEAD 的用法 {#aead}
 
 The Authenticated Encryption with Associated Data (AEAD; see {{!AEAD}}) function
 used for QUIC packet protection is the AEAD that is negotiated for use with the
 TLS connection.  For example, if TLS is using the TLS_AES_128_GCM_SHA256 cipher
 suite, the AEAD_AES_128_GCM function is used.
+
+用于 QUIC 数据包保护的带有关联数据的认证加密 (AEAD {{!AEAD}}) 功能是 AEAD，
+它经过协商可与 TLS 连接一起使用。例如，如果 TLS 使用 TLS_AES_128_GCM_SHA256 密码套件，
+则使用 AEAD_AES_128_GCM 函数。
 
 QUIC can use any of the cipher suites defined in {{!TLS13}} with the exception
 of TLS_AES_128_CCM_8_SHA256.  A cipher suite MUST NOT be negotiated unless a
@@ -1527,16 +1531,30 @@ a header protection scheme for all cipher suites defined in {{!TLS13}} aside
 from TLS_AES_128_CCM_8_SHA256.  These cipher suites have a 16-byte
 authentication tag and produce an output 16 bytes larger than their input.
 
+QUIC 可以使用 {{!TLS13}} 中定义的任意加密套件，除了 TLS_AES_128_CCM_8_SHA256。
+除非为密码套件定义了 Header 保护方案，否则不得协商密码套件。除了 TLS_AES_128_CCM_8_SHA256 之外，
+本文档还为 {{!TLS13}} 中定义的所有密码套件定义了 Header 保护方案。这些密码套件含有 16 字节的身份
+验证标签，并产生比其输入多 16 个字节的输出。
+
 Note:
 
 : An endpoint MUST NOT reject a ClientHello that offers a cipher suite that it
   does not support, or it would be impossible to deploy a new cipher suite.
   This also applies to TLS_AES_128_CCM_8_SHA256.
 
+注意：
+
+: 端点不能拒绝提供不支持的密码套件的 ClientHello，否则将无法部署新的密码套件。
+  这也适用于 TLS_AES_128_CCM_8_SHA256 。
+
 When constructing packets, the AEAD function is applied prior to applying
 header protection; see {{header-protect}}. The unprotected packet header is part
 of the associated data (A). When processing packets, an endpoint first
 removes the header protection.
+
+构造数据包时，在应用 Header 保护之前先应用 AEAD 函数（{{header-protect}}）。
+未受保护的数据包 Header 是关联数据 (A) 的一部分。在处理数据包时，端点首先移除
+Header 保护。
 
 The key and IV for the packet are computed as described in {{protection-keys}}.
 The nonce, N, is formed by combining the packet protection IV with the packet
@@ -1544,28 +1562,46 @@ number.  The 62 bits of the reconstructed QUIC packet number in network byte
 order are left-padded with zeros to the size of the IV.  The exclusive OR of the
 padded packet number and the IV forms the AEAD nonce.
 
+数据包的密钥和 IV 如 {{protection-keys}} 中所述进行计算。随机数 N 是通过将数据包
+保护 IV 与数据包编号组合而成的。以网络字节顺序将重构的 QUIC 数据包编号的 62 位用
+零填充到 IV 的大小。填充数据包编号与 IV 的异或构成 AEAD 随机数。
+
 The associated data, A, for the AEAD is the contents of the QUIC header,
 starting from the first byte of either the short or long header, up to and
 including the unprotected packet number.
 
+AEAD 的关联数据 A 是 QUIC 报头的内容，从短报头或长报头的第一个字节开始，直到并
+包括不受保护的包编号。
+
 The input plaintext, P, for the AEAD is the payload of the QUIC packet, as
 described in {{QUIC-TRANSPORT}}.
 
+AEAD 的输入明文 P 是 QUIC 数据包的有效负载，如 {{QUIC-TRANSPORT}} 中所述。
+
 The output ciphertext, C, of the AEAD is transmitted in place of P.
+
+AEAD 的输出密文 C 替换 P 发送。
 
 Some AEAD functions have limits for how many packets can be encrypted under the
 same key and IV; see {{aead-limits}}.  This might be lower than the packet
 number limit.  An endpoint MUST initiate a key update ({{key-update}}) prior to
 exceeding any limit set for the AEAD that is in use.
 
+一些 AEAD 函数对使用相同密钥和 IV 可以加密多少个数据包有限制（见 {{aead-limits}}）。
+这可能低于数据包数量限制。端点必须在超过为使用的 AEAD 设置的任何限制之前启动密钥
+更新（{{key-update}}）。
 
-## Header Protection {#header-protect}
+## Header Protection - Header 保护 {#header-protect}
 
 Parts of QUIC packet headers, in particular the Packet Number field, are
 protected using a key that is derived separately from the packet protection key
 and IV.  The key derived using the "quic hp" label is used to provide
 confidentiality protection for those fields that are not exposed to on-path
 elements.
+
+QUIC 数据包头的一部分，特别是「数据包编号」字段，使用与数据包保护密钥和 IV 分别
+派生的密钥进行保护。使用 "quic hp" 标签派生的密钥用于为那些未暴露于路径元素的字段
+提供机密保护。
 
 This protection applies to the least-significant bits of the first byte, plus
 the Packet Number field.  The four least-significant bits of the first byte are
@@ -1574,20 +1610,33 @@ first byte are protected for packets with short headers.  For both header forms,
 this covers the reserved bits and the Packet Number Length field; the Key Phase
 bit is also protected for packets with a short header.
 
+这种保护适用于第一个字节的最低有效位，再加上「数据包编号」字段。对于使用长包头的数据包，
+第一个字节的四个最低有效位受到保护；对于使用短包头的数据包，将保护第一个字节的五个最低
+有效位。对于这两种包头形式，这都包括保留位和「数据包编号长度」字段。对于具有短报头的
+数据包，密钥相位位也受到保护。
+
 The same header protection key is used for the duration of the connection, with
 the value not changing after a key update (see {{key-update}}).  This allows
 header protection to be used to protect the key phase.
+
+连接期间使用相同的报头保护密钥，密钥更新后该值不变（见 {{key-update}}）。
+这允许把 Header 保护用来保护关键阶段。
 
 This process does not apply to Retry or Version Negotiation packets, which do
 not contain a protected payload or any of the fields that are protected by this
 process.
 
+此过程不适用于重试或版本协商数据包，这些数据包不包含受保护的有效负载或此过程
+保护的任何字段。
 
-### Header Protection Application
+### Header Protection Application - Header 保护应用
 
 Header protection is applied after packet protection is applied (see {{aead}}).
 The ciphertext of the packet is sampled and used as input to an encryption
 algorithm.  The algorithm used depends on the negotiated AEAD.
+
+在应用包保护（见 {{aead}}）之后应用报头保护。对数据包的密文进行采样，并将其用作
+加密算法的输入。使用的算法取决于协商的 AEAD。
 
 The output of this algorithm is a 5-byte mask that is applied to the protected
 header fields using exclusive OR.  The least significant bits of the first byte
@@ -1595,9 +1644,16 @@ of the packet are masked by the least significant bits of the first mask byte,
 and the packet number is masked with the remaining bytes.  Any unused bytes of
 mask that might result from a shorter packet number encoding are unused.
 
+该算法的输出是一个 5 字节的掩码，该掩码使用异或运算应用于受保护的包头字段。数据包
+第一个字节的最低有效位被第一个屏蔽字节的最低有效位屏蔽，而数据包号被其余字节屏蔽。
+较短的数据包编号编码可能导致的任何未使用的掩码字节都未被使用。
+
 {{pseudo-hp}} shows a sample algorithm for applying header protection. Removing
 header protection only differs in the order in which the packet number length
 (pn_length) is determined (here "^" is used to represent exclusive or).
+
+{{pseudo-hp}} 显示了用于应用标头保护的示例算法。移除报头保护的区别仅在于确定数据包
+编号长度 (pn_length) 的顺序不同（这里的 "^" 用于表示异或）。
 
 ~~~
 mask = header_protection(hp_key, sample)
@@ -1618,10 +1674,15 @@ packet[pn_offset:pn_offset+pn_length] ^= mask[1:1+pn_length]
 Specific header protection functions are defined based on the selected cipher
 suite; see {{hp-aes}} and {{hp-chacha}}.
 
+根据所选的密码套件定义特定的报头保护功能（见 {{hp-aes}} 和 {{hp-chacha}}）。
+
 {{fig-sample}} shows an example long header packet (Initial) and a short header
 packet (1-RTT). {{fig-sample}} shows the fields in each header that are covered
 by header protection and the portion of the protected packet payload that is
 sampled.
+
+{{fig-sample}} 显示了一个示例长标头包 (Initial) 和短标头包 (1-RTT)。{{fig-sample}}
+显示了标头保护所覆盖的每个标头中的字段以及所采样的受保护数据包有效负载的一部分。
 
 ~~~
 Initial Packet {
@@ -1668,11 +1729,18 @@ these AES AEADs are defined in {{!AEAD=RFC5116}}), and AEAD_CHACHA20_POLY1305
 header protection is used ({{hp-aes}}), matching the AEAD_AES_128_GCM packet
 protection.
 
+在 TLS 密码套件可以与 QUIC 一起使用之前，必须为与该密码套件一起使用的 AEAD 指定
+标头保护算法。本文档定义了 AEAD_AES_128_GCM、AEAD_AES_128_CCM、AEAD_AES_256_GCM
+（所有这些 AES AEADs 在 {{!AEAD=RFC5116}}）和 AEAD_CHACHA20_POLY1305
+（在 {{!CHACHA=RFC8439}} 中定义）的算法。在 TLS 选择密码套件之前，使用 AES 标头
+保护（{{hp-aes}}），与 AEAD_AES_128_GCM 数据包保护相匹配。
 
-### Header Protection Sample {#hp-sample}
+### Header Protection Sample - Header 保护例子 {#hp-sample}
 
 The header protection algorithm uses both the header protection key and a sample
 of the ciphertext from the packet Payload field.
+
+Header 保护算法同时使用 Header 保护密钥和来自数据包有效载荷字段的密文样本。
 
 The same number of bytes are always sampled, but an allowance needs to be made
 for the endpoint removing protection, which will not know the length of the
@@ -1681,8 +1749,14 @@ of 4 bytes after the start of the Packet Number field.  That is, in sampling
 packet ciphertext for header protection, the Packet Number field is assumed to
 be 4 bytes long (its maximum possible encoded length).
 
+总是采样相同数量的字节，但是需要为端点移除保护留出余地，因为不知道数据包编号
+字段的长度。密文的样本从数据包编号字段开始后 4 个字节的偏移量开始获取。也就是说，
+在对用于报头保护的分组密文进行采样时，分组编号字段假定为 4 字节长（其最大可能编码长度）。
+
 An endpoint MUST discard packets that are not long enough to contain a complete
 sample.
+
+端点必须丢弃长度不足以包含完整样本的数据包。
 
 To ensure that sufficient data is available for sampling, packets are padded so
 that the combined lengths of the encoded packet number and protected payload is
@@ -1694,10 +1768,19 @@ least 3 bytes of frames in the unprotected payload if the packet number is
 encoded on a single byte, or 2 bytes of frames for a 2-byte packet number
 encoding.
 
+为了确保有足够的数据可用于采样，对数据包进行填充，以使编码的数据包编号和受保护的
+有效载荷的组合长度至少比标头保护所需的样本长 4 个字节。 在 {{!TLS13}} 中定义的
+密码套件（TLS_AES_128_CCM_8_SHA256 除外，在本文中未定义标头保护方案）具有 16 字节
+扩展和 16 字节标头保护样本。如果将数据包号编码在单个字节上，则需要在未受保护的
+有效载荷中至少包含 3 个字节的帧；对于 2 字节的数据包号编码，则需要 2 个字节的帧。
+
 The sampled ciphertext can be determined by the following pseudocode:
+
+可以通过下面的伪代码确定采样的密文：
 
 ~~~
 # pn_offset is the start of the Packet Number field.
+# pn_offset 为数据包编号字段的开始。
 sample_offset = pn_offset + 4
 
 sample = packet[sample_offset..sample_offset+sample_length]
@@ -1705,11 +1788,15 @@ sample = packet[sample_offset..sample_offset+sample_length]
 
 where the packet number offset of a short header packet can be calculated as:
 
+其中，短头数据包的编号偏移可以计算为：
+
 ~~~
 pn_offset = 1 + len(connection_id)
 ~~~
 
 and the packet number offset of a long header packet can be calculated as:
+
+并且长头数据包的编号偏移量可以计算为：
 
 ~~~
 pn_offset = 7 + len(destination_connection_id) +
@@ -1724,20 +1811,31 @@ For example, for a packet with a short header, an 8-byte connection ID, and
 protected with AEAD_AES_128_GCM, the sample takes bytes 13 to 28 inclusive
 (using zero-based indexing).
 
+例如，对于使用短头、8 字节连接 ID 并受 AEAD_AES_128_GCM 保护的数据包，该示例
+将获取包含 13-28 个字节（使用基于零的索引）。
+
 Multiple QUIC packets might be included in the same UDP datagram. Each packet
 is handled separately.
 
+同一个 UDP 数据报中可能包含多个 QUIC 数据包。每个数据包是分开处理的。
 
-### AES-Based Header Protection {#hp-aes}
+### AES-Based Header Protection - 基于 AES 的 Header 保护 {#hp-aes}
 
 This section defines the packet protection algorithm for AEAD_AES_128_GCM,
 AEAD_AES_128_CCM, and AEAD_AES_256_GCM. AEAD_AES_128_GCM and AEAD_AES_128_CCM
 use 128-bit AES in electronic code-book (ECB) mode. AEAD_AES_256_GCM uses
 256-bit AES in ECB mode.  AES is defined in {{!AES=DOI.10.6028/NIST.FIPS.197}}.
 
+这部分定义了 AEAD_AES_128_GCM、AEAD_AES_128_CCM 和 AEAD_AES_256_GCM 的数据包保护算法。
+AEAD_AES_128_GCM 和 AEAD_AES_128_CCM 在电子密码簿 (ECB) 模式下使用 128 位 AES。
+AEAD_AES_256_GCM 在 ECB 模式下使用 256 位 AES。AES 定义在 {{!AES=DOI.10.6028/NIST.FIPS.197}}。
+
 This algorithm samples 16 bytes from the packet ciphertext. This value is used
 as the input to AES-ECB.  In pseudocode, the header protection function is
 defined as:
+
+该算法从数据包密文中采样 16 个字节。该值用作 AES-ECB 的输入。在伪代码中，
+Header 保护函数定义为：
 
 ~~~
 header_protection(hp_key, sample):
@@ -1745,23 +1843,35 @@ header_protection(hp_key, sample):
 ~~~
 
 
-### ChaCha20-Based Header Protection {#hp-chacha}
+### ChaCha20-Based Header Protection - 基于 ChaCha20 的 Header 保护 {#hp-chacha}
 
 When AEAD_CHACHA20_POLY1305 is in use, header protection uses the raw ChaCha20
 function as defined in {{Section 2.4 of CHACHA}}.  This uses a 256-bit key and
 16 bytes sampled from the packet protection output.
 
+使用 AEAD_CHACHA20_POLY1305 时，Header 保护使用 {{Section 2.4 of CHACHA}} 中定义的
+原始 ChaCha20 函数。它使用一个 256 位密钥和 16 个字节从数据包保护输出中采样。
+
 The first 4 bytes of the sampled ciphertext are the block counter.  A ChaCha20
 implementation could take a 32-bit integer in place of a byte sequence, in
 which case the byte sequence is interpreted as a little-endian value.
+
+采样密文的前 4 个字节是块计数器。ChaCha20 实现可以使用 32 位整数代替字节序列，
+在这种情况下，字节序列被解释为低位字节序值。
 
 The remaining 12 bytes are used as the nonce. A ChaCha20 implementation might
 take an array of three 32-bit integers in place of a byte sequence, in which
 case the nonce bytes are interpreted as a sequence of 32-bit little-endian
 integers.
 
+剩余的 12 个字节用作随机数。 ChaCha20 实现可能采用三个 32 位整数数组来代替字节序列，
+在这种情况下，现时字节被解释为 32 位 Little-endian 整数序列。
+
 The encryption mask is produced by invoking ChaCha20 to protect 5 zero bytes. In
 pseudocode, the header protection function is defined as:
+
+加密掩码是通过调用 ChaCha20 来保护 5 个零字节而产生的。在伪代码中，
+Header 保护函数定义为：
 
 ~~~
 header_protection(hp_key, sample):
