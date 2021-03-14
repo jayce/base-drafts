@@ -1881,7 +1881,7 @@ header_protection(hp_key, sample):
 ~~~
 
 
-## Receiving Protected Packets
+## Receiving Protected Packets - 接收保护数据包
 
 Once an endpoint successfully receives a packet with a given packet number, it
 MUST discard all packets in the same packet number space with higher packet
@@ -1890,17 +1890,27 @@ numbers if they cannot be successfully unprotected with either the same key, or
 {{key-update}}.  Similarly, a packet that appears to trigger a key update, but
 cannot be unprotected successfully MUST be discarded.
 
+一旦端点成功地接收到特定数据包编号的数据包，它必须丢弃相同数据包编号空间中具有更高
+数据包编号的所有数据包，如果它们不能用相同的密钥或（如果有密钥更新）后续的数据包保护
+密钥成功取消保护（见 {{key-update}}）。类似地，必须丢弃看似触发密钥更新但无法成功取消
+保护的数据包。
+
 Failure to unprotect a packet does not necessarily indicate the existence of a
 protocol error in a peer or an attack.  The truncated packet number encoding
 used in QUIC can cause packet numbers to be decoded incorrectly if they are
 delayed significantly.
 
+未能解除对数据包的保护并不一定表明对等方中存在协议错误或攻击。在 QUIC 中使用的截断包编
+号编码可能会导致包编号被错误地解码，如果它们被严重延迟的话。
 
-## Use of 0-RTT Keys {#using-early-data}
+## Use of 0-RTT Keys - 使用 0-RTT 密钥 {#using-early-data}
 
 If 0-RTT keys are available (see {{enable-0rtt}}), the lack of replay protection
 means that restrictions on their use are necessary to avoid replay attacks on
 the protocol.
+
+如果 0-RTT 密钥可用（见 {{enable-0rtt}}），则缺少重放保护意味着需要限制它们的使用，
+以避免对协议的重播攻击。
 
 Of the frames defined in {{QUIC-TRANSPORT}}, the STREAM, RESET_STREAM,
 STOP_SENDING, and CONNECTION_CLOSE frames are potentially unsafe for use with
@@ -1911,35 +1921,60 @@ of processing replayed application data could have unwanted consequences. A
 client therefore MUST NOT use 0-RTT for application data unless specifically
 requested by the application that is in use.
 
+在 {{QUIC-TRANSPORT}} 中定义的 STREAM、RESET_STREAM、STOP_SENDING、CONNECTION_CLOSE 帧
+可能与 0-RTT 一起使用，因为它们携带应用程序数据。在 0-RT 中收到的应用程序数据可能导致
+服务器上的应用程序多次处理数据，而不是一次。服务器在处理重放的应用程序数据时所采取的
+其他操作可能会产生不必要的后果。因此，客户端不得对应用程序数据使用 0-RTT，除非正在使用的
+应用程序明确要求。
+
 An application protocol that uses QUIC MUST include a profile that defines
 acceptable use of 0-RTT; otherwise, 0-RTT can only be used to carry QUIC frames
 that do not carry application data. For example, a profile for HTTP is
 described in {{?HTTP-REPLAY=RFC8470}} and used for HTTP/3; see
 {{Section 10.9 of QUIC-HTTP}}.
 
+使用 QUIC 的应用程序协议必须包含一个定义 0-RTT 可接受使用的配置文件；否则，0-RTT 只能
+用于承载不承载应用程序数据的 QUIC 帧。例如，{{?HTTP-REPLAY=RFC8470}} 中描述了 HTTP 的概要
+文件，并将其用于 HTTP/3（见 {{Section 10.9 of QUIC-HTTP}}）。
+
 Though replaying packets might result in additional connection attempts, the
 effect of processing replayed frames that do not carry application data is
 limited to changing the state of the affected connection. A TLS handshake
 cannot be successfully completed using replayed packets.
 
+尽管重放数据包可能会导致额外的连接尝试，但处理不携带应用程序数据的重放帧的效果
+仅限于更改受影响连接的状态。用重放的数据包无法成功完成 TLS 握手。
+
 A client MAY wish to apply additional restrictions on what data it sends prior
 to the completion of the TLS handshake.
+
+客户端可能希望在 TLS 握手完成之前对其发送的数据应用附加限制。
 
 A client otherwise treats 0-RTT keys as equivalent to 1-RTT keys, except that
 it cannot send certain frames with 0-RTT keys; see
 {{Section 12.5 of QUIC-TRANSPORT}}.
+
+否则，客户端将 0-RTT 密钥视为等同于 1-RTT 密钥，只是它不能用 0-RTT 密钥发送某些帧
+{{Section 12.5 of QUIC-TRANSPORT}}。
 
 A client that receives an indication that its 0-RTT data has been accepted by a
 server can send 0-RTT data until it receives all of the server's handshake
 messages.  A client SHOULD stop sending 0-RTT data if it receives an indication
 that 0-RTT data has been rejected.
 
+接收到服务器已接受 0-RTT 数据的指示的客户端可以发送 0-RTT 数据，直到它接收到服务器
+的所有握手消息为止。如果客户端收到 0-RTT 数据已被拒绝的指示，则应停止发送 0-RTT 数据。
+
 A server MUST NOT use 0-RTT keys to protect packets; it uses 1-RTT keys to
 protect acknowledgments of 0-RTT packets.  A client MUST NOT attempt to
 decrypt 0-RTT packets it receives and instead MUST discard them.
 
+服务器不能使用 0-RTT 密钥来保护数据包；它使用 1-RTT 密钥来保护 0-RTT 数据包的确认。
+客户端不能试图解密它接收到的 0-RTT 数据包，而是必须丢弃它们。
+
 Once a client has installed 1-RTT keys, it MUST NOT send any more 0-RTT
 packets.
+一旦客户端安装了 1-RTT 密钥，就不能再发送任何 0-RTT 数据包。
 
 Note:
 
@@ -1949,6 +1984,11 @@ Note:
   necessary to remove packet protection cannot be derived until the client
   receives all server handshake messages.
 
+注意：
+
+: 服务器在接收到 0-RTT 数据时可以对其进行确认，但是在 TLS 握手完成之前，任何包含 0-RTT 数据
+  确认的数据包都不能被客户端删除数据包保护。在客户端接收到所有服务器握手消息之前，无法导出
+  删除数据包保护所需的 1-RTT 密钥。
 
 ## Receiving Out-of-Order Protected Packets {#pre-hs-protected}
 
