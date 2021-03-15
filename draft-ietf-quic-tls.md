@@ -1990,7 +1990,7 @@ Note:
   确认的数据包都不能被客户端删除数据包保护。在客户端接收到所有服务器握手消息之前，无法导出
   删除数据包保护所需的 1-RTT 密钥。
 
-## Receiving Out-of-Order Protected Packets {#pre-hs-protected}
+## Receiving Out-of-Order Protected Packets - 接收无序受保护的数据包 {#pre-hs-protected}
 
 Due to reordering and loss, protected packets might be received by an endpoint
 before the final TLS handshake messages are received.  A client will be unable
@@ -1998,19 +1998,35 @@ to decrypt 1-RTT packets from the server, whereas a server will be able to
 decrypt 1-RTT packets from the client.  Endpoints in either role MUST NOT
 decrypt 1-RTT packets from their peer prior to completing the handshake.
 
+由于重新排序和丢失，在接收到最终 TLS 握手消息之前，端点可能会接收到
+受保护的数据包。客户端将无法从服务器解密 1-RTT 数据包，而服务器将能够
+从客户端解密 1-RTT 数据包。在完成握手之前，任一角色的端点都不能解密来
+自其对等方的 1-RTT 数据包。
+
 Even though 1-RTT keys are available to a server after receiving the first
 handshake messages from a client, it is missing assurances on the client state:
+
+即使在从客户端接收到第一个握手消息后，服务器可以使用 1-RTT 密钥，
+但它在客户端状态上缺少保证：
 
 - The client is not authenticated, unless the server has chosen to use a
   pre-shared key and validated the client's pre-shared key binder; see {{Section
   4.2.11 of TLS13}}.
 
+- 除非服务器选择使用预共享密钥并验证了客户端的预共享密钥绑定器，否则
+  客户端不会被验证（见 {{Section 4.2.11 of TLS13}}）。
+
 - The client has not demonstrated liveness, unless the server has validated the
   client's address with a Retry packet or other means; see
   {{Section 8.1 of QUIC-TRANSPORT}}.
 
+- 客户端没有表现出活跃性，除非服务器用重试包或其他方法验证了客户机的地址
+  （见 {{Section 8.1 of QUIC-TRANSPORT}}）。
+
 - Any received 0-RTT data that the server responds to might be due to a replay
   attack.
+
+- 服务器响应的任何接收到的 0-RTT 数据都可能是由于重播攻击造成的。
 
 Therefore, the server's use of 1-RTT keys before the handshake is complete is
 limited to sending data.  A server MUST NOT process incoming 1-RTT protected
@@ -2020,11 +2036,21 @@ acknowledgments for 1-RTT packets until the TLS handshake is complete.  Received
 packets protected with 1-RTT keys MAY be stored and later decrypted and used
 once the handshake is complete.
 
+因此，在握手完成之前，服务器对 1-RTT 密钥的使用仅限于发送数据。在 TLS 握手完成之前，
+服务器不得处理传入的 1-RTT 保护的数据包。因为发送确认表示数据包中的所有帧都已处理，
+所以在 TLS 握手完成之前，服务器无法发送 1-RTT 数据包的确认。接收到的由 1-RTT 密钥
+保护的分组可以被存储，并且在握手完成之后被解密和使用。
+
 Note:
 
 : TLS implementations might provide all 1-RTT secrets prior to handshake
   completion.  Even where QUIC implementations have 1-RTT read keys, those keys
   are not to be used prior to completing the handshake.
+
+注意：
+
+: TLS 实现可能在握手完成之前提供所有 1-RTT 秘密。即使 QUIC 实现有 1-RTT 读取密钥，
+  在完成握手之前也不能使用这些密钥。
 
 The requirement for the server to wait for the client Finished message creates
 a dependency on that message being delivered.  A client can avoid the
@@ -2033,14 +2059,23 @@ packets coalesced with a Handshake packet containing a copy of the CRYPTO frame
 that carries the Finished message, until one of the Handshake packets is
 acknowledged.  This enables immediate server processing for those packets.
 
+服务器等待客户端完成消息的要求会在正在传递的消息上创建依赖关系。客户端可以通过发送
+其 1-RTT 数据包与包含承载完成消息的加密帧副本的握手数据包合并，直到其中一个握手数据
+包被确认为止，来避免意味着的可能的线路头阻塞。这使得服务器能够立即处理这些数据包。
+
 A server could receive packets protected with 0-RTT keys prior to receiving a
 TLS ClientHello.  The server MAY retain these packets for later decryption in
 anticipation of receiving a ClientHello.
+
+服务器可以在接收 TLS ClientHello 之前接收受 0-RTT 密钥保护的数据包。服务器可以
+保留这些数据包，以便在接收预期的 ClientHello 时解密。
 
 A client generally receives 1-RTT keys at the same time as the handshake
 completes.  Even if it has 1-RTT secrets, a client MUST NOT process
 incoming 1-RTT protected packets before the TLS handshake is complete.
 
+客户端通常在握手完成的同时接收 1-RTT 密钥。即使它有 1-RTT 秘密，客户端也不能
+在 TLS 握手完成之前处理传入的 1-RTT 保护的数据包。
 
 ## Retry Packet Integrity {#retry-integrity}
 
