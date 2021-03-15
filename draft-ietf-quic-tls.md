@@ -1420,8 +1420,8 @@ Initial packets apply the packet protection process, but use a secret derived
 from the Destination Connection ID field from the client's first Initial
 packet.
 
-Initial 数据包应用数据包保护过程，是使用从客户端的第一个 Initial 数据包的“目标连接ID”字段
-派生的密码。
+Initial 数据包应用数据包保护过程，是使用从客户端的第一个 Initial 数据包的「目标连接ID」
+字段派生出来的密码。
 
 This secret is determined by using HKDF-Extract (see {{Section 2.2 of HKDF}})
 with a salt of 0x38762cf7f55934b34d179ae6a4c80cadccbb7f0a and a IKM of the
