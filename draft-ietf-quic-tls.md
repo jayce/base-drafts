@@ -2452,16 +2452,19 @@ Handshake packets, but because that tampering requires modifying TLS handshake
 messages, that tampering will cause the TLS handshake to fail.
 
 
-# QUIC-Specific Adjustments to the TLS Handshake
+# QUIC-Specific Adjustments to the TLS Handshake - QUIC 对 TLS 握手的调整
 
 Certain aspects of the TLS handshake are different when used with QUIC.
+
+与 QUIC 一起使用时，TLS 握手的某些方面是不同的。
 
 QUIC also requires additional features from TLS.  In addition to negotiation of
 cryptographic parameters, the TLS handshake carries and authenticates values for
 QUIC transport parameters.
 
+QUIC 还需要 TLS 的其他特性。除了协商密码参数外，TLS 握手还携带并验证 QUIC 传输参数的值。
 
-## Protocol Negotiation {#protocol-negotiation}
+## Protocol Negotiation - 协议协商 {#protocol-negotiation}
 
 QUIC requires that the cryptographic handshake provide authenticated protocol
 negotiation.  TLS uses Application Layer Protocol Negotiation
@@ -2469,11 +2472,19 @@ negotiation.  TLS uses Application Layer Protocol Negotiation
 is used for agreeing on an application protocol, endpoints MUST use ALPN for
 this purpose.
 
+QUIC 要求加密握手提供经过身份验证的协议协商。TLS 使用应用层协议协商 ({{!ALPN=RFC7301}})
+来选择应用层协议。除非使用另一种机制来商定应用程序协议，否则端点必须为此使用 ALPN。
+
 When using ALPN, endpoints MUST immediately close a connection (see {{Section
 10.2 of QUIC-TRANSPORT}}) with a no_application_protocol TLS alert (QUIC error
 code 0x178; see {{tls-errors}}) if an application protocol is not negotiated.
 While {{!ALPN}} only specifies that servers use this alert, QUIC clients MUST
 use error 0x178 to terminate a connection when ALPN negotiation fails.
+
+在使用 ALPN 时，如果应用层协议没有协商，端点必须立即关闭带有 no_application_protocol
+TLS 警报（QUIC 错误代码 0x178；见{{tls-errors}}）的连接（见 {{Section
+10.2 of QUIC-TRANSPORT}}）。而 {{!ALPN}} 仅指定服务器使用此警报，当 ALPN 协商
+失败时，QUIC 客户端必须使用错误 0x178 终止连接。
 
 An application protocol MAY restrict the QUIC versions that it can operate over.
 Servers MUST select an application protocol compatible with the QUIC version
@@ -2483,14 +2494,22 @@ compatible application protocol as a connection error of type 0x178
 incompatible application protocol by a server as a connection error of type
 0x178.
 
+应用层协议可能会限制它可以操作的 QUIC 版本。服务器必须选择与客户端选择的 QUIC 版本
+兼容的应用层协议。服务器必须将无法选择兼容的应用层协议视为 0x178 类型的连接错误
+(no_application_protocol)。类似地，客户端必须将服务器选择的不兼容应用程序协议
+视为 0x178 类型的连接错误。
 
-## QUIC Transport Parameters Extension {#quic_parameters}
+## QUIC Transport Parameters Extension - QUIC 传输参数扩展 {#quic_parameters}
 
 QUIC transport parameters are carried in a TLS extension. Different versions of
 QUIC might define a different method for negotiating transport configuration.
 
+QUIC 传输参数在 TLS 扩展中携带。不同版本的 QUIC 可能会定义不同的方法来协商传输配置。
+
 Including transport parameters in the TLS handshake provides integrity
 protection for these values.
+
+在 TLS 握手中包含传输参数可以为这些值提供完整性保护。
 
 ~~~
    enum {
@@ -2501,6 +2520,8 @@ protection for these values.
 The extension_data field of the quic_transport_parameters extension contains a
 value that is defined by the version of QUIC that is in use.
 
+quic_transport_parameters扩展的extension_data字段包含一个值，该值由正在使用的 QUIC 版本定义。
+
 The quic_transport_parameters extension is carried in the ClientHello and the
 EncryptedExtensions messages during the handshake. Endpoints MUST send the
 quic_transport_parameters extension; endpoints that receive ClientHello or
@@ -2508,20 +2529,34 @@ EncryptedExtensions messages without the quic_transport_parameters extension
 MUST close the connection with an error of type 0x16d (equivalent to a fatal TLS
 missing_extension alert, see {{tls-errors}}).
 
+quic_transport_parameters 扩展在 ClientHello 和握手期间的加密数据中携带。端点必须
+发送 quic_transport_parameters 扩展; 在没有 quic_transport_parameters 扩展的情况下
+接收 ClientHello 或 EncryptedExtensions 消息的端点必须以 0x16d 错误类型关闭连接
+（相当于 TLS missing_extension 警告，见 {{tls-errors}}）。
+
 Transport parameters become available prior to the completion of the handshake.
 A server might use these values earlier than handshake completion. However, the
 value of transport parameters is not authenticated until the handshake
 completes, so any use of these parameters cannot depend on their authenticity.
 Any tampering with transport parameters will cause the handshake to fail.
 
+传输参数在握手完成之前可用。服务器可能在握手完成之前使用这些值。但是，在握手完成
+之前，传输参数的值未被验证，因此任何使用这些参数都不能依赖于他们的真实性。任何带
+有传输参数的篡改都会导致握手失败。
+
 Endpoints MUST NOT send this extension in a TLS connection that does not use
 QUIC (such as the use of TLS with TCP defined in {{!TLS13}}).  A fatal
 unsupported_extension alert MUST be sent by an implementation that supports this
 extension if the extension is received when the transport is not QUIC.
 
+终端不能在没有使用 QUIC 的 TLS 连接中发送此扩展（例如，如在 {{!TLS13}} 中定义了
+使用 TCP 的 TLS）。如果在传输不是 QUIC 时接收到扩展，则支持此扩展的实现必须发送
+unsupported_extension 警告。
+
 Negotiating the quic_transport_parameters extension causes the EndOfEarlyData to
 be removed; see {{remove-eoed}}.
 
+协商 quic_transport_parameters 扩展会导致 EndOfEarlyData 被移除（见 {{remove-eoed}}）。
 
 ## Removing the EndOfEarlyData Message {#remove-eoed}
 
