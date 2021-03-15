@@ -2431,7 +2431,7 @@ The KEY_UPDATE_ERROR error code (0xe) is used to signal errors related to key
 updates.
 
 
-# Security of Initial Messages
+# Security of Initial Messages - Initial 消息的安全
 
 Initial packets are not protected with a secret key, so they are subject to
 potential tampering by an attacker.  QUIC provides protection against attackers
@@ -2440,6 +2440,10 @@ against attacks where the attacker can observe and inject packets.  Some forms
 of tampering -- such as modifying the TLS messages themselves -- are detectable,
 but some -- such as modifying ACKs -- are not.
 
+Initial 数据包不受密钥保护，因此可能受到攻击者的篡改。QUIC 提供了数据包无法读取数据包
+的攻击者的保护，但不会试图针对攻击者可以观察和注入数据包的攻击提供额外的保护。某种形式
+的篡改，例如修改 TLS 消息本身是可检测的，但是类似修改 ACK 是不可检测的。
+
 For example, an attacker could inject a packet containing an ACK frame that
 makes it appear that a packet had not been received or to create a false
 impression of the state of the connection (e.g., by modifying the ACK Delay).
@@ -2447,10 +2451,16 @@ Note that such a packet could cause a legitimate packet to be dropped as a
 duplicate.  Implementations SHOULD use caution in relying on any data that is
 contained in Initial packets that is not otherwise authenticated.
 
+例如，攻击者可以注入包含 ACK 帧的数据包，使其看起来没有收到数据包，或者创建连接状态
+的错误印象（例如，通过修改 ACK 延迟）。请注意，这样的数据包可能导致合法数据包作为副本
+被丢弃。在依赖初始数据包中包含的任何数据时，实施应谨慎，否则未经验证。
+
 It is also possible for the attacker to tamper with data that is carried in
 Handshake packets, but because that tampering requires modifying TLS handshake
 messages, that tampering will cause the TLS handshake to fail.
 
+攻击者也有可能篡改握手包中携带的数据，但由于篡改需要修改 TLS 握手消息，因此篡改会
+导致 TLS 握手失败。
 
 # QUIC-Specific Adjustments to the TLS Handshake - QUIC 对 TLS 握手的调整
 
