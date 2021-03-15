@@ -2558,20 +2558,27 @@ be removed; see {{remove-eoed}}.
 
 协商 quic_transport_parameters 扩展会导致 EndOfEarlyData 被移除（见 {{remove-eoed}}）。
 
-## Removing the EndOfEarlyData Message {#remove-eoed}
+## Removing the EndOfEarlyData Message - 移除 EndOfEarlyData 消息 {#remove-eoed}
 
 The TLS EndOfEarlyData message is not used with QUIC.  QUIC does not rely on
 this message to mark the end of 0-RTT data or to signal the change to Handshake
 keys.
 
+TLS 的 EndOfEarlyData 消息不与 QUIC 一起使用。QUIC 不依赖此消息来标记 0-RTT 数据
+的结束或向握手键发出更改信号。
+
 Clients MUST NOT send the EndOfEarlyData message.  A server MUST treat receipt
 of a CRYPTO frame in a 0-RTT packet as a connection error of type
 PROTOCOL_VIOLATION.
 
+客户端不能发送 EndOfEarlyData 消息。服务器必须将收到 0-RTT 数据包中的加密帧视为
+违反协议类型的连接错误。
+
 As a result, EndOfEarlyData does not appear in the TLS handshake transcript.
 
+因此，EndOfEarlyData 不会出现在 TLS 握手记录中。
 
-## Prohibit TLS Middlebox Compatibility Mode {#compat-mode}
+## Prohibit TLS Middlebox Compatibility Mode - 禁止 TLS 中间件兼容模式 {#compat-mode}
 
 Appendix D.4 of {{!TLS13}} describes an alteration to the TLS 1.3 handshake as
 a workaround for bugs in some middleboxes. The TLS 1.3 middlebox compatibility
@@ -2579,29 +2586,44 @@ mode involves setting the legacy_session_id field to a 32-byte value in the
 ClientHello and ServerHello, then sending a change_cipher_spec record. Both
 field and record carry no semantic content and are ignored.
 
+{{!TLS13}} 附录 D.4 描述了对 TLS1.3 握手的更改作为一些中间件中错误的解决方法。
+TLS1.3 中间件兼容模式涉及将 legacy_session_id 字段设置为 ClientHello 和 ServerHello 中的
+32-byte，然后发送一个 change_cipher_spec 记录。这两个字段和记录都没有语义内容并被忽略。
+
 This mode has no use in QUIC as it only applies to middleboxes that interfere
 with TLS over TCP. QUIC also provides no means to carry a change_cipher_spec
 record. A client MUST NOT request the use of the TLS 1.3 compatibility mode. A
 server SHOULD treat the receipt of a TLS ClientHello with a non-empty
 legacy_session_id field as a connection error of type PROTOCOL_VIOLATION.
 
+这种模式在 QUIC 中没有用处，因为它只适用于通过 TLS over TCP 的中间件。
+QUIC 也没有提供任何方法来携带 change_cipher_spec 记录。客户端不得请求
+使用 TLS1.3 兼容模式。服务器应该将收到的 TLS ClientHello 处理为非空
+legacy_session_id 字段，作为 PROTOCOL_VIOLATION 类型的连接错误。
 
-# Security Considerations
+# Security Considerations - 安全注意事项
 
 All of the security considerations that apply to TLS also apply to the use of
 TLS in QUIC. Reading all of {{!TLS13}} and its appendices is the best way to
 gain an understanding of the security properties of QUIC.
 
+所有适用于 TLS 的安全考虑也适用于在 QUIC 中使用的 TLS。阅读 {{!TLS13}} 及其附录
+是了解 QUIC 安全性的最佳方法。
+
 This section summarizes some of the more important security aspects specific to
 the TLS integration, though there are many security-relevant details in the
 remainder of the document.
 
+本节概述了 TLS 集成中一些更重要的安全方面，尽管文档的其余部分中有许多与安全相关
+的详细信息。
 
-## Session Linkability
+## Session Linkability - 会话关联
 
 Use of TLS session tickets allows servers and possibly other entities to
 correlate connections made by the same client; see {{resumption}} for details.
 
+使用 TLS 会话凭证允许服务器和其他实体可能要关联的由同一个客户端建立的连接
+（详细信息，见 {{resumption}}）。
 
 ## Replay Attacks with 0-RTT {#replay}
 
