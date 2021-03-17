@@ -2357,11 +2357,14 @@ after having received a packet protected using the new keys. After this period,
 old read keys and their corresponding secrets SHOULD be discarded.
 
 
-## Limits on AEAD Usage {#aead-limits}
+## Limits on AEAD Usage - AEAD 使用限制 {#aead-limits}
 
 This document sets usage limits for AEAD algorithms to ensure that overuse does
 not give an adversary a disproportionate advantage in attacking the
 confidentiality and integrity of communications when using QUIC.
+
+本文档为 AEAD 算法设定了使用限制，以确保在使用 QUIC 时，过度使用不会给对手在攻击
+通信的机密性和完整性方面的不成比例优势。
 
 The usage limits defined in TLS 1.3 exist for protection against attacks
 on confidentiality and apply to successful applications of AEAD protection. The
@@ -2370,11 +2373,20 @@ number of attempts to forge packets. TLS achieves this by closing connections
 after any record fails an authentication check. In comparison, QUIC ignores any
 packet that cannot be authenticated, allowing multiple forgery attempts.
 
+TLS1.3 中定义的使用限制适用于防止对机密性攻击的攻击，并适用于 AEAD 保护的成功应用。
+认证加密中的完整性保护还取决于限制伪造数据包的次数。TLS 通过关闭任何记录后的连接来
+实现这一点，因为任何记录都无法通过身份验证检查。相比之下，QUIC 忽略任何无法验证的包，
+允许多次伪造尝试。
+
 QUIC accounts for AEAD confidentiality and integrity limits separately. The
 confidentiality limit applies to the number of packets encrypted with a given
 key. The integrity limit applies to the number of packets decrypted within a
 given connection. Details on enforcing these limits for each AEAD algorithm
 follow below.
+
+QUIC 分别对 AEAD 保密和完整性限制进行了说明。保密限制适用于使用给定密钥加密的数据包的
+数量。完整性限制适用于在给定连接中解密的数据包数。下面是对每个 AEAD 算法执行这些限制的
+详细信息。
 
 Endpoints MUST count the number of encrypted packets for each set of keys. If
 the total number of encrypted packets with the same key exceeds the
@@ -2387,6 +2399,12 @@ It is RECOMMENDED that endpoints immediately close the connection with a
 connection error of type AEAD_LIMIT_REACHED before reaching a state where key
 updates are not possible.
 
+端点必须计算每组密钥的加密数据包数。如果具有相同密钥的加密数据包总数超过所选 AEAD 的保密
+限制，则终结点必须停止使用这些密钥。端点必须在发送超过所选 AEAD 许可的保密限制的受保护数
+据包之前启动密钥更新。如果无法进行密钥更新或达到完整性限制，则端点必须停止使用连接，并且
+仅发送无状态重置以响应接收数据包。建议端点以 AEAD_LIMIT_REACHED 类型的连接错误立即关闭连
+接，在达到无法进行密钥更新的状态之前。
+
 For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the confidentiality limit is
 2<sup>23</sup> encrypted packets; see {{gcm-bounds}}. For
 AEAD_CHACHA20_POLY1305, the confidentiality limit is greater than the number of
@@ -2396,12 +2414,22 @@ packets; see {{ccm-bounds}}. Applying a limit reduces the probability that an
 attacker can distinguish the AEAD in use from a random permutation; see
 {{AEBounds}}, {{ROBUST}}, and {{?GCM-MU=DOI.10.1145/3243734.3243816}}.
 
+对于 AEAD_AES_128_GCM 和 AEAD_AES_256_GCM ，机密性限制为 2<sup>23</sup> 加密数据包
+（见 {{gcm-binds}}）。 对于 AEAD_CHACHA20_POLY1305 ，机密性限制大于可能数据包的数量
+(2<sup>62</sup>)，因此可以忽略。对于 AEAD_AES_128_CCM ，机密性限制为 2<sup>21.5</sup>
+加密数据包（见 {{ccm-binds}}）。应用限制可降低攻击者将使用中的 AEAD 与随机排列区分
+开来的概率（见 {{AEBounds}}, {{ROBUST}}, {{?GCM-MU=DOI.10.1145/3243734.3243816}})。
+
 In addition to counting packets sent, endpoints MUST count the number of
 received packets that fail authentication during the lifetime of a connection.
 If the total number of received packets that fail authentication within the
 connection, across all keys, exceeds the integrity limit for the selected AEAD,
 the endpoint MUST immediately close the connection with a connection error of
 type AEAD_LIMIT_REACHED and not process any more packets.
+
+除了统计发送的数据包外，端点还必须统计在连接生存期内未通过身份验证的接收数据包的数量。
+如果连接内所有密钥中未通过身份验证的接收数据包总数超过所选AEAD的完整性限制，则终结点
+必须以 AEAD_LIMIT_REACHED 类型的连接错误立即关闭连接，并且不再处理任何数据包。
 
 For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the integrity limit is 2<sup>52</sup>
 invalid packets; see {{gcm-bounds}}. For AEAD_CHACHA20_POLY1305, the integrity
@@ -2410,11 +2438,21 @@ the integrity limit is 2<sup>21.5</sup> invalid packets; see
 {{ccm-bounds}}. Applying this limit reduces the probability that an attacker can
 successfully forge a packet; see {{AEBounds}}, {{ROBUST}}, and {{?GCM-MU}}.
 
+对于 AEAD_AES_128_GCM 和 AEAD_AES_256_GCM，完整性限制为 2<sup>52</sup> 无效的数据包
+（见 {{gcm-binds}}）。对于 AEAD_CHACHA20_POLY1305，完整性限制为 2<sup>36</sup> 无效
+的数据包（见 {{AEBOUNDS}}）。对于 AEAD_AES_128_CCM，完整性限制为 2<sup>21.5</sup>无
+效的数据包（见 {{ccm-binds}}）。应用此限制会降低攻击者可以成功伪造数据包的概率
+（见 {{AEBounds}}, {{ROBUST}}, {{?GCM-MU}}）。
+
 Endpoints that limit the size of packets MAY use higher confidentiality and
 integrity limits; see {{aead-analysis}} for details.
 
+限制数据包大小的端点可以使用更高的机密性和完整性限制；相关详细信息，见 {{aead-analysis}}。
+
 Future analyses and specifications MAY relax confidentiality or integrity limits
 for an AEAD.
+
+未来的分析和规范可能会放宽 AEAD 的机密性或完整性限制。
 
 Any TLS cipher suite that is specified for use with QUIC MUST define limits on
 the use of the associated AEAD function that preserves margins for
@@ -2424,12 +2462,17 @@ authentication.  Providing a reference to any analysis upon which values are
 based - and any assumptions used in that analysis - allows limits to be adapted
 to varying usage conditions.
 
+任何指定与 QUIC 一起使用的 TLS 密码套件都必须定义对相关 AEAD 函数的使用限制，
+该函数为机密性和完整性保留边距。也就是说，必须为可以通过身份验证的数据包的数量
+和可以通过身份验证的数据包的数量指定限制。提供对价值所基于的任何分析的参考
+（以及该分析中使用的任何假设）允许根据不同的使用条件调整限制。
 
-## Key Update Error Code {#key-update-error}
+## Key Update Error Code - 密钥更新错误代码 {#key-update-error}
 
 The KEY_UPDATE_ERROR error code (0xe) is used to signal errors related to key
 updates.
 
+KEY_UPDATE_ERROR (0xe) 错误代码用来表示与密钥更新相关的错误。
 
 # Security of Initial Messages - Initial 消息的安全
 
