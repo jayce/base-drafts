@@ -2077,15 +2077,22 @@ incoming 1-RTT protected packets before the TLS handshake is complete.
 客户端通常在握手完成的同时接收 1-RTT 密钥。即使它有 1-RTT 秘密，客户端也不能
 在 TLS 握手完成之前处理传入的 1-RTT 保护的数据包。
 
-## Retry Packet Integrity {#retry-integrity}
+## Retry Packet Integrity - Retry 数据包完整性 {#retry-integrity}
 
 Retry packets (see the Retry Packet section of {{QUIC-TRANSPORT}}) carry a
 Retry Integrity Tag that provides two properties: it allows discarding
 packets that have accidentally been corrupted by the network; only an
 entity that observes an Initial packet can send a valid Retry packet.
 
+重试数据包（见 {QUIC-TRANSPORT}} 的重试数据包部分）带有一个 Retry Integrity 标记，
+该标记提供两个属性：它允许丢弃意外被网络损坏的数据包；只有观察初始数据包的实体才
+能发送有效的重试数据包。
+
 The Retry Integrity Tag is a 128-bit field that is computed as the output of
 AEAD_AES_128_GCM ({{!AEAD}}) used with the following inputs:
+
+Retry Integrity 标记是一个 128 位的字段，它被计算为 AEAD_AES_128_GCM ({{!AEAD}})
+与以下输入一起使用：
 
 - The secret key, K, is 128 bits equal to 0xbe0c690b9f66575a1d766b54e368c84e.
 - The nonce, N, is 96 bits equal to 0x461599d35d632bf2239825bb.
@@ -2093,9 +2100,17 @@ AEAD_AES_128_GCM ({{!AEAD}}) used with the following inputs:
 - The associated data, A, is the contents of the Retry Pseudo-Packet, as
   illustrated in {{retry-pseudo}}:
 
+- 密钥 K 是 128 位，等于 0xbe0c690b9f66575a1d766b54e368c84e。
+- 临时 N 是 96 位，等于 0x461599d35d632bf2239825bb。
+- 明文 P 是空的。
+- 关联数据 A 是重试伪数据包的内容，如下所示：
+
 The secret key and the nonce are values derived by calling HKDF-Expand-Label
 using 0xd9c9943e6101fd200021506bcc02814c73030f25c79d71ce876eca876e6fca8e as the
 secret, with labels being "quic key" and "quic iv" ({{protection-keys}}).
+
+secret key 和 nonce 是使用 0xd9c9943e6101fd200021506bcc02814c73030f25c79d71ce876eca876e6fca8e
+作为 secret 调用 HKDF-Expand-Label 得到的值，标签是 "quic key" 和 "quic iv"（{{protection-keys}}）。
 
 ~~~
 Retry Pseudo-Packet {
@@ -2119,11 +2134,16 @@ The Retry Pseudo-Packet is not sent over the wire. It is computed by taking
 the transmitted Retry packet, removing the Retry Integrity Tag and prepending
 the two following fields:
 
+重试伪数据包不是通过网络发送的。它是通过获取传输的重试数据包、删除重试完整性
+标记并在以下两个字段前面加上前缀来计算的：
+
 ODCID Length:
 
 : The ODCID Length field contains the length in bytes of the Original
   Destination Connection ID field that follows it, encoded as an 8-bit unsigned
   integer.
+
+: ODCID 长度字段包含遵循它的原始目标连接 ID 字段的字节的长度，编码为 8 位无符号整数。
 
 Original Destination Connection ID:
 
@@ -2133,23 +2153,36 @@ Original Destination Connection ID:
   ensures that a valid Retry packet can only be sent by an entity that
   observes the Initial packet.
 
+: 原始目标连接 ID 包含此重试响应的初始数据包的目标连接 ID 的值。该字段的长度在 ODCID Length
+  中给出。此字段的存在可确保只能由观察初始数据包的实体发送有效的重试分组。
+
 
 # Key Update - 密钥更新 {#key-update}
 
 Once the handshake is confirmed (see {{handshake-confirmed}}), an endpoint MAY
 initiate a key update.
 
+一旦握手被确认（见 {{handshake-confirmed}}），端点可以发起密钥更新。
+
 The Key Phase bit indicates which packet protection keys are used to protect the
 packet.  The Key Phase bit is initially set to 0 for the first set of 1-RTT
 packets and toggled to signal each subsequent key update.
+
+Key Phase 比特位指示哪些数据包保护密钥用于保护数据包。Key Phase 比特位初始设置
+为 0 的第一个 1-RTT 分组的 0，并切换以发出每个后续密钥更新。
 
 The Key Phase bit allows a recipient to detect a change in keying material
 without needing to receive the first packet that triggered the change.  An
 endpoint that notices a changed Key Phase bit updates keys and decrypts the
 packet that contains the changed value.
 
+Key Phase 比特位允许接收方检测密钥材料的更改，而不需要接收触发更改的第一个包。
+一个端点，它注意到一个更改的 Key Phase 比特位更新密钥并解密包含更改值的数据包。
+
 Initiating a key update results in both endpoints updating keys.  This differs
 from TLS where endpoints can update keys independently.
+
+启动密钥更新会导致两个端点都更新密钥。这与端点可以独立更新密钥的 TLS 不同。
 
 This mechanism replaces the key update mechanism of TLS, which relies on
 KeyUpdate messages sent using 1-RTT encryption keys.  Endpoints MUST NOT send a
@@ -2157,9 +2190,16 @@ TLS KeyUpdate message.  Endpoints MUST treat the receipt of a TLS KeyUpdate
 message as a connection error of type 0x10a, equivalent to a
 fatal TLS alert of unexpected_message; see {{tls-errors}}.
 
+该机制取代了 TLS 的密钥更新机制，该机制依赖于使用 1-RTT 加密密钥发送的 KeyUpdate 消息。
+端点不得发送 TLS 密钥更新消息。端点必须将接收 TLS KeyUpdate 消息视为 0x10a 类型的连接
+错误，相当于 TLS 警告 unexpected_message（见 {{tls-errors}}）。
+
 {{ex-key-update}} shows a key update process, where the initial set of keys used
 (identified with @M) are replaced by updated keys (identified with @N).  The
 value of the Key Phase bit is indicated in brackets \[].
+
+{{ex-key-update}} 显示了一个密钥更新过程，其中使用的初始密钥集（用 @M 表示）被更新的密钥
+（用 @N 表示）替换。键相位的值在括号 \[] 中表示。
 
 ~~~
    Initiating Peer                    Responding Peer
@@ -2185,7 +2225,7 @@ value of the Key Phase bit is indicated in brackets \[].
 {: #ex-key-update title="Key Update"}
 
 
-## Initiating a Key Update {#key-update-initiate}
+## Initiating a Key Update - 发起密钥更新 {#key-update-initiate}
 
 Endpoints maintain separate read and write secrets for packet protection.  An
 endpoint initiates a key update by updating its packet protection write secret
@@ -2195,7 +2235,14 @@ uses the KDF function provided by TLS with a label of "quic ku".  The
 corresponding key and IV are created from that secret as defined in
 {{protection-keys}}.  The header protection key is not updated.
 
+端点维护单独的读写机密以保护数据包。端点通过更新其数据包保护写入机密并使用该机密保护
+新数据包来启动密钥更新。端点根据现有的写机密创建一个新的写机密，如 {{Section 7.2 of TLS13}}
+中所述。它使用 TLS 提供的带有 "quic ku" 标签的 KDF 函数。根据 {{protection-keys}} 中定义的
+秘密创建相应的密钥和 IV。Header 保护密钥未更新。
+
 For example, to update write keys with TLS 1.3, HKDF-Expand-Label is used as:
+
+例如，要用 TLS1.3 更新写密钥，HKDF-Expand-Label 用作：
 
 ~~~
 secret_<n+1> = HKDF-Expand-Label(secret_<n>, "quic ku",
@@ -2204,6 +2251,8 @@ secret_<n+1> = HKDF-Expand-Label(secret_<n>, "quic ku",
 
 The endpoint toggles the value of the Key Phase bit and uses the updated key and
 IV to protect all subsequent packets.
+
+端点切换密 Key Phase 比特位的值，并使用更新的密钥和 IV 来保护所有后续数据包。
 
 An endpoint MUST NOT initiate a key update prior to having confirmed the
 handshake ({{handshake-confirmed}}).  An endpoint MUST NOT initiate a subsequent
@@ -2214,14 +2263,27 @@ implemented by tracking the lowest packet number sent with each key phase, and
 the highest acknowledged packet number in the 1-RTT space: once the latter is
 higher than or equal to the former, another key update can be initiated.
 
+端点在确认握手之前不能启动密钥更新（{{handshake-confirmed}}）。端点不得启动后续
+密钥更新，除非它已接收到由当前密钥阶段的密钥保护发送的数据包的确认。这样可以确保
+在启动另一个密钥更新之前，密钥对两个对等方都可用。这可以通过跟踪每个密钥阶段发送
+的最低包数和 1-RTT 空间中的最高确认包数来实现：一旦后者高于或等于前者，就可以启动
+另一个密钥更新。
+
 Note:
 
 : Keys of packets other than the 1-RTT packets are never updated; their keys are
   derived solely from the TLS handshake state.
 
+注意：
+
+: 除了 1-RTT 数据包之外的数据包的密钥从不更新；它们的密钥完全来自 TLS 握手状态。
+
 The endpoint that initiates a key update also updates the keys that it uses for
 receiving packets.  These keys will be needed to process packets the peer sends
 after updating.
+
+发起密钥更新的端点还更新用于接收数据包的密钥。这些密钥将用于处理对等方在更新
+后发送的数据包。
 
 An endpoint MUST retain old keys until it has successfully unprotected a packet
 sent using the new keys.  An endpoint SHOULD retain old keys for some time
@@ -2229,8 +2291,11 @@ after unprotecting a packet sent using the new keys.  Discarding old keys too
 early can cause delayed packets to be discarded.  Discarding packets will be
 interpreted as packet loss by the peer and could adversely affect performance.
 
+端点必须保留旧密钥，直到它成功地取消了使用新密钥发送的数据包的保护。在取消对使用
+新密钥发送的数据包的保护之后，端点应该保留旧密钥一段时间。过早丢弃旧密钥会导致丢弃
+延迟的数据包。丢弃数据包将被对等方解释为数据包丢失，并可能对性能产生不利影响。
 
-## Responding to a Key Update
+## Responding to a Key Update - 响应密钥更新
 
 A peer is permitted to initiate a key update after receiving an acknowledgment
 of a packet in the current key phase.  An endpoint detects a key update when
@@ -2239,6 +2304,10 @@ the last packet it sent.  To process this packet, the endpoint uses the next
 packet protection key and IV.  See {{receive-key-generation}} for considerations
 about generating these keys.
 
+允许对等体在收到当前密钥阶段的数据包的确认后启动密钥更新。端点在处理具有与用于保护
+其发送的最后一个数据包的值不同的关键阶段时检测到密钥更新。要处理此数据包，端点使用
+下一个数据包保护密钥和 IV。有关生成这些密钥的考虑，见 {{receive-key-generation}}。
+
 If a packet is successfully processed using the next key and IV, then the peer
 has initiated a key update.  The endpoint MUST update its send keys to the
 corresponding key phase in response, as described in {{key-update-initiate}}.
@@ -2246,6 +2315,11 @@ Sending keys MUST be updated before sending an acknowledgment for the packet
 that was received with updated keys.  By acknowledging the packet that triggered
 the key update in a packet protected with the updated keys, the endpoint signals
 that the key update is complete.
+
+如果使用下一个密钥和 IV 成功处理数据包，则对等体已启动密钥更新。端点必须以响应的
+响应将其发送密钥更新为相应的密钥阶段，如 {{key-update-initiate}} 中所述。必须在发送
+已收到更新键接收的数据包的确认之前更新发送密钥。通过确认在使用更新的键保护的数据包
+中触发密钥更新的数据包，键更新完成的端点信号。
 
 An endpoint can defer sending the packet or acknowledgment according to its
 normal packet sending behaviour; it is not necessary to immediately generate a
@@ -2258,14 +2332,23 @@ its peer has updated keys twice without awaiting confirmation.  An endpoint MAY
 treat such consecutive key updates as a connection error of type
 KEY_UPDATE_ERROR.
 
+端点可以根据其正常数据包发送行为推迟发送数据包或确认；没有必要响应于密钥更新立即
+生成数据包。端点发送的下一个数据包将使用更新的密钥。包含确认的下一个数据包将导致
+要完成的密钥更新。如果端点检测到第二次更新，则在已发送包含启动密钥更新的数据包的
+数据包的更新密钥的任何数据包，指示其对等体是否在不等待确认的情况下进行两次更新键。
+端点可以将这种连续的密钥更新视为 KEY_UPDATE_ERROR 类型的连接错误。
+
 An endpoint that receives an acknowledgment that is carried in a packet
 protected with old keys where any acknowledged packet was protected with newer
 keys MAY treat that as a connection error of type KEY_UPDATE_ERROR.  This
 indicates that a peer has received and acknowledged a packet that initiates a
 key update, but has not updated keys in response.
 
+一个端点，其接收与用旧密钥保护的数据包中携带的确认，其中使用较新密钥保护任何确认
+的数据包可能将其视为 KEY_UPDATE_ERROR 类型的连接错误。这表示对等体已收到并确认
+发起密钥更新的数据包，但未更新响应的密钥。
 
-## Timing of Receive Key Generation {#receive-key-generation}
+## Timing of Receive Key Generation -  {#receive-key-generation}
 
 Endpoints responding to an apparent key update MUST NOT generate a timing
 side-channel signal that might indicate that the Key Phase bit was invalid (see
@@ -2275,11 +2358,20 @@ keys will generate no variation in the timing signal produced by attempting to
 remove packet protection, and results in all packets with an invalid Key Phase
 bit being rejected.
 
+响应明显密钥更新的端点不得生成可能指示密钥相位位无效的定时侧信道信号
+（见 {{header-protect-analysis}}）。当还不允许密钥更新时，端点可以使用虚拟包
+保护密钥代替丢弃的密钥。使用伪密钥不会在试图移除数据包保护所产生的定时信号中
+产生任何变化，并且会导致具有无效密钥相位位的所有数据包被拒绝。
+
 The process of creating new packet protection keys for receiving packets could
 reveal that a key update has occurred. An endpoint MAY generate new keys as
 part of packet processing, but this creates a timing signal that could be used
 by an attacker to learn when key updates happen and thus leak the value of the
 Key Phase bit.
+
+为接收数据包创建新的数据包保护密钥的过程可能会显示发生了密钥更新。
+作为包处理的一部分，端点可以生成新的密钥，但这会创建一个定时信号，
+攻击者可以利用该信号在密钥更新发生时进行学习，从而泄漏密钥相位位的值。
 
 Endpoints are generally expected to have current and next receive packet
 protection keys available. For a short period after a key update completes, up
@@ -2287,22 +2379,35 @@ to the PTO, endpoints MAY defer generation of the next set of
 receive packet protection keys. This allows endpoints
 to retain only two sets of receive keys; see {{old-keys-recv}}.
 
+通常期望端点具有当前和下一个接收包保护密钥。在密钥更新完成后的短时间内，直到 PTO，
+端点可以推迟下一组接收数据包保护密钥的生成。这允许端点只保留两组接收密钥
+（见 {{old-keys-recv}}）。
+
 Once generated, the next set of packet protection keys SHOULD be retained, even
 if the packet that was received was subsequently discarded.  Packets containing
 apparent key updates are easy to forge and - while the process of key update
 does not require significant effort - triggering this process could be used by
 an attacker for DoS.
 
+一旦生成，就应该保留下一组数据包保护密钥，即使接收到的数据包随后被丢弃。
+包含明显的密钥更新的数据包很容易伪造，而密钥更新过程并不需要花费大量精力，
+攻击者可能会利用触发此过程来进行 DoS 攻击。
+
 For this reason, endpoints MUST be able to retain two sets of packet protection
 keys for receiving packets: the current and the next.  Retaining the previous
 keys in addition to these might improve performance, but this is not essential.
 
+因此，端点必须能够保留两组用于接收数据包的数据包保护密钥：当前和下一组。
+除此之外，保留以前的键可能会提高性能，但这不是必需的。
 
-## Sending with Updated Keys {#old-keys-send}
+## Sending with Updated Keys - 使用新的密钥发送数据 {#old-keys-send}
 
 An endpoint never sends packets that are protected with old keys.  Only the
 current keys are used.  Keys used for protecting packets can be discarded
 immediately after switching to newer keys.
+
+端点永远不会发送使用旧密钥保护的数据包。只使用当前密钥。切换到新的密钥后，可以立即
+丢弃用于保护数据包的密钥。
 
 Packets with higher packet numbers MUST be protected with either the same or
 newer packet protection keys than packets with lower packet numbers.  An
@@ -2310,12 +2415,18 @@ endpoint that successfully removes protection with old keys when newer keys were
 used for packets with lower packet numbers MUST treat this as a connection error
 of type KEY_UPDATE_ERROR.
 
+具有较高数据包编号的数据包必须使用与具有较低数据包号的数据包相同或更新的数据包
+保护密钥保护。当具有较低数据包号码的数据包使用旧密钥时成功删除保护的端点必须将
+其视为 KEY_UPDATE_ERROR 类型的连接错误。
 
-## Receiving with Different Keys {#old-keys-recv}
+## Receiving with Different Keys - 使用不同的密钥接收数据 {#old-keys-recv}
 
 For receiving packets during a key update, packets protected with older keys
 might arrive if they were delayed by the network.  Retaining old packet
 protection keys allows these packets to be successfully processed.
+
+对于在密钥更新期间接收数据包，如果网络延迟，则使用旧密钥保护的数据包可能到达。
+保留旧的数据包保护密钥允许成功处理这些数据包。
 
 As packets protected with keys from the next key phase use the same Key Phase
 value as those protected with keys from the previous key phase, it is necessary
@@ -2326,15 +2437,27 @@ previous packet protection keys; a recovered packet number that is higher than
 any packet number from the current key phase requires the use of the next packet
 protection keys.
 
+由于使用来自下一个密钥阶段的密钥保护的数据包使用与使用来自上一个密钥阶段的密钥
+保护的数据包相同的密钥阶段值，因此如果要处理使用旧密钥保护的数据包，则有必要区
+分这两者。这可以通过使用数据包编号来实现。低于当前密钥阶段的任何包编号的恢复包
+编号使用先前的包保护密钥；高于当前密钥阶段的任何包编号的恢复包编号需要使用下一
+个包保护密钥。
+
 Some care is necessary to ensure that any process for selecting between
 previous, current, and next packet protection keys does not expose a timing side
 channel that might reveal which keys were used to remove packet protection.  See
 {{hp-side-channel}} for more information.
 
+一些注意是必要的，以确保在前一个、当前和下一个包保护密钥之间进行选择的任何过程都
+不会暴露可能揭示用于移除包保护的密钥的定时侧信道。有关详细信息，见 {{hp-side-channel}}。
+
 Alternatively, endpoints can retain only two sets of packet protection keys,
 swapping previous for next after enough time has passed to allow for reordering
 in the network.  In this case, the Key Phase bit alone can be used to select
 keys.
+
+或者，端点只能保留两组包保护密钥，在经过足够的时间后，将上一组密钥交换为下一组，
+以便允许在网络中重新排序。在这种情况下，只能使用密钥阶段比特位来选择密钥。
 
 An endpoint MAY allow a period of approximately the Probe Timeout (PTO; see
 {{QUIC-RECOVERY}}) after promoting the next set of receive keys to be current
@@ -2345,6 +2468,12 @@ this time is expected to be long enough that any reordered packets would be
 declared lost by a peer even if they were acknowledged and short enough to
 allow a peer to initiate further key updates.
 
+端点在将下一组接收密钥升级为当前后，可能会允许大约探测超时（PTO，见 {QUIC-RECOVERY}}）
+的时间段，然后再创建后续的包保护密钥集。这些更新的密钥可能会在当时替换以前的密钥。
+警告说 PTO 是一种主观的度量（也就是说，对等方可以对 RTT 有不同的看法）这一次预计足够长，
+即使对等方承认这些数据包并足够短，允许对等方发起进一步的密钥更新，也会导致对等方声明丢
+失任何重新排序的数据包。
+
 Endpoints need to allow for the possibility that a peer might not be able to
 decrypt packets that initiate a key update during the period when the peer
 retains old keys.  Endpoints SHOULD wait three times the PTO before initiating a
@@ -2352,10 +2481,16 @@ key update after receiving an acknowledgment that confirms that the previous key
 update was received.  Failing to allow sufficient time could lead to packets
 being discarded.
 
+端点需要考虑到对等方可能无法解密在对等方保留旧密钥期间启动密钥更新的数据包的可能性。
+端点在收到确认已接收到上一个密钥更新的确认后，应在启动密钥更新之前等待 PTO 三次。
+如果不允许足够的时间，可能导致丢弃数据包。
+
 An endpoint SHOULD retain old read keys for no more than three times the PTO
 after having received a packet protected using the new keys. After this period,
 old read keys and their corresponding secrets SHOULD be discarded.
 
+端点在接收到使用新密钥保护的数据包后，应将旧的读取密钥保留不超过 PTO 的三倍。
+在此期间之后，旧的读密钥及其相应的秘密应该被丢弃。
 
 ## Limits on AEAD Usage - AEAD 使用限制 {#aead-limits}
 
@@ -2415,9 +2550,9 @@ attacker can distinguish the AEAD in use from a random permutation; see
 {{AEBounds}}, {{ROBUST}}, and {{?GCM-MU=DOI.10.1145/3243734.3243816}}.
 
 对于 AEAD_AES_128_GCM 和 AEAD_AES_256_GCM ，机密性限制为 2<sup>23</sup> 加密数据包
-（见 {{gcm-binds}}）。 对于 AEAD_CHACHA20_POLY1305 ，机密性限制大于可能数据包的数量
+（见 {{gcm-bounds}}）。 对于 AEAD_CHACHA20_POLY1305 ，机密性限制大于可能数据包的数量
 (2<sup>62</sup>)，因此可以忽略。对于 AEAD_AES_128_CCM ，机密性限制为 2<sup>21.5</sup>
-加密数据包（见 {{ccm-binds}}）。应用限制可降低攻击者将使用中的 AEAD 与随机排列区分
+加密数据包（见 {{ccm-bounds}}）。应用限制可降低攻击者将使用中的 AEAD 与随机排列区分
 开来的概率（见 {{AEBounds}}, {{ROBUST}}, {{?GCM-MU=DOI.10.1145/3243734.3243816}})。
 
 In addition to counting packets sent, endpoints MUST count the number of
@@ -2439,9 +2574,9 @@ the integrity limit is 2<sup>21.5</sup> invalid packets; see
 successfully forge a packet; see {{AEBounds}}, {{ROBUST}}, and {{?GCM-MU}}.
 
 对于 AEAD_AES_128_GCM 和 AEAD_AES_256_GCM，完整性限制为 2<sup>52</sup> 无效的数据包
-（见 {{gcm-binds}}）。对于 AEAD_CHACHA20_POLY1305，完整性限制为 2<sup>36</sup> 无效
-的数据包（见 {{AEBOUNDS}}）。对于 AEAD_AES_128_CCM，完整性限制为 2<sup>21.5</sup>无
-效的数据包（见 {{ccm-binds}}）。应用此限制会降低攻击者可以成功伪造数据包的概率
+（见 {{gcm-bounds}}）。对于 AEAD_CHACHA20_POLY1305，完整性限制为 2<sup>36</sup> 无效
+的数据包（见 {{AEBounds}}）。对于 AEAD_AES_128_CCM，完整性限制为 2<sup>21.5</sup>无
+效的数据包（见 {{ccm-bounds}}）。应用此限制会降低攻击者可以成功伪造数据包的概率
 （见 {{AEBounds}}, {{ROBUST}}, {{?GCM-MU}}）。
 
 Endpoints that limit the size of packets MAY use higher confidentiality and
