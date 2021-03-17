@@ -2348,7 +2348,7 @@ key update, but has not updated keys in response.
 的数据包可能将其视为 KEY_UPDATE_ERROR 类型的连接错误。这表示对等体已收到并确认
 发起密钥更新的数据包，但未更新响应的密钥。
 
-## Timing of Receive Key Generation -  {#receive-key-generation}
+## Timing of Receive Key Generation - 接收密钥生成的时机 {#receive-key-generation}
 
 Endpoints responding to an apparent key update MUST NOT generate a timing
 side-channel signal that might indicate that the Key Phase bit was invalid (see
