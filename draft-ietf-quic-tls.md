@@ -2813,15 +2813,21 @@ correlate connections made by the same client; see {{resumption}} for details.
 使用 TLS 会话凭证允许服务器和其他实体可能要关联的由同一个客户端建立的连接
 （详细信息，见 {{resumption}}）。
 
-## Replay Attacks with 0-RTT {#replay}
+## Replay Attacks with 0-RTT - 0-RTT 重放攻击 {#replay}
 
 As described in {{Section 8 of TLS13}}, use of TLS early data comes with an
 exposure to replay attack.  The use of 0-RTT in QUIC is similarly vulnerable to
 replay attack.
 
+如 {{Section 8 of TLS13}} 中描述的，使用 TLS 早期数据会面临重放攻击。在 QUIC 中
+使用 0-RTT 同样容易受到重放攻击。
+
 Endpoints MUST implement and use the replay protections described in {{!TLS13}},
 however it is recognized that these protections are imperfect.  Therefore,
 additional consideration of the risk of replay is needed.
+
+端点必须实现并使用 {{!TLS13}} 中描述的重放保护，但是人们认识到这些保护措施是不
+完善的。因此，需要额外考虑重放的风险。
 
 QUIC is not vulnerable to replay attack, except via the application protocol
 information it might carry.  The management of QUIC protocol state based on the
@@ -2830,6 +2836,11 @@ Processing of QUIC frames is idempotent and cannot result in invalid connection
 states if frames are replayed, reordered or lost.  QUIC connections do not
 produce effects that last beyond the lifetime of the connection, except for
 those produced by the application protocol that QUIC serves.
+
+QUIC 不易受到重放攻击，除非通过它可能携带的应用程序协议信息。基于 {{QUIC-TRANSPORT}}
+中定义的帧类型的 QUIC 协议状态管理不易被重放。QUIC 帧的处理是幂等的，如果帧被重放、重新
+排序或丢失，则不会导致无效的连接状态。QUIC 连接不会产生超过连接生存期的效果，但 QUIC 所
+服务的应用程序协议产生的效果除外。
 
 Note:
 
@@ -2841,10 +2852,20 @@ Note:
   potential for reuse of these tokens means that they require stronger
   protections against replay.
 
+注意：
+
+: TLS 会话凭证和地址验证令牌用于在连接之间传输 QUIC 配置信息。具体来说，使服务器
+  能够有效地恢复连接建立和地址验证中使用的状态。这些值不能用于在端点之间传递应用
+  程序语义；客户端必须将它们视为不透明值。重用这些令牌的可能性意味着它们需要更强
+  的保护来防止重放。
+
 A server that accepts 0-RTT on a connection incurs a higher cost than accepting
 a connection without 0-RTT.  This includes higher processing and computation
 costs.  Servers need to consider the probability of replay and all associated
 costs when accepting 0-RTT.
+
+在连接上接受 0-RTT 的服务器比在没有 0-RTT 的情况下接受连接的服务器成本更高。这包括
+更高的处理和计算成本。在接受 0-RTT 时，服务器需要考虑重放的概率和所有相关成本。
 
 Ultimately, the responsibility for managing the risks of replay attacks with
 0-RTT lies with an application protocol.  An application protocol that uses QUIC
@@ -2852,19 +2873,30 @@ MUST describe how the protocol uses 0-RTT and the measures that are employed to
 protect against replay attack.  An analysis of replay risk needs to consider
 all QUIC protocol features that carry application semantics.
 
+最终，管理 0-RTT 重放攻击风险的责任在于应用程序协议。使用 QUIC 的应用程序协议必须描述
+该协议如何使用 0-RTT 以及用于防止重放攻击的措施。重放风险分析需要考虑所有带有应用程序
+语义的 QUIC 协议特性。
+
 Disabling 0-RTT entirely is the most effective defense against replay attack.
+
+完全禁用 0-RTT 是对重放攻击最有效的防御。
 
 QUIC extensions MUST describe how replay attacks affect their operation, or
 prohibit their use in 0-RTT.  Application protocols MUST either prohibit the use
 of extensions that carry application semantics in 0-RTT or provide replay
 mitigation strategies.
 
+QUIC 扩展必须描述重放攻击如何影响它们的操作，或者禁止在 0-RTT 中使用它们。应用程序
+协议必须禁止使用在 0-RTT 中承载应用程序语义的扩展，或者提供重放缓解策略。
 
-## Packet Reflection Attack Mitigation {#reflection}
+## Packet Reflection Attack Mitigation - 缓解数据包反射攻击 {#reflection}
 
 A small ClientHello that results in a large block of handshake messages from a
 server can be used in packet reflection attacks to amplify the traffic generated
 by an attacker.
+
+一个小的 ClientHello 会导致来自服务器的大量握手消息，可用于包反射攻击，以放大攻击
+者生成的数据量。
 
 QUIC includes three defenses against this attack. First, the packet containing
 a ClientHello MUST be padded to a minimum size. Second, if responding to an
@@ -2874,8 +2906,12 @@ of QUIC-TRANSPORT}}). Finally, because acknowledgments of Handshake packets are
 authenticated, a blind attacker cannot forge them. Put together, these defenses
 limit the level of amplification.
 
+QUIC 包括三种防御措施来对付这种攻击。首先，包含 ClientHello 的包必须填充到最小大小。
+第二，如果对未经验证的源地址作出响应，则禁止服务器发送超过其已接收字节数三倍的字节
+（见 {{Section 8.1 of QUIC-TRANSPORT}}）。最后，由于握手包的确认是经过身份验证的，
+所以盲攻击者无法伪造它们。综合起来，这些防御系统限制了放大的水平。
 
-## Header Protection Analysis {#header-protect-analysis}
+## Header Protection Analysis - Header 保护分析 {#header-protect-analysis}
 
 {{?NAN=DOI.10.1007/978-3-030-26948-7_9}} analyzes authenticated encryption
 algorithms that provide nonce privacy, referred to as "Hide Nonce" (HN)
@@ -2883,6 +2919,11 @@ transforms. The general header protection construction in this document is
 one of those algorithms (HN1). Header protection is applied after the packet
 protection AEAD, sampling a set of bytes (`sample`) from the AEAD output and
 encrypting the header field using a pseudorandom function (PRF) as follows:
+
+{{?NAN=DOI.10.1007/978-3-030-26948-7_9}} 分析了提供随机隐私的经过身份验证的加密算法，
+称为 "Hide Nonce" (HN) 变换。 本文档中的一般标题保护结构是其中一个算法 (HN1)。 标题
+保护应用于数据包保护 AEAD 后，从 AEAD 输出中采样一组字节样本 (`sample`) 并使用伪随机
+函数 (PRF) 加密标题字段，如下所示：
 
 ~~~
 protected_field = field XOR PRF(hp_key, sample)
@@ -2892,11 +2933,18 @@ The header protection variants in this document use a pseudorandom permutation
 (PRP) in place of a generic PRF. However, since all PRPs are also PRFs {{IMC}},
 these variants do not deviate from the HN1 construction.
 
+本文档中的 Header 保护变体使用伪随机置换 (PRP) 代替通用 PRF。 然而，由于所有 PRPS 也是
+PRFS {{IMC}}，因此这些变体不会偏离 HN1 结构。
+
 As `hp_key` is distinct from the packet protection key, it follows that header
 protection achieves AE2 security as defined in {{NAN}} and therefore guarantees
 privacy of `field`, the protected packet header. Future header protection
 variants based on this construction MUST use a PRF to ensure equivalent
 security guarantees.
+
+由于 `hp_key` 与数据包保护键不同，因此标题保护实现了 AE2 安全性，如 {{NAN}} 中所定义，
+因此保证了 `field` 的隐私，受保护的数据包 Header。基于此构造的未来 Header 保护型必须
+使用 PRF 来确保等效的安全保证。
 
 Use of the same key and ciphertext sample more than once risks compromising
 header protection. Protecting two different headers with the same key and
@@ -2906,13 +2954,20 @@ samples being identical approach 2<sup>-L/2</sup>, that is, the birthday bound.
 For the algorithms described in this document, that probability is one in
 2<sup>64</sup>.
 
+使用相同的密钥和密文示例不止一旦泄压标题保护的风险。使用相同的密钥和密文示例保护两个
+不同的标头显示保护字段的独占或受保护的字段。假设 AEAD 作为 PRF，如果采样 L 比特，则
+两个密文样本的几率是相同的方法 2<SUP>-L/2</sup>，即生日绑定。 对于本文档中描述的算法，
+可能是 2<sup>64</sup> 中的一个。
+
 To prevent an attacker from modifying packet headers, the header is transitively
 authenticated using packet protection; the entire packet header is part of the
 authenticated additional data.  Protected fields that are falsified or modified
 can only be detected once the packet protection is removed.
 
+为了防止攻击者修改数据包头，使用数据包保护对数据包头进行传递性身份验证；整个数据包头
+是经过身份验证的附加数据的一部分。只有删除数据包保护后，才能检测到伪造或修改的受保护字段。
 
-## Header Protection Timing Side-Channels {#hp-side-channel}
+## Header Protection Timing Side-Channels - Header 保护计时旁路攻击 {#hp-side-channel}
 
 An attacker could guess values for packet numbers or Key Phase and have an
 endpoint confirm guesses through timing side channels.  Similarly, guesses for
@@ -2924,9 +2979,18 @@ side-channels, the entire process of header protection removal, packet number
 recovery, and packet protection removal MUST be applied together without timing
 and other side-channels.
 
+攻击者可以猜测数据包编号或 Key Phase 的值，并让端点通过定时旁路确认猜测。类似地，
+可以尝试并公开对数据包编号长度的猜测。如果一个数据包的接收者丢弃了具有重复数据包编号
+的数据包，而没有尝试移除数据包保护，那么他们可以通过定时侧信道揭示数据包编号与接收到
+的数据包匹配。为了使认证不受旁路的影响，必须在没有定时和其他旁侧信道的情况下同时
+应用头保护移除、包编号恢复和包保护移除的整个过程。
+
 For the sending of packets, construction and protection of packet payloads and
 packet numbers MUST be free from side-channels that would reveal the packet
 number or its encoded size.
+
+对于数据包的发送，数据包有效载荷和数据包编号的构造和保护必须不受会暴露数据包编号或
+其编码大小的侧信道的影响。
 
 During a key update, the time taken to generate new keys could reveal through
 timing side-channels that a key update has occurred.  Alternatively, where an
@@ -2937,6 +3001,11 @@ in {{receive-key-generation}}.  By generating new keys before a key update is
 received, receipt of packets will not create timing signals that leak the value
 of the Key Phase.
 
+在密钥更新期间，生成新密钥所花费的时间可以通过定时端通道显示密钥更新已经发生。
+或者，当攻击者注入数据包时，此侧通道可能会显示注入数据包的关键阶段的值。在接收
+到密钥更新之后，端点应该生成并保存下一组接收数据包保护密钥，如 {{receive-key-generation}} 中所述。
+通过在接收到密钥更新之前生成新密钥，数据包的接收不会产生泄漏密钥相位值的定时信号。
+
 This depends on not doing this key generation during packet processing and it
 can require that endpoints maintain three sets of packet protection keys for
 receiving: for the previous key phase, for the current key phase, and for the
@@ -2944,8 +3013,11 @@ next key phase.  Endpoints can instead choose to defer generation of the next
 receive packet protection keys until they discard old keys so that only two sets
 of receive keys need to be retained at any point in time.
 
+这取决于在数据包处理期间不生成密钥，并且可能要求端点维护三组用于接收的数据包保护密钥：
+用于前一个密钥阶段、当前密钥阶段和下一个密钥阶段。相反，端点可以选择推迟下一个接收包
+保护密钥的生成，直到丢弃旧密钥，以便在任何时间点只需要保留两组接收密钥。
 
-## Key Diversity
+## Key Diversity - 密钥多样性
 
 In using TLS, the central key schedule of TLS is used.  As a result of the TLS
 handshake messages being integrated into the calculation of secrets, the
@@ -2954,25 +3026,39 @@ inclusion of the QUIC transport parameters extension ensures that handshake and
 TLS over TCP.  To avoid the possibility of cross-protocol key synchronization,
 additional measures are provided to improve key separation.
 
+在使用 TLS 时，使用 TLS 的中心密钥调度。由于 TLS 握手消息被集成到秘密计算中，QUIC 传输
+参数扩展的包含确保握手和 1-RTT 密钥与通过 TCP 运行 TLS 的服务器可能产生的密钥不同。为了
+避免跨协议密钥同步的可能性，提供了额外的措施来改进密钥分离。
+
 The QUIC packet protection keys and IVs are derived using a different label than
 the equivalent keys in TLS.
+
+QUIC 包保护密钥和 IVs 是使用与 TLS 中的等效密钥不同的标签导出的。
 
 To preserve this separation, a new version of QUIC SHOULD define new labels for
 key derivation for packet protection key and IV, plus the header protection
 keys.  This version of QUIC uses the string "quic".  Other versions can use a
 version-specific label in place of that string.
 
+为了保持这种分离，QUIC 的新版本应该为数据包保护密钥和 IV 的密钥派生定义新的标签，加上
+报头保护密钥。这个版本的 QUIC 使用字符串 "quic"。其他版本可以使用特定于版本的标签来
+代替该字符串。
+
 The initial secrets use a key that is specific to the negotiated QUIC version.
 New QUIC versions SHOULD define a new salt value used in calculating initial
 secrets.
 
+最初的秘密使用一个特定于协商 QUIC 版本的密钥。新的 QUIC 版本应该定义一个用于计算
+初始机密的新 salt  值。
 
-## Randomness
+## Randomness - 随机性
 
 QUIC depends on endpoints being able to generate secure random numbers, both
 directly for protocol values such as the connection ID, and transitively via
 TLS. See {{!RFC4086}} for guidance on secure random number generation.
 
+QUIC 依赖于端点能够生成安全的随机数，既可以直接用于协议值（如连接ID），也可以
+通过 TLS 传递。见 {{!RFC4086}} 安全随机数生成指南。
 
 # IANA Considerations
 
