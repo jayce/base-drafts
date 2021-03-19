@@ -88,6 +88,8 @@ informative:
 This document describes loss detection and congestion control mechanisms for
 QUIC.
 
+本文档描述了 QUIC 的丢包检测和拥塞控制机制。
+
 --- note_Note_to_Readers
 
 Discussion of this draft takes place on the QUIC working group mailing list
@@ -100,12 +102,14 @@ code and issues list for this draft can be found at
 
 --- middle
 
-# Introduction
+# Introduction - 介绍
 
 
 QUIC is a secure general-purpose transport protocol, described in
 {{QUIC-TRANSPORT}}). This document describes loss detection and congestion
 control mechanisms for QUIC.
+
+QUIC 是一种安全的通用传输协议（{{QUIC-TRANSPORT}}）。本文描述了 QUIC 的丢包检测和拥塞控制机制。
 
 # Conventions and Definitions
 
@@ -113,15 +117,22 @@ control mechanisms for QUIC.
 
 Definitions of terms that are used in this document:
 
+本文中使用的术语定义：
+
 Ack-eliciting frames:
 
 : All frames other than ACK, PADDING, and CONNECTION_CLOSE are considered
   ack-eliciting.
 
+: 除了 ACK、PADDING 和 CONNECTION_CLOSE 之外的所有帧都视为是 ack-eliciting 帧（需要确认）。
+
 Ack-eliciting packets:
 
 : Packets that contain ack-eliciting frames elicit an ACK from the receiver
   within the maximum acknowledgment delay and are called ack-eliciting packets.
+
+: 包含 ack-eliciting 帧的数据包在最大确认延迟内从接收器中引出 ACK，
+  且称为 ack-eliciting 数据包。
 
 In-flight packets:
 
@@ -129,7 +140,10 @@ In-flight packets:
   PADDING frame, and they have been sent but are not acknowledged, declared
   lost, or discarded along with old keys.
 
-# Design of the QUIC Transmission Machinery
+: 当数据包被确认或包含 PADDING 帧时，它们被视为正在进行中，并且已经发送但未与
+  旧密钥一起被确认，声明为丢失或被丢弃。
+
+# Design of the QUIC Transmission Machinery - QUIC 传输机制的设计
 
 All transmissions in QUIC are sent with a packet-level header, which indicates
 the encryption level and includes a packet sequence number (referred to below as
@@ -140,28 +154,48 @@ are sent in monotonically increasing order within a space, preventing ambiguity.
 It is permitted for some packet numbers to never be used, leaving intentional
 gaps.
 
+QUIC 中的所有传输均以数据包级 Header 发送，该数据包级 Header 指示加密级别并包括
+数据包序列号（以下称为数据包号）。加密级别指示数据包编号空间，如 {{Section 12.3
+of QUIC-TRANSPORT}} 中所述。在连接的生命周期内，数据包号永远不会在数据包号空间内
+重复。数据包号在一个空间内以单调递增的顺序发送，从而避免了歧义。允许某些数据包编
+号从不使用，从而留出故意的间隙。
+
 This design obviates the need for disambiguating between transmissions and
 retransmissions; this eliminates significant complexity from QUIC's
 interpretation of TCP loss detection mechanisms.
+
+这种设计消除了传输和重传之间的歧义; 避免了 QUIC 解释 TCP 丢失检测机制的复杂性。
 
 QUIC packets can contain multiple frames of different types. The recovery
 mechanisms ensure that data and frames that need reliable delivery are
 acknowledged or declared lost and sent in new packets as necessary. The types
 of frames contained in a packet affect recovery and congestion control logic:
 
+QUIC 数据包可以包含多个不同类型的帧。恢复机制确保需要可靠传递的数据和帧被确认或
+声明丢失，并在必要时以新包的形式发送。数据包中包含的帧类型影响恢复和拥塞控制逻辑：
+
 * All packets are acknowledged, though packets that contain no
   ack-eliciting frames are only acknowledged along with ack-eliciting
   packets.
+
+* 所有数据包都会被确认，但不包含 ack-eliciting 帧的数据包只与 ack-eliciting 数据包
+  一起被确认。
 
 * Long header packets that contain CRYPTO frames are critical to the
   performance of the QUIC handshake and use shorter timers for
   acknowledgment.
 
+* 包含加密帧的长头数据包对于 QUIC 握手的性能至关重要，且使用较短的时间进行确认。
+
 * Packets containing frames besides ACK or CONNECTION_CLOSE frames count toward
   congestion control limits and are considered in-flight.
 
+* 包含除 ACK 或 CONNECTION_CLOSE 帧以外的帧的数据包计入拥塞控制限制，并被视为在传输中。
+
 * PADDING frames cause packets to contribute toward bytes in flight without
   directly causing an acknowledgment to be sent.
+
+* PADDING 帧对传输中的数据包贡献字节而已，并没有直接引起发送确认。
 
 # Relevant Differences Between QUIC and TCP
 
