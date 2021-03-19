@@ -3399,7 +3399,7 @@ packet = 4cfe4189655e5cd55c41f69080575d7999c25a5bfb
 ~~~
 
 
-# AEAD Algorithm Analysis {#aead-analysis}
+# AEAD Algorithm Analysis - AEAD 算法分析 {#aead-analysis}
 
 This section documents analyses used in deriving AEAD algorithm limits for
 AEAD_AES_128_GCM, AEAD_AES_128_CCM, and AEAD_AES_256_GCM. The analyses that
@@ -3407,22 +3407,34 @@ follow use symbols for multiplication (*), division (/), and exponentiation (^),
 plus parentheses for establishing precedence. The following symbols are also
 used:
 
+本节文档分析用于派生 AEAD_AES_128_GCM、AEAD_AES_128_CCM、AEAD_AES_256_GCM 的 AEAD
+算法限制。分析使用乘法 (*) ，除法 (/) 和指数 (^) 等符号，以及用括号来确定优先级。
+还使用以下符号：
+
 t:
 
 : The size of the authentication tag in bits. For these ciphers, t is 128.
+: 身份验证标记的大小（单位比特）。对于这些套件， t 是 128。
 
 n:
 
 : The size of the block function in bits. For these ciphers, n is 128.
+
+: 块函数的大小（单位比特）。对于这些套件，n 是 128。
 
 k:
 
 : The size of the key in bits. This is 128 for AEAD_AES_128_GCM and
   AEAD_AES_128_CCM; 256 for AEAD_AES_256_GCM.
 
+: 密钥的大小（单位比特）。AEAD_AES_128_GCM 和 AEAD_AES_128_CCM 是 128；
+  AEAD_AES_256_GCM 是 256。
+
 l:
 
 : The number of blocks in each packet (see below).
+
+: 每个数据包中的块的数量。
 
 q:
 
@@ -3430,15 +3442,21 @@ q:
   is the bound on the number of packets that can be protected before updating
   keys.
 
+: 由端点创建和保护的真实数据包数量。此值是更新密钥之前可以保护的数据包数的界限。
+
 v:
 
 : The number of forged packets that endpoints will accept. This value is the
   bound on the number of forged packets that an endpoint can reject before
   updating keys.
 
+: 端点将接受的伪造数据包数量。此值是绑定在端点更新密钥之前拒绝的伪造数据包数量。
+
 o:
 
 : The amount of offline ideal cipher queries made by an adversary.
+
+: 攻击者制造的离线密码查询的数量。
 
 The analyses that follow rely on a count of the number of block operations
 involved in producing each message. This analysis is performed for packets of
@@ -3449,8 +3467,17 @@ size of a QUIC packet. Only endpoints that strictly limit packet size can use
 the larger confidentiality and integrity limits that are derived using the
 smaller packet size.
 
+接下来的分析依赖于生成每条消息所涉及的块操作数的计数。此分析针对大小为
+2<sup>11</sup> (l = 2<sup>7</sup>) 和 2<sup>16</sup> (l = 2<sup>12</sup>) 的数据包
+执行。2<sup>11</sup> 的大小预计是与常见部署模式匹配的限制，而 2<sup>16</sup> 是
+QUIC 数据包的最大大小。只有严格限制数据包大小的端点才能使用使用较小数据包大小
+导出的较大机密性和完整性限制。
+
 For AEAD_AES_128_GCM and AEAD_AES_256_GCM, the message length (l) is the length
 of the associated data in blocks plus the length of the plaintext in blocks.
+
+对于 AEAD_AES_128_GCM 和 AEAD_AES_256_GCM，消息长度 (l) 是以块为单位的关联数据的长度加上
+以块为单位的纯文本长度。
 
 For AEAD_AES_128_CCM, the total number of block cipher operations is the sum of:
 the length of the associated data in blocks, the length of the ciphertext in
@@ -3461,37 +3488,56 @@ bytes, or <tt>2l = 2<sup>13</sup></tt> otherwise). This simplification is based
 on the packet containing all of the associated data and ciphertext. This results
 in a 1 to 3 block overestimation of the number of operations per packet.
 
+对于 AEAD_AES_128_CCM，块密码操作的总数是：块中关联数据的长度，块中的密文的长度，
+块中的明文的长度，+1。在该分析中，这被简化为以块为单位的数据包长度的两倍的值
+（即，对于限制为 2<sup>11</sup> 字节的数据包为 <tt>2l = 2<sup>8</sup></tt>，
+否则为 <tt>2l = 2<sup>13</sup></tt>）。这种简化基于包含所有相关数据和密文的数据包。
+这导致每个数据包的操作数被高估了 1-3 个块。
 
-## Analysis of AEAD_AES_128_GCM and AEAD_AES_256_GCM Usage Limits {#gcm-bounds}
+## Analysis of AEAD_AES_128_GCM and AEAD_AES_256_GCM Usage Limits - AEAD_AES_128_GCM 和 AEAD_AES_256_GCM 的用法分析 {#gcm-bounds}
 
 {{?GCM-MU}} specify concrete bounds for AEAD_AES_128_GCM and AEAD_AES_256_GCM as
 used in TLS 1.3 and QUIC. This section documents this analysis using several
 simplifying assumptions:
 
+{{?GCM-MU}} 指定 TLS1.3 和 QUIC 中使用的 AEAD_AES_128_GCM 和 AEAD_AES_256_GCM 的具体
+范围。本节使用一些简化的假设来记录此分析：
+
 - The number of ciphertext blocks an attacker uses in forgery attempts is
 bounded by v * l, the number of forgery attempts and the size of each packet (in
 blocks).
 
+- 密文块的数量，攻击者尝试伪造的，由 v * l 界定，伪造尝试的数量和每个数据包的大小（以块为单位）。
+
 - The amount of offline work done by an attacker does not dominate other factors
 in the analysis.
+
+- 攻击者所做的离线工作量没有统治分析中的其他因素。
 
 The bounds in {{?GCM-MU}} are tighter and more complete than those used in
 {{AEBounds}}, which allows for larger limits than those described in
 {{?TLS13}}.
 
+{{?GCM-MU}} 中的界限比 {{AEBounds}} 中使用的界限更紧密，更完整，这允许比 {{?TLS13}} 中
+描述的那些更大的限制。
 
-### Confidentiality Limit
+### Confidentiality Limit - 保密性限制
 
 For confidentiality, Theorum (4.3) in {{?GCM-MU}} establishes that - for a
 single user that does not repeat nonces - the dominant term in determining the
 distinguishing advantage between a real and random AEAD algorithm gained by an
 attacker is:
 
+为了保密起见，{{?GCM-MU}} 中的定理 (4.3) 确定了（对于不重复 nonces 的单个用户）
+确定攻击者获得的真实 AEAD 算法和随机 AEAD 算法之间区别优势的主要条件是：
+
 ~~~
 2 * (q * l)^2 / 2^n
 ~~~
 
 For a target advantage of 2<sup>-57</sup>, this results in the relation:
+
+对于 2<sup>-57</sup> 的目标优势，这导致以下关系：
 
 ~~~
 q <= 2^35 / l
@@ -3503,11 +3549,17 @@ an attacker to gain an larger advantage than the target of 2<sup>-57</sup>. The
 limit for endpoints that allow for the packet size to be as large as
 2<sup>16</sup> is instead 2<sup>23</sup>.
 
+因此，不发送大于 2<sup>11</sup> 字节的数据包的端点无法在单个连接中保护超过
+2<sup>28</sup> 个数据包，而不会使攻击者获得比目标 2<sup>-57</sup> 更大的优势。
+允许数据包大小为 2<sup>16</sup> 的端点的限制改为 2<sup>23</sup>。
 
-### Integrity Limit
+### Integrity Limit - 完整性限制
 
 For integrity, Theorem (4.3) in {{?GCM-MU}} establishes that an attacker gains
 an advantage in successfully forging a packet of no more than:
+
+对于完整性，{{?GCM-MU}} 中的定理（4.3）确定了攻击者在成功伪造数据包时获得
+的优势不超过：
 
 ~~~
 (1 / 2^(8 * n)) + ((2 * v) / 2^(2 * n))
@@ -3519,6 +3571,9 @@ the fourth term in this inequality dominates the rest, so the others can be
 removed without significant effect on the result. This produces the following
 approximation:
 
+目标是将这一优势限制在 2<sup>-57</sup>。对于 AEAD_AES_128_GCM，这个不等式中的
+第四项支配其余项，因此可以去掉其他项而对结果没有显著影响。这将产生以下近似值：
+
 ~~~
 v <= 2^64 / l
 ~~~
@@ -3528,8 +3583,14 @@ Endpoints that do not attempt to remove protection from packets larger than
 2<sup>57</sup> packets. Endpoints that do not restrict the size of processed
 packets can attempt to remove protection from at most 2<sup>52</sup> packets.
 
+不尝试从大于 2<sup>11</sup> 字节的数据包中删除保护的端点最多可以尝试从
+2<sup>57</sup> 个数据包中删除保护。不限制已处理数据包大小的端点最多可以
+尝试从 2<sup>52</sup> 个数据包中删除保护。
+
 For AEAD_AES_256_GCM, the same term dominates, but the larger value of k
 produces the following approximation:
+
+对于 AEAD_AES_256_GCM，相同的项占主导地位，但较大的 k 值产生以下近似值：
 
 ~~~
 v <= 2^192 / l
@@ -3539,21 +3600,32 @@ This is substantially larger than the limit for AEAD_AES_128_GCM.  However, this
 document recommends that the same limit be applied to both functions as either
 limit is acceptably large.
 
+这远远大于 AEAD_AES_128_GCM 的限制。但是，本文件建议对两个函数应用相同的限制，
+因为都是可接受的。
 
-## Analysis of AEAD_AES_128_CCM Usage Limits {#ccm-bounds}
+## Analysis of AEAD_AES_128_CCM Usage Limits - AEAD_AES_128_CCM 使用限制分析 {#ccm-bounds}
 
 TLS {{?TLS13}} and {{AEBounds}} do not specify limits on usage
 for AEAD_AES_128_CCM. However, any AEAD that is used with QUIC requires limits
 on use that ensure that both confidentiality and integrity are preserved. This
 section documents that analysis.
 
+TLS {{?TLS13}} 和 {{AEBounds}} 没有为 AEAD_AES_128_CCM 指定使用限制。但是，任何
+与 QUIC 一起使用的 AEAD 都需要限制使用，以确保机密性和完整性得到保护。本节记录了这种分析。
+
 {{?CCM-ANALYSIS=DOI.10.1007/3-540-36492-7_7}} is used as the basis of this
 analysis. The results of that analysis are used to derive usage limits that are
 based on those chosen in {{?TLS13}}.
 
+{{?CCM-ANALYSIS=DOI.10.1007/3-540-36492-7_7}} 作为分析的基础。该分析的结果用于
+推导基于 {{?TLS13}} 中选择的使用限制。
+
 For confidentiality, Theorem 2 in {{?CCM-ANALYSIS}} establishes that an attacker
 gains a distinguishing advantage over an ideal pseudorandom permutation (PRP) of
 no more than:
+
+为了保密，{{?CCM-ANALYSIS}} 中的定理 2 确定了攻击者比理想伪随机置换（PRP）获得的
+显著优势不超过：
 
 ~~~
 (2l * q)^2 / 2^n
@@ -3564,8 +3636,13 @@ strictly higher advantage for the same number of messages. As the targets for
 the confidentiality advantage and the integrity advantage are the same, only
 Theorem 1 needs to be considered.
 
+{{?CCM-ANALYSIS}} 中定理 1 中的完整性限制为攻击者提供了对相同数量的消息的严格的
+更高的优势。由于保密性优势和完整性优势的目标是相同的，因此只需要考虑定理 1。
+
 Theorem 1 establishes that an attacker gains an advantage over an
 ideal PRP of no more than:
+
+定理 1 确定攻击者比理想 PRP 获得的优势不超过：
 
 ~~~
 v / 2^t + (2l * (v + q))^2 / 2^n
@@ -3574,9 +3651,15 @@ v / 2^t + (2l * (v + q))^2 / 2^n
 As `t` and `n` are both 128, the first term is negligible relative to the
 second, so that term can be removed without a significant effect on the result.
 
+由于 `t` 和 `n` 都是 128，第一项相对于第二项可以忽略不计，因此可以删除该项而
+不会对结果产生重大影响。
+
 This produces a relation that combines both encryption and decryption attempts
 with the same limit as that produced by the theorem for confidentiality alone.
 For a target advantage of 2<sup>-57</sup>, this results in:
+
+这就产生了一种关系，这种关系结合了加密和解密两种尝试，其限制与仅由保密性定理产生的
+限制相同。对于 2<sup>-57</sup> 的目标优势，这将导致：
 
 ~~~
 v + q <= 2^34.5 / l
@@ -3587,6 +3670,9 @@ produced. Endpoints that limit packets to 2<sup>11</sup> bytes therefore have
 both confidentiality and integrity limits of 2<sup>26.5</sup> packets. Endpoints
 that do not restrict packet size have a limit of 2<sup>21.5</sup>.
 
+通过设置 `q = v`，可以生成机密性和完整性限制的值。因此，将数据包限制为
+2<sup>11</sup> 个字节的端点具有 2<sup>26.5</sup> 个数据包的机密性和完整性限制。
+不限制数据包大小的端点限制为 2<sup>21.5</sup>。
 
 # Change Log
 
