@@ -3060,19 +3060,24 @@ TLS. See {{!RFC4086}} for guidance on secure random number generation.
 QUIC 依赖于端点能够生成安全的随机数，既可以直接用于协议值（如连接ID），也可以
 通过 TLS 传递。见 {{!RFC4086}} 安全随机数生成指南。
 
-# IANA Considerations
+# IANA Considerations - IANA 考虑因素
 
 IANA has registered a codepoint of 57 (or 0x39) for the
 quic_transport_parameters extension (defined in {{quic_parameters}}) in the TLS
 ExtensionType Values Registry {{!TLS-REGISTRIES=RFC8447}}.
 
+IANA 已在 TLS ExtensionType Values 注册表 {{!TLS-REGISTRIES=RFC8447}} 中注册了
+用于 57（或 0x39）的编码位置，用于 quic_transport_parameters 扩展
+（在 {{quic_parameters}} 中定义）。
+
 The Recommended column for this extension is marked Yes. The TLS 1.3 Column
 includes CH and EE.
 
+此扩展的推荐列标记为 "Yes"。 TLS1.3 列包括 CH 和 EE。
 
 --- back
 
-# Sample Packet Protection {#test-vectors}
+# Sample Packet Protection - 数据包保护示例 {#test-vectors}
 
 This section shows examples of packet protection so that implementations can be
 verified incrementally. Samples of Initial packets from both client and server,
@@ -3080,12 +3085,18 @@ plus a Retry packet are defined. These packets use an 8-byte client-chosen
 Destination Connection ID of 0x8394c8f03e515708. Some intermediate values are
 included. All values are shown in hexadecimal.
 
+本节展示了数据包保护的示例，以便可以增量地验证实现。定义了来自客户机和服务器的
+初始数据包的样本，以及一个重试数据包。这些数据包使用 0x8394c8f03e515708 的 8 字节
+的客户端选择的目标连接 ID。包括一些中间值。所有值均以十六进制显示。
 
-## Keys
+## Keys - 密钥
 
 The labels generated during the execution of the HKDF-Expand-Label function
 (that is, HkdfLabel.label) and part of the value given to the HKDF-Expand
 function in order to produce its output are:
+
+执行 HKDF-Expand-Label 函数时生成的标签 (HkdfLabel.label) 为了产生输出，
+给 HKDF-Expand 函数的部分值是：
 
 client in:
 : 00200f746c73313320636c69656e7420696e00
@@ -3104,6 +3115,8 @@ quic hp:
 
 The initial secret is common:
 
+initial 密码是公共的：
+
 ~~~
 initial_secret = HKDF-Extract(initial_salt, cid)
     = 7db5df06e7a69e432496adedb0085192
@@ -3111,6 +3124,8 @@ initial_secret = HKDF-Extract(initial_salt, cid)
 ~~~
 
 The secrets for protecting client packets are:
+
+保护客户端数据包的秘密是：
 
 ~~~
 client_initial_secret
@@ -3130,6 +3145,8 @@ hp  = HKDF-Expand-Label(client_initial_secret, "quic hp", "", 16)
 
 The secrets for protecting server packets are:
 
+保护服务端数据包的秘密是：
+
 ~~~
 server_initial_secret
     = HKDF-Expand-Label(initial_secret, "server in", "", 32)
@@ -3147,11 +3164,14 @@ hp  = HKDF-Expand-Label(server_initial_secret, "quic hp", "", 16)
 ~~~
 
 
-## Client Initial {#sample-client-initial}
+## Client Initial - 客户端初始化 {#sample-client-initial}
 
 The client sends an Initial packet.  The unprotected payload of this packet
 contains the following CRYPTO frame, plus enough PADDING frames to make a
 1162-byte payload:
+
+客户端发送 Initial 数据包。数据包中未受保护的有效载荷包含以下 CRYPTO 帧，
+以及足够的 PADDING 帧，以制作 1162 字节有效载荷：
 
 ~~~
 060040f1010000ed0303ebf8fa56f129 39b9584a3896472ec40bb863cfd3e868
@@ -3168,6 +3188,9 @@ The unprotected header indicates a length of 1182 bytes: the 4-byte packet
 number, 1162 bytes of frames, and the 16-byte authentication tag.  The header
 includes the connection ID and a packet number of 2:
 
+未保护的 Header 表示 1182 字节的长度：4 字节数据包编号，1162 字节的帧和 16 字节
+身份验证标记。Header 包括连接 ID 和一个为 2 的数据包编号：
+
 ~~~
 c300000001088394c8f03e5157080000449e00000002
 ~~~
@@ -3175,6 +3198,9 @@ c300000001088394c8f03e5157080000449e00000002
 Protecting the payload produces output that is sampled for header protection.
 Because the header uses a 4-byte packet number encoding, the first 16 bytes of
 the protected payload is sampled, then applied to the header:
+
+保护有效载荷产生用于标头保护的输出。由于 Header 使用 4 字节的数据包编号编码，所以
+对受保护的有效载荷的前 16 个字节进行采样，然后应用于 Header：
 
 ~~~
 sample = d1b1c98dd7689fb8ec11d242b123dc9b
@@ -3190,6 +3216,8 @@ header = c000000001088394c8f03e5157080000449e7b9aec34
 ~~~
 
 The resulting protected packet is:
+
+生成的受保护数据包是：
 
 ~~~
 c000000001088394c8f03e5157080000 449e7b9aec34d1b1c98dd7689fb8ec11
@@ -3233,10 +3261,12 @@ e221af44860018ab0856972e194cd934
 ~~~
 
 
-## Server Initial
+## Server Initial - 服务端初始化
 
 The server sends the following payload in response, including an ACK frame, a
 CRYPTO frame, and no PADDING frames:
+
+服务器发送以下有效负载作为响应，包括 ACK、CRYPTO 帧，没有 PADDING 帧：
 
 ~~~
 02000000000600405a020000560303ee fce7f7b37ba1d1632e96677825ddf739
@@ -3248,12 +3278,16 @@ CRYPTO frame, and no PADDING frames:
 The header from the server includes a new connection ID and a 2-byte packet
 number encoding for a packet number of 1:
 
+服务端的 Header 包括新的连接 ID 和数据包编号为 1 的 2 个字节编码的数据包编号
+
 ~~~
 c1000000010008f067a5502a4262b50040750001
 ~~~
 
 As a result, after protection, the header protection sample is taken starting
 from the third protected byte:
+
+因此，在保护之后，从第三个受保护字节开始获取报头保护样本：
 
 ~~~
 sample = 2cd0991cd25b0aac406a5816b6394100
@@ -3262,6 +3296,8 @@ header = cf000000010008f067a5502a4262b5004075c0d9
 ~~~
 
 The final protected packet is then:
+
+然后，最终受保护的数据包：
 
 ~~~
 cf000000010008f067a5502a4262b500 4075c0d95a482cd0991cd25b0aac406a
@@ -3272,12 +3308,15 @@ dbcba3f6ea46c5b7684df3548e7ddeb9 c3bf9c73cc3f3bded74b562bfb19fb84
 ~~~
 
 
-## Retry
+## Retry - 重试
 
 This shows a Retry packet that might be sent in response to the Initial packet
 in {{sample-client-initial}}. The integrity check includes the client-chosen
 connection ID value of 0x8394c8f03e515708, but that value is not
 included in the final Retry packet:
+
+这示出了可能会响应于 {{sample-client-initial}} 中的 Initial 数据包而发送的重试数据包。
+完整性检查包括客户端选择连接 ID 0x8394c8f03e515708，但该值没有包含在最终重试包中：
 
 ~~~
 ff000000010008f067a5502a4262b574 6f6b656e04a265ba2eff4d829058fb3f
@@ -3285,15 +3324,20 @@ ff000000010008f067a5502a4262b574 6f6b656e04a265ba2eff4d829058fb3f
 ~~~
 
 
-## ChaCha20-Poly1305 Short Header Packet
+## ChaCha20-Poly1305 Short Header Packet - ChaCha20-Poly1305 短 Header 数据包
 
 This example shows some of the steps required to protect a packet with
 a short header.  This example uses AEAD_CHACHA20_POLY1305.
+
+此示例显示保护数据包使用短 Header 所需的一些步骤。 此示例使用 AEAD_CHACHA20_POLY1305。
 
 In this example, TLS produces an application write secret from which a server
 uses HKDF-Expand-Label to produce four values: a key, an IV, a header
 protection key, and the secret that will be used after keys are updated (this
 last value is not used further in this example).
+
+在此示例中，TLS 生成应用程序写秘密，服务器使用 HKDF-Expand-Label 生成四个值：
+密钥、IV、Header 保护密钥和在密钥更新后将使用的秘密（最后一个值在此示例中不再进一步使用）。
 
 ~~~
 secret
@@ -3323,6 +3367,10 @@ example, using a packet number of length 3 (that is, 49140 is encoded) avoids
 having to pad the payload of the packet; PADDING frames would be needed if the
 packet number is encoded on fewer bytes.
 
+下面显示了保护目标连接 ID 为空的最小数据包所涉及的步骤。此数据包包含单个 PING 帧
+（有效负载仅为 0x01），数据包编号为 654360564。在该示例中，使用长度为 3 的数据包编号
+（编码成 49140）避免了必须填充数据包的有效载荷；如果数据包号在较少字节上编码，则需要 PADDING 帧。
+
 ~~~
 pn                 = 654360564 (decimal)
 nonce              = e0459b3474bdd0e46d417eb0
@@ -3334,6 +3382,8 @@ payload ciphertext = 655e5cd55c41f69080575d7999c25a5bfb
 The resulting ciphertext is the minimum size possible. One byte is skipped to
 produce the sample for header protection.
 
+产生的密文是可能的最小大小。跳过一个字节以生成头保护的样本。
+
 ~~~
 sample = 5e5cd55c41f69080575d7999c25a5bfb
 mask   = aefefe7d03
@@ -3341,6 +3391,8 @@ header = 4cfe4189
 ~~~
 
 The protected packet is the smallest possible packet size of 21 bytes.
+
+最小的受保护的数据包可能是 21 字节大小的包。
 
 ~~~
 packet = 4cfe4189655e5cd55c41f69080575d7999c25a5bfb
