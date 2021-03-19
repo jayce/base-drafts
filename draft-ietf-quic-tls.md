@@ -3017,7 +3017,7 @@ of receive keys need to be retained at any point in time.
 用于前一个密钥阶段、当前密钥阶段和下一个密钥阶段。相反，端点可以选择推迟下一个接收包
 保护密钥的生成，直到丢弃旧密钥，以便在任何时间点只需要保留两组接收密钥。
 
-## Key Diversity - 密钥多样性
+## Key Diversity - 密钥多样性 {#key-diversity}
 
 In using TLS, the central key schedule of TLS is used.  As a result of the TLS
 handshake messages being integrated into the calculation of secrets, the
