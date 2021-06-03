@@ -25,7 +25,8 @@ normative:
     title: "QUIC: A UDP-Based Multiplexed and Secure Transport"
     date: {DATE}
     seriesinfo:
-      Internet-Draft: draft-ietf-quic-transport-latest
+      RFC: 9000
+      DOI: 10.17487/RFC9000
     author:
       -
         ins: J. Iyengar
@@ -82,21 +83,6 @@ transport for HTTP, such as stream multiplexing, per-stream flow control, and
 low-latency connection establishment.  This document describes a mapping of HTTP
 semantics over QUIC.  This document also identifies HTTP/2 features that are
 subsumed by QUIC, and describes how HTTP/2 extensions can be ported to HTTP/3.
-
---- note_DO_NOT_DEPLOY_THIS_VERSION_OF_HTTP
-
-DO NOT DEPLOY THIS VERSION OF HTTP/3 UNTIL IT IS IN AN RFC. This version is
-still a work in progress. For trial deployments, please use earlier versions.
-
---- note_Note_to_Readers
-
-Discussion of this draft takes place on the QUIC working group mailing list
-(quic@ietf.org), which is archived at
-[](https://mailarchive.ietf.org/arch/search/?email_list=quic).
-
-Working Group information can be found at [](https://github.com/quicwg); source
-code and issues list for this draft can be found at
-[](https://github.com/quicwg/base-drafts/labels/-http).
 
 
 --- middle
@@ -217,7 +203,10 @@ Additional resources are provided in the final sections:
 
 ## Conventions and Terminology
 
-{::boilerplate bcp14}
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in BCP 14 {{!BCP14}} when, and only
+when, they appear in all capitals, as shown here.
 
 This document uses the variable-length integer encoding from
 {{QUIC-TRANSPORT}}.
@@ -312,7 +301,7 @@ host identifier to an IP address, establishing a QUIC connection to that address
 on the indicated port (including validation of the server certificate as
 described above), and sending an HTTP/3 request message targeting the URI
 to the server over that secured connection.  Unless some other mechanism is used
-to select HTTP/3, the token "h3" is used in the Application Layer Protocol
+to select HTTP/3, the token "h3" is used in the Application-Layer Protocol
 Negotiation (ALPN; see {{!RFC7301}}) extension during the TLS handshake.
 
 Connectivity problems (e.g., blocking UDP) can result in QUIC connection
@@ -524,9 +513,6 @@ HTTP messages carry metadata as a series of key-value pairs called HTTP fields;
 see {{Sections 6.3 and 6.5 of SEMANTICS}}. For a listing of registered HTTP
 fields, see the "Hypertext Transfer Protocol (HTTP) Field Name Registry"
 maintained at [](https://www.iana.org/assignments/http-fields/).
-
-> **Note:**  This registry will not exist until {{!SEMANTICS}} is approved.
-> **RFC Editor**, please remove this note prior to publication.
 
 Field names are strings containing a subset of ASCII characters. Properties of
 HTTP field names and values are discussed in more detail in {{Section 5.1 of
@@ -1295,7 +1281,7 @@ frame.
 
 ### DATA {#frame-data}
 
-DATA frames (type=0x0) convey arbitrary, variable-length sequences of bytes
+DATA frames (type=0x00) convey arbitrary, variable-length sequences of bytes
 associated with HTTP request or response content.
 
 DATA frames MUST be associated with an HTTP request or response.  If a DATA
@@ -1304,7 +1290,7 @@ connection error of type H3_FRAME_UNEXPECTED; see {{errors}}.
 
 ~~~~~~~~~~ drawing
 DATA Frame {
-  Type (i) = 0x0,
+  Type (i) = 0x00,
   Length (i),
   Data (..),
 }
@@ -1313,12 +1299,12 @@ DATA Frame {
 
 ### HEADERS {#frame-headers}
 
-The HEADERS frame (type=0x1) is used to carry an HTTP field section, encoded
+The HEADERS frame (type=0x01) is used to carry an HTTP field section, encoded
 using QPACK. See {{QPACK}} for more details.
 
 ~~~~~~~~~~  drawing
 HEADERS Frame {
-  Type (i) = 0x1,
+  Type (i) = 0x01,
   Length (i),
   Encoded Field Section (..),
 }
@@ -1331,7 +1317,7 @@ error ({{errors}}) of type H3_FRAME_UNEXPECTED.
 
 ### CANCEL_PUSH {#frame-cancel-push}
 
-The CANCEL_PUSH frame (type=0x3) is used to request cancellation of a server
+The CANCEL_PUSH frame (type=0x03) is used to request cancellation of a server
 push prior to the push stream being received.  The CANCEL_PUSH frame identifies
 a server push by Push ID (see {{server-push}}), encoded as a variable-length
 integer.
@@ -1365,7 +1351,7 @@ error of type H3_FRAME_UNEXPECTED.
 
 ~~~~~~~~~~  drawing
 CANCEL_PUSH Frame {
-  Type (i) = 0x3,
+  Type (i) = 0x03,
   Length (i),
   Push ID (i),
 }
@@ -1387,7 +1373,7 @@ type H3_ID_ERROR.
 
 ### SETTINGS {#frame-settings}
 
-The SETTINGS frame (type=0x4) conveys configuration parameters that affect how
+The SETTINGS frame (type=0x04) conveys configuration parameters that affect how
 endpoints communicate, such as preferences and constraints on peer behavior.
 Individually, a SETTINGS parameter can also be referred to as a "setting"; the
 identifier and value of each setting parameter can be referred to as a "setting
@@ -1429,7 +1415,7 @@ Setting {
 }
 
 SETTINGS Frame {
-  Type (i) = 0x4,
+  Type (i) = 0x04,
   Length (i),
   Setting (..) ...,
 }
@@ -1444,7 +1430,7 @@ not understand.
 
 The following settings are defined in HTTP/3:
 
-  SETTINGS_MAX_FIELD_SECTION_SIZE (0x6):
+  SETTINGS_MAX_FIELD_SECTION_SIZE (0x06):
   : The default value is unlimited.  See {{header-size-constraints}} for usage.
 
 Setting identifiers of the format `0x1f * N + 0x21` for non-negative integer
@@ -1521,12 +1507,12 @@ error of type H3_SETTINGS_ERROR.
 
 ### PUSH_PROMISE {#frame-push-promise}
 
-The PUSH_PROMISE frame (type=0x5) is used to carry a promised request header
+The PUSH_PROMISE frame (type=0x05) is used to carry a promised request header
 section from server to client on a request stream, as in HTTP/2.
 
 ~~~~~~~~~~  drawing
 PUSH_PROMISE Frame {
-  Type (i) = 0x5,
+  Type (i) = 0x05,
   Length (i),
   Push ID (i),
   Encoded Field Section (..),
@@ -1578,7 +1564,7 @@ See {{server-push}} for a description of the overall server push mechanism.
 
 ### GOAWAY {#frame-goaway}
 
-The GOAWAY frame (type=0x7) is used to initiate graceful shutdown of an HTTP/3
+The GOAWAY frame (type=0x07) is used to initiate graceful shutdown of an HTTP/3
 connection by either endpoint.  GOAWAY allows an endpoint to stop accepting new
 requests or pushes while still finishing processing of previously received
 requests and pushes.  This enables administrative actions, like server
@@ -1586,7 +1572,7 @@ maintenance.  GOAWAY by itself does not close a connection.
 
 ~~~~~~~~~~  drawing
 GOAWAY Frame {
-  Type (i) = 0x7,
+  Type (i) = 0x07,
   Length (i),
   Stream ID/Push ID (..),
 }
@@ -1610,7 +1596,7 @@ See {{connection-shutdown}} for more information on the use of the GOAWAY frame.
 
 ### MAX_PUSH_ID {#frame-max-push-id}
 
-The MAX_PUSH_ID frame (type=0xd) is used by clients to control the number of
+The MAX_PUSH_ID frame (type=0x0d) is used by clients to control the number of
 server pushes that the server can initiate.  This sets the maximum value for a
 Push ID that the server can use in PUSH_PROMISE and CANCEL_PUSH frames.
 Consequently, this also limits the number of push streams that the server can
@@ -1631,7 +1617,7 @@ pushes.
 
 ~~~~~~~~~~  drawing
 MAX_PUSH_ID Frame {
-  Type (i) = 0xd,
+  Type (i) = 0x0d,
   Length (i),
   Push ID (i),
 }
@@ -1701,62 +1687,62 @@ can have other effects regardless of the error code; for example, see
 The following error codes are defined for use when abruptly terminating streams,
 aborting reading of streams, or immediately closing HTTP/3 connections.
 
-H3_NO_ERROR (0x100):
+H3_NO_ERROR (0x0100):
 : No error.  This is used when the connection or stream needs to be closed, but
   there is no error to signal.
 
-H3_GENERAL_PROTOCOL_ERROR (0x101):
+H3_GENERAL_PROTOCOL_ERROR (0x0101):
 : Peer violated protocol requirements in a way that does not match a more
   specific error code, or endpoint declines to use the more specific error code.
 
-H3_INTERNAL_ERROR (0x102):
+H3_INTERNAL_ERROR (0x0102):
 : An internal error has occurred in the HTTP stack.
 
-H3_STREAM_CREATION_ERROR (0x103):
+H3_STREAM_CREATION_ERROR (0x0103):
 : The endpoint detected that its peer created a stream that it will not accept.
 
-H3_CLOSED_CRITICAL_STREAM (0x104):
+H3_CLOSED_CRITICAL_STREAM (0x0104):
 : A stream required by the HTTP/3 connection was closed or reset.
 
-H3_FRAME_UNEXPECTED (0x105):
+H3_FRAME_UNEXPECTED (0x0105):
 : A frame was received that was not permitted in the current state or on the
   current stream.
 
-H3_FRAME_ERROR (0x106):
+H3_FRAME_ERROR (0x0106):
 : A frame that fails to satisfy layout requirements or with an invalid size
   was received.
 
-H3_EXCESSIVE_LOAD (0x107):
+H3_EXCESSIVE_LOAD (0x0107):
 : The endpoint detected that its peer is exhibiting a behavior that might be
   generating excessive load.
 
-H3_ID_ERROR (0x108):
+H3_ID_ERROR (0x0108):
 : A Stream ID or Push ID was used incorrectly, such as exceeding a limit,
   reducing a limit, or being reused.
 
-H3_SETTINGS_ERROR (0x109):
+H3_SETTINGS_ERROR (0x0109):
 : An endpoint detected an error in the payload of a SETTINGS frame.
 
-H3_MISSING_SETTINGS (0x10a):
+H3_MISSING_SETTINGS (0x010a):
 : No SETTINGS frame was received at the beginning of the control stream.
 
-H3_REQUEST_REJECTED (0x10b):
+H3_REQUEST_REJECTED (0x010b):
 : A server rejected a request without performing any application processing.
 
-H3_REQUEST_CANCELLED (0x10c):
+H3_REQUEST_CANCELLED (0x010c):
 : The request or its response (including pushed response) is cancelled.
 
-H3_REQUEST_INCOMPLETE (0x10d):
+H3_REQUEST_INCOMPLETE (0x010d):
 : The client's stream terminated without containing a fully-formed request.
 
-H3_MESSAGE_ERROR (0x10e):
+H3_MESSAGE_ERROR (0x010e):
 : An HTTP message was malformed and cannot be processed.
 
-H3_CONNECT_ERROR (0x10f):
+H3_CONNECT_ERROR (0x010f):
 : The TCP connection established in response to a CONNECT request was reset or
   abnormally closed.
 
-H3_VERSION_FALLBACK (0x110):
+H3_VERSION_FALLBACK (0x0110):
 : The requested operation cannot be served over HTTP/3.  The peer should
   retry over HTTP/1.1.
 
@@ -1840,11 +1826,11 @@ request or response containing an invalid field name into an HTTP/1.1 message.
 
 Similarly, HTTP/3 can transport field values that are not valid. While most
 values that can be encoded will not alter field parsing, carriage return (CR,
-ASCII 0xd), line feed (LF, ASCII 0xa), and the zero character (NUL, ASCII 0x0)
-might be exploited by an attacker if they are translated verbatim. Any request
-or response that contains a character not permitted in a field value MUST be
-treated as malformed ({{malformed}}).  Valid characters are defined by the
-"field-content" ABNF rule in {{Section 5.5 of SEMANTICS}}.
+ASCII 0x0d), line feed (LF, ASCII 0x0d), and the zero character (NUL, ASCII
+0x0d) might be exploited by an attacker if they are translated verbatim. Any
+request or response that contains a character not permitted in a field value
+MUST be treated as malformed ({{malformed}}).  Valid characters are defined by
+the "field-content" ABNF rule in {{Section 5.5 of SEMANTICS}}.
 
 ## Cacheability of Pushed Responses
 
@@ -2045,7 +2031,7 @@ registries that manage the assignment of codepoints in HTTP/3.
 ## Registration of HTTP/3 Identification String {#iana-alpn}
 
 This document creates a new registration for the identification of
-HTTP/3 in the "Application Layer Protocol Negotiation (ALPN)
+HTTP/3 in the "Application-Layer Protocol Negotiation (ALPN)
 Protocol IDs" registry established in {{?RFC7301}}.
 
 The "h3" string identifies HTTP/3:
@@ -2099,21 +2085,21 @@ its semantics, including any parts of the frame that are conditionally present.
 
 The entries in {{iana-frame-table}} are registered by this document.
 
-| ---------------- | ------ | -------------------------- |
-| Frame Type       | Value  | Specification              |
-| ---------------- | :----: | -------------------------- |
-| DATA             |  0x0   | {{frame-data}}             |
-| HEADERS          |  0x1   | {{frame-headers}}          |
-| Reserved         |  0x2   | N/A                        |
-| CANCEL_PUSH      |  0x3   | {{frame-cancel-push}}      |
-| SETTINGS         |  0x4   | {{frame-settings}}         |
-| PUSH_PROMISE     |  0x5   | {{frame-push-promise}}     |
-| Reserved         |  0x6   | N/A                        |
-| GOAWAY           |  0x7   | {{frame-goaway}}           |
-| Reserved         |  0x8   | N/A                        |
-| Reserved         |  0x9   | N/A                        |
-| MAX_PUSH_ID      |  0xd   | {{frame-max-push-id}}      |
-| ---------------- | ------ | -------------------------- |
+| ------------ | ------- | -------------------------- |
+| Frame Type   | Value   | Specification              |
+| ------------ | :-----: | -------------------------- |
+| DATA         |  0x00   | {{frame-data}}             |
+| HEADERS      |  0x01   | {{frame-headers}}          |
+| Reserved     |  0x02   | N/A                        |
+| CANCEL_PUSH  |  0x03   | {{frame-cancel-push}}      |
+| SETTINGS     |  0x04   | {{frame-settings}}         |
+| PUSH_PROMISE |  0x05   | {{frame-push-promise}}     |
+| Reserved     |  0x06   | N/A                        |
+| GOAWAY       |  0x07   | {{frame-goaway}}           |
+| Reserved     |  0x08   | N/A                        |
+| Reserved     |  0x09   | N/A                        |
+| MAX_PUSH_ID  |  0x0d   | {{frame-max-push-id}}      |
+| ------------ | ------- | -------------------------- |
 {: #iana-frame-table title="Initial HTTP/3 Frame Types"}
 
 Each code of the format `0x1f * N + 0x21` for non-negative integer values of N
@@ -2149,16 +2135,16 @@ Default:
 
 The entries in {{iana-setting-table}} are registered by this document.
 
-| ---------------------------- | ------ | ------------------------- | --------- |
-| Setting Name                 |  Value | Specification             | Default   |
-| ---------------------------- | :----: | ------------------------- | --------- |
-| Reserved                     |  0x0   | N/A                       | N/A       |
-| Reserved                     |  0x2   | N/A                       | N/A       |
-| Reserved                     |  0x3   | N/A                       | N/A       |
-| Reserved                     |  0x4   | N/A                       | N/A       |
-| Reserved                     |  0x5   | N/A                       | N/A       |
-| MAX_FIELD_SECTION_SIZE       |  0x6   | {{settings-parameters}}   | Unlimited |
-| ---------------------------- | ------ | ------------------------- | --------- |
+| ----------------------- | ------- | ----------------------- | --------- |
+| Setting Name            |  Value  | Specification           | Default   |
+| ----------------------- | :-----: | ----------------------- | --------- |
+| Reserved                |  0x00   | N/A                     | N/A       |
+| Reserved                |  0x02   | N/A                     | N/A       |
+| Reserved                |  0x03   | N/A                     | N/A       |
+| Reserved                |  0x04   | N/A                     | N/A       |
+| Reserved                |  0x05   | N/A                     | N/A       |
+| MAX_FIELD_SECTION_SIZE  |  0x06   | {{settings-parameters}} | Unlimited |
+| ----------------------- | ------- | ----------------------- | --------- |
 {: #iana-setting-table title="Initial HTTP/3 Settings"}
 
 Each code of the format `0x1f * N + 0x21` for non-negative integer values of N
@@ -2199,23 +2185,23 @@ Required policy to avoid collisions with HTTP/2 error codes.
 | --------------------------------- | ---------- | ---------------------------------------- | ---------------------- |
 | Name                              | Value      | Description                              | Specification          |
 | --------------------------------- | ---------- | ---------------------------------------- | ---------------------- |
-| H3_NO_ERROR                       | 0x100      | No error                                 | {{http-error-codes}}   |
-| H3_GENERAL_PROTOCOL_ERROR         | 0x101      | General protocol error                   | {{http-error-codes}}   |
-| H3_INTERNAL_ERROR                 | 0x102      | Internal error                           | {{http-error-codes}}   |
-| H3_STREAM_CREATION_ERROR          | 0x103      | Stream creation error                    | {{http-error-codes}}   |
-| H3_CLOSED_CRITICAL_STREAM         | 0x104      | Critical stream was closed               | {{http-error-codes}}   |
-| H3_FRAME_UNEXPECTED               | 0x105      | Frame not permitted in the current state | {{http-error-codes}}   |
-| H3_FRAME_ERROR                    | 0x106      | Frame violated layout or size rules      | {{http-error-codes}}   |
-| H3_EXCESSIVE_LOAD                 | 0x107      | Peer generating excessive load           | {{http-error-codes}}   |
-| H3_ID_ERROR                       | 0x108      | An identifier was used incorrectly       | {{http-error-codes}}   |
-| H3_SETTINGS_ERROR                 | 0x109      | SETTINGS frame contained invalid values  | {{http-error-codes}}   |
-| H3_MISSING_SETTINGS               | 0x10a      | No SETTINGS frame received               | {{http-error-codes}}   |
-| H3_REQUEST_REJECTED               | 0x10b      | Request not processed                    | {{http-error-codes}}   |
-| H3_REQUEST_CANCELLED              | 0x10c      | Data no longer needed                    | {{http-error-codes}}   |
-| H3_REQUEST_INCOMPLETE             | 0x10d      | Stream terminated early                  | {{http-error-codes}}   |
-| H3_MESSAGE_ERROR                  | 0x10e      | Malformed message                        | {{http-error-codes}}   |
-| H3_CONNECT_ERROR                  | 0x10f      | TCP reset or error on CONNECT request    | {{http-error-codes}}   |
-| H3_VERSION_FALLBACK               | 0x110      | Retry over HTTP/1.1                      | {{http-error-codes}}   |
+| H3_NO_ERROR                       | 0x0100     | No error                                 | {{http-error-codes}}   |
+| H3_GENERAL_PROTOCOL_ERROR         | 0x0101     | General protocol error                   | {{http-error-codes}}   |
+| H3_INTERNAL_ERROR                 | 0x0102     | Internal error                           | {{http-error-codes}}   |
+| H3_STREAM_CREATION_ERROR          | 0x0103     | Stream creation error                    | {{http-error-codes}}   |
+| H3_CLOSED_CRITICAL_STREAM         | 0x0104     | Critical stream was closed               | {{http-error-codes}}   |
+| H3_FRAME_UNEXPECTED               | 0x0105     | Frame not permitted in the current state | {{http-error-codes}}   |
+| H3_FRAME_ERROR                    | 0x0106     | Frame violated layout or size rules      | {{http-error-codes}}   |
+| H3_EXCESSIVE_LOAD                 | 0x0107     | Peer generating excessive load           | {{http-error-codes}}   |
+| H3_ID_ERROR                       | 0x0108     | An identifier was used incorrectly       | {{http-error-codes}}   |
+| H3_SETTINGS_ERROR                 | 0x0109     | SETTINGS frame contained invalid values  | {{http-error-codes}}   |
+| H3_MISSING_SETTINGS               | 0x010a     | No SETTINGS frame received               | {{http-error-codes}}   |
+| H3_REQUEST_REJECTED               | 0x010b     | Request not processed                    | {{http-error-codes}}   |
+| H3_REQUEST_CANCELLED              | 0x010c     | Data no longer needed                    | {{http-error-codes}}   |
+| H3_REQUEST_INCOMPLETE             | 0x010d     | Stream terminated early                  | {{http-error-codes}}   |
+| H3_MESSAGE_ERROR                  | 0x010e     | Malformed message                        | {{http-error-codes}}   |
+| H3_CONNECT_ERROR                  | 0x010f     | TCP reset or error on CONNECT request    | {{http-error-codes}}   |
+| H3_VERSION_FALLBACK               | 0x0110     | Retry over HTTP/1.1                      | {{http-error-codes}}   |
 | --------------------------------- | ---------- | ---------------------------------------- | ---------------------- |
 {: #iana-error-table title="Initial HTTP/3 Error Codes"}
 
@@ -2384,44 +2370,44 @@ and are expected to be portable to HTTP/2.
 
 ### Comparison Between HTTP/2 and HTTP/3 Frame Types
 
-DATA (0x0):
+DATA (0x00):
 : Padding is not defined in HTTP/3 frames.  See {{frame-data}}.
 
-HEADERS (0x1):
+HEADERS (0x01):
 : The PRIORITY region of HEADERS is not defined in HTTP/3 frames. Padding is not
   defined in HTTP/3 frames.  See {{frame-headers}}.
 
-PRIORITY (0x2):
+PRIORITY (0x02):
 : As described in {{h2-diff-priority}}, HTTP/3 does not provide a means of
   signaling priority.
 
-RST_STREAM (0x3):
+RST_STREAM (0x03):
 : RST_STREAM frames do not exist in HTTP/3, since QUIC provides stream lifecycle
   management.  The same code point is used for the CANCEL_PUSH frame
   ({{frame-cancel-push}}).
 
-SETTINGS (0x4):
+SETTINGS (0x04):
 : SETTINGS frames are sent only at the beginning of the connection.  See
   {{frame-settings}} and {{h2-settings}}.
 
-PUSH_PROMISE (0x5):
+PUSH_PROMISE (0x05):
 : The PUSH_PROMISE frame does not reference a stream; instead the push stream
   references the PUSH_PROMISE frame using a Push ID.  See
   {{frame-push-promise}}.
 
-PING (0x6):
+PING (0x06):
 : PING frames do not exist in HTTP/3, as QUIC provides equivalent
   functionality.
 
-GOAWAY (0x7):
+GOAWAY (0x07):
 : GOAWAY does not contain an error code.  In the client to server direction,
   it carries a Push ID instead of a server initiated stream ID.
   See {{frame-goaway}}.
 
-WINDOW_UPDATE (0x8):
+WINDOW_UPDATE (0x08):
 : WINDOW_UPDATE frames do not exist in HTTP/3, since QUIC provides flow control.
 
-CONTINUATION (0x9):
+CONTINUATION (0x09):
 : CONTINUATION frames do not exist in HTTP/3; instead, larger
   HEADERS/PUSH_PROMISE frames than HTTP/2 are permitted.
 
@@ -2445,33 +2431,33 @@ settings are reserved, and their receipt is an error.  See
 
 Below is a listing of how each HTTP/2 SETTINGS parameter is mapped:
 
-SETTINGS_HEADER_TABLE_SIZE (0x1):
+SETTINGS_HEADER_TABLE_SIZE (0x01):
 : See {{QPACK}}.
 
-SETTINGS_ENABLE_PUSH (0x2):
+SETTINGS_ENABLE_PUSH (0x02):
 : This is removed in favor of the MAX_PUSH_ID frame, which provides a more
   granular control over server push.  Specifying a setting with the identifier
-  0x2 (corresponding to the SETTINGS_ENABLE_PUSH parameter) in the HTTP/3
+  0x02 (corresponding to the SETTINGS_ENABLE_PUSH parameter) in the HTTP/3
   SETTINGS frame is an error.
 
-SETTINGS_MAX_CONCURRENT_STREAMS (0x3):
+SETTINGS_MAX_CONCURRENT_STREAMS (0x03):
 : QUIC controls the largest open Stream ID as part of its flow control logic.
-  Specifying a setting with the identifier 0x3 (corresponding to the
+  Specifying a setting with the identifier 0x03 (corresponding to the
   SETTINGS_MAX_CONCURRENT_STREAMS parameter) in the HTTP/3 SETTINGS frame is an
   error.
 
-SETTINGS_INITIAL_WINDOW_SIZE (0x4):
+SETTINGS_INITIAL_WINDOW_SIZE (0x04):
 : QUIC requires both stream and connection flow control window sizes to be
   specified in the initial transport handshake.  Specifying a setting with the
-  identifier 0x4 (corresponding to the SETTINGS_INITIAL_WINDOW_SIZE parameter)
+  identifier 0x04 (corresponding to the SETTINGS_INITIAL_WINDOW_SIZE parameter)
   in the HTTP/3 SETTINGS frame is an error.
 
-SETTINGS_MAX_FRAME_SIZE (0x5):
+SETTINGS_MAX_FRAME_SIZE (0x05):
 : This setting has no equivalent in HTTP/3.  Specifying a setting with the
-  identifier 0x5 (corresponding to the SETTINGS_MAX_FRAME_SIZE parameter) in the
-  HTTP/3 SETTINGS frame is an error.
+  identifier 0x05 (corresponding to the SETTINGS_MAX_FRAME_SIZE parameter) in
+  the HTTP/3 SETTINGS frame is an error.
 
-SETTINGS_MAX_HEADER_LIST_SIZE (0x6):
+SETTINGS_MAX_HEADER_LIST_SIZE (0x06):
 : This setting identifier has been renamed SETTINGS_MAX_FIELD_SECTION_SIZE.
 
 In HTTP/3, setting values are variable-length integers (6, 14, 30, or 62 bits
@@ -2501,52 +2487,52 @@ codes are not directly portable between versions.
 The HTTP/2 error codes defined in {{Section 7 of HTTP2}} logically map to
 the HTTP/3 error codes as follows:
 
-NO_ERROR (0x0):
+NO_ERROR (0x00):
 : H3_NO_ERROR in {{http-error-codes}}.
 
-PROTOCOL_ERROR (0x1):
+PROTOCOL_ERROR (0x01):
 : This is mapped to H3_GENERAL_PROTOCOL_ERROR except in cases where more
   specific error codes have been defined. Such cases include
   H3_FRAME_UNEXPECTED, H3_MESSAGE_ERROR, and H3_CLOSED_CRITICAL_STREAM defined
   in {{http-error-codes}}.
 
-INTERNAL_ERROR (0x2):
+INTERNAL_ERROR (0x02):
 : H3_INTERNAL_ERROR in {{http-error-codes}}.
 
-FLOW_CONTROL_ERROR (0x3):
+FLOW_CONTROL_ERROR (0x03):
 : Not applicable, since QUIC handles flow control.
 
-SETTINGS_TIMEOUT (0x4):
+SETTINGS_TIMEOUT (0x04):
 : Not applicable, since no acknowledgment of SETTINGS is defined.
 
-STREAM_CLOSED (0x5):
+STREAM_CLOSED (0x05):
 : Not applicable, since QUIC handles stream management.
 
-FRAME_SIZE_ERROR (0x6):
+FRAME_SIZE_ERROR (0x06):
 : H3_FRAME_ERROR error code defined in {{http-error-codes}}.
 
-REFUSED_STREAM (0x7):
+REFUSED_STREAM (0x07):
 : H3_REQUEST_REJECTED (in {{http-error-codes}}) is used to indicate that a
   request was not processed. Otherwise, not applicable because QUIC handles
   stream management.
 
-CANCEL (0x8):
+CANCEL (0x08):
 : H3_REQUEST_CANCELLED in {{http-error-codes}}.
 
-COMPRESSION_ERROR (0x9):
+COMPRESSION_ERROR (0x09):
 : Multiple error codes are defined in {{QPACK}}.
 
-CONNECT_ERROR (0xa):
+CONNECT_ERROR (0x0a):
 : H3_CONNECT_ERROR in {{http-error-codes}}.
 
-ENHANCE_YOUR_CALM (0xb):
+ENHANCE_YOUR_CALM (0x0b):
 : H3_EXCESSIVE_LOAD in {{http-error-codes}}.
 
-INADEQUATE_SECURITY (0xc):
+INADEQUATE_SECURITY (0x0c):
 : Not applicable, since QUIC is assumed to provide sufficient security on all
   connections.
 
-HTTP_1_1_REQUIRED (0xd):
+HTTP_1_1_REQUIRED (0x0d):
 : H3_VERSION_FALLBACK in {{http-error-codes}}.
 
 Error codes need to be defined for HTTP/2 and HTTP/3 separately.  See
@@ -2581,283 +2567,6 @@ for the target version. An intermediary is permitted to promote stream errors to
 connection errors but they should be aware of the cost to the HTTP/3 connection
 for what might be a temporary or intermittent error.
 
-# Change Log
-
-> **RFC Editor's Note:**  Please remove this section prior to publication of a
-> final version of this document.
-
-## Since draft-ietf-quic-http-32
-
-- Removed draft version guidance; added final version string
-- Added H3_MESSAGE_ERROR for malformed messages
-
-## Since draft-ietf-quic-http-31
-
-Editorial changes only.
-
-## Since draft-ietf-quic-http-30
-
-Editorial changes only.
-
-## Since draft-ietf-quic-http-29
-
-- Require a connection error if a reserved frame type that corresponds to a
-  frame in HTTP/2 is received (#3991, #3993)
-- Require a connection error if a reserved setting that corresponds to a
-  setting in HTTP/2 is received (#3954, #3955)
-
-## Since draft-ietf-quic-http-28
-
-- CANCEL_PUSH is recommended even when the stream is reset (#3698, #3700)
-- Use H3_ID_ERROR when GOAWAY contains a larger identifier (#3631, #3634)
-
-## Since draft-ietf-quic-http-27
-
-- Updated text to refer to latest HTTP revisions
-- Use the HTTP definition of authority for establishing and coalescing
-  connections (#253, #2223, #3558)
-- Define use of GOAWAY from both endpoints (#2632, #3129)
-- Require either :authority or Host if the URI scheme has a mandatory
-  authority component (#3408, #3475)
-
-## Since draft-ietf-quic-http-26
-
-- No changes
-
-## Since draft-ietf-quic-http-25
-
-- Require QUICv1 for HTTP/3 (#3117, #3323)
-- Remove DUPLICATE_PUSH and allow duplicate PUSH_PROMISE (#3275, #3309)
-- Clarify the definition of "malformed" (#3352, #3345)
-
-## Since draft-ietf-quic-http-24
-
-- Removed H3_EARLY_RESPONSE error code; H3_NO_ERROR is recommended instead
-  (#3130,#3208)
-- Unknown error codes are equivalent to H3_NO_ERROR (#3276,#3331)
-- Some error codes are reserved for greasing (#3325,#3360)
-
-## Since draft-ietf-quic-http-23
-
-- Removed `quic` Alt-Svc parameter (#3061,#3118)
-- Clients need not persist unknown settings for use in 0-RTT (#3110,#3113)
-- Clarify error cases around CANCEL_PUSH (#2819,#3083)
-
-## Since draft-ietf-quic-http-22
-
-- Removed priority signaling (#2922,#2924)
-- Further changes to error codes (#2662,#2551):
-  - Error codes renumbered
-  - HTTP_MALFORMED_FRAME replaced by HTTP_FRAME_ERROR, HTTP_ID_ERROR, and others
-- Clarify how unknown frame types interact with required frame sequence
-  (#2867,#2858)
-- Describe interactions with the transport in terms of defined interface terms
-  (#2857,#2805)
-- Require the use of the `http-opportunistic` resource (RFC 8164) when scheme is
-  `http` (#2439,#2973)
-- Settings identifiers cannot be duplicated (#2979)
-- Changes to SETTINGS frames in 0-RTT (#2972,#2790,#2945):
-  - Servers must send all settings with non-default values in their SETTINGS
-    frame, even when resuming
-  - If a client doesn't have settings associated with a 0-RTT ticket, it uses
-    the defaults
-  - Servers can't accept early data if they cannot recover the settings the
-    client will have remembered
-- Clarify that Upgrade and the 101 status code are prohibited (#2898,#2889)
-- Clarify that frame types reserved for greasing can occur on any stream, but
-  frame types reserved due to HTTP/2 correspondence are prohibited
-  (#2997,#2692,#2693)
-- Unknown error codes cannot be treated as errors (#2998,#2816)
-
-## Since draft-ietf-quic-http-21
-
-No changes
-
-## Since draft-ietf-quic-http-20
-
-- Prohibit closing the control stream (#2509, #2666)
-- Change default priority to use an orphan node (#2502, #2690)
-- Exclusive priorities are restored (#2754, #2781)
-- Restrict use of frames when using CONNECT (#2229, #2702)
-- Close and maybe reset streams if a connection error occurs for CONNECT (#2228,
-  #2703)
-- Encourage provision of sufficient unidirectional streams for QPACK (#2100,
-  #2529, #2762)
-- Allow extensions to use server-initiated bidirectional streams (#2711, #2773)
-- Clarify use of maximum header list size setting (#2516, #2774)
-- Extensive changes to error codes and conditions of their sending
-  - Require connection errors for more error conditions (#2511, #2510)
-  - Updated the error codes for illegal GOAWAY frames (#2714, #2707)
-  - Specified error code for HEADERS on control stream (#2708)
-  - Specified error code for servers receiving PUSH_PROMISE (#2709)
-  - Specified error code for receiving DATA before HEADERS (#2715)
-  - Describe malformed messages and their handling (#2410, #2764)
-  - Remove HTTP_PUSH_ALREADY_IN_CACHE error (#2812, #2813)
-  - Refactor Push ID related errors (#2818, #2820)
-  - Rationalize HTTP/3 stream creation errors (#2821, #2822)
-
-## Since draft-ietf-quic-http-19
-
-- SETTINGS_NUM_PLACEHOLDERS is 0x9 (#2443,#2530)
-- Non-zero bits in the Empty field of the PRIORITY frame MAY be treated as an
-  error (#2501)
-
-## Since draft-ietf-quic-http-18
-
-- Resetting streams following a GOAWAY is recommended, but not required
-  (#2256,#2457)
-- Use variable-length integers throughout (#2437,#2233,#2253,#2275)
-  - Variable-length frame types, stream types, and settings identifiers
-  - Renumbered stream type assignments
-  - Modified associated reserved values
-- Frame layout switched from Length-Type-Value to Type-Length-Value
-  (#2395,#2235)
-- Specified error code for servers receiving DUPLICATE_PUSH (#2497)
-- Use connection error for invalid PRIORITY (#2507, #2508)
-
-## Since draft-ietf-quic-http-17
-
-- HTTP_REQUEST_REJECTED is used to indicate a request can be retried (#2106,
-  #2325)
-- Changed error code for GOAWAY on the wrong stream (#2231, #2343)
-
-## Since draft-ietf-quic-http-16
-
-- Rename "HTTP/QUIC" to "HTTP/3" (#1973)
-- Changes to PRIORITY frame (#1865, #2075)
-  - Permitted as first frame of request streams
-  - Remove exclusive reprioritization
-  - Changes to Prioritized Element Type bits
-- Define DUPLICATE_PUSH frame to refer to another PUSH_PROMISE (#2072)
-- Set defaults for settings, allow request before receiving SETTINGS (#1809,
-  #1846, #2038)
-- Clarify message processing rules for streams that aren't closed (#1972, #2003)
-- Removed reservation of error code 0 and moved HTTP_NO_ERROR to this value
-  (#1922)
-- Removed prohibition of zero-length DATA frames (#2098)
-
-## Since draft-ietf-quic-http-15
-
-Substantial editorial reorganization; no technical changes.
-
-## Since draft-ietf-quic-http-14
-
-- Recommend sensible values for QUIC transport parameters (#1720,#1806)
-- Define error for missing SETTINGS frame (#1697,#1808)
-- Setting values are variable-length integers (#1556,#1807) and do not have
-  separate maximum values (#1820)
-- Expanded discussion of connection closure (#1599,#1717,#1712)
-- HTTP_VERSION_FALLBACK falls back to HTTP/1.1 (#1677,#1685)
-
-## Since draft-ietf-quic-http-13
-
-- Reserved some frame types for grease (#1333, #1446)
-- Unknown unidirectional stream types are tolerated, not errors; some reserved
-  for grease (#1490, #1525)
-- Require settings to be remembered for 0-RTT, prohibit reductions (#1541,
-  #1641)
-- Specify behavior for truncated requests (#1596, #1643)
-
-## Since draft-ietf-quic-http-12
-
-- TLS SNI extension isn't mandatory if an alternative method is used (#1459,
-  #1462, #1466)
-- Removed flags from HTTP/3 frames (#1388, #1398)
-- Reserved frame types and settings for use in preserving extensibility (#1333,
-  #1446)
-- Added general error code (#1391, #1397)
-- Unidirectional streams carry a type byte and are extensible (#910,#1359)
-- Priority mechanism now uses explicit placeholders to enable persistent
-  structure in the tree (#441,#1421,#1422)
-
-## Since draft-ietf-quic-http-11
-
-- Moved QPACK table updates and acknowledgments to dedicated streams (#1121,
-  #1122, #1238)
-
-## Since draft-ietf-quic-http-10
-
-- Settings need to be remembered when attempting and accepting 0-RTT (#1157,
-  #1207)
-
-## Since draft-ietf-quic-http-09
-
-- Selected QCRAM for header compression (#228, #1117)
-- The server_name TLS extension is now mandatory (#296, #495)
-- Specified handling of unsupported versions in Alt-Svc (#1093, #1097)
-
-## Since draft-ietf-quic-http-08
-
-- Clarified connection coalescing rules (#940, #1024)
-
-## Since draft-ietf-quic-http-07
-
-- Changes for integer encodings in QUIC (#595,#905)
-- Use unidirectional streams as appropriate (#515, #240, #281, #886)
-- Improvement to the description of GOAWAY (#604, #898)
-- Improve description of server push usage (#947, #950, #957)
-
-## Since draft-ietf-quic-http-06
-
-- Track changes in QUIC error code usage (#485)
-
-## Since draft-ietf-quic-http-05
-
-- Made push ID sequential, add MAX_PUSH_ID, remove SETTINGS_ENABLE_PUSH (#709)
-- Guidance about keep-alive and QUIC PINGs (#729)
-- Expanded text on GOAWAY and cancellation (#757)
-
-## Since draft-ietf-quic-http-04
-
-- Cite RFC 5234 (#404)
-- Return to a single stream per request (#245,#557)
-- Use separate frame type and settings registries from HTTP/2 (#81)
-- SETTINGS_ENABLE_PUSH instead of SETTINGS_DISABLE_PUSH (#477)
-- Restored GOAWAY (#696)
-- Identify server push using Push ID rather than a stream ID (#702,#281)
-- DATA frames cannot be empty (#700)
-
-## Since draft-ietf-quic-http-03
-
-None.
-
-## Since draft-ietf-quic-http-02
-
-- Track changes in transport draft
-
-## Since draft-ietf-quic-http-01
-
-- SETTINGS changes (#181):
-    - SETTINGS can be sent only once at the start of a connection;
-      no changes thereafter
-    - SETTINGS_ACK removed
-    - Settings can only occur in the SETTINGS frame a single time
-    - Boolean format updated
-
-- Alt-Svc parameter changed from "v" to "quic"; format updated (#229)
-- Closing the connection control stream or any message control stream is a
-  fatal error (#176)
-- HPACK Sequence counter can wrap (#173)
-- 0-RTT guidance added
-- Guide to differences from HTTP/2 and porting HTTP/2 extensions added
-  (#127,#242)
-
-## Since draft-ietf-quic-http-00
-
-- Changed "HTTP/2-over-QUIC" to "HTTP/QUIC" throughout (#11,#29)
-- Changed from using HTTP/2 framing within Stream 3 to new framing format and
-  two-stream-per-request model (#71,#72,#73)
-- Adopted SETTINGS format from draft-bishop-httpbis-extended-settings-01
-- Reworked SETTINGS_ACK to account for indeterminate inter-stream order (#75)
-- Described CONNECT pseudo-method (#95)
-- Updated ALPN token and Alt-Svc guidance (#13,#87)
-- Application-layer-defined error codes (#19,#74)
-
-
-## Since draft-shade-quic-http2-mapping-00
-
-- Adopted as base for draft-ietf-quic-http
-- Updated authors/editors list
 
 # Acknowledgments
 {:numbered="false"}
